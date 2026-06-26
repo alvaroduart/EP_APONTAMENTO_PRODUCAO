@@ -1,0 +1,1672 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electro Plastic · Terminal de Produção</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --blue: #003c92;
+            --blue-deep: #003C91;
+            --ink: #10172a;
+            --ink-soft: #5c6678;
+            --bg: #f1f3f7;
+            --surface: #ffffff;
+            --border: #e2e6ef;
+            --green: #137a52;
+            --green-bg: #e5f3ec;
+            --amber: #b15e0a;
+            --amber-bg: #fbecdc;
+            --gray: #9aa3b3;
+            --gray-bg: #eef0f4;
+            --radius: 14px;
+            --shadow: 0 1px 2px rgba(16, 23, 42, .04), 0 8px 24px -12px rgba(16, 23, 42, .10);
+            --red: #c01530;
+            --red-bg: #fde2e4;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--ink);
+            font-family: 'Inter', system-ui, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            margin: 0;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        button {
+            font-family: inherit;
+        }
+
+        :focus-visible {
+            outline: 2px solid var(--blue);
+            outline-offset: 2px;
+        }
+
+        /* ---------- Header ---------- */
+        .topbar {
+            background: var(--blue-deep);
+            color: #fff;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .brand-mark svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .brand-text h1 {
+            font-size: 16px;
+            letter-spacing: .02em;
+            font-weight: 700;
+        }
+
+        .brand-text span {
+            display: block;
+            font-size: 11px;
+            color: #aebde0;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            margin-top: 1px;
+        }
+
+        .wall-clock {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: .03em;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .live-pip {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #3fd587;
+            animation: pip 2s ease-in-out infinite;
+        }
+
+        @keyframes pip {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .25; }
+        }
+
+        /* ---------- Layout ---------- */
+        .wrap {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 24px 20px 60px;
+        }
+
+        /* ---------- Status banner ---------- */
+        .status-banner {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            transition: border-color .25s ease;
+        }
+
+        .status-ring {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: var(--gray-bg);
+            position: relative;
+        }
+
+        .status-ring::after {
+            content: '';
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--gray);
+        }
+
+        body[data-status="running"] .status-ring {
+            background: var(--green-bg);
+        }
+
+        body[data-status="running"] .status-ring::after {
+            background: var(--green);
+            animation: breathe 1.8s ease-in-out infinite;
+        }
+
+        body[data-status="occurrence"] .status-ring {
+            background: var(--amber-bg);
+        }
+
+        body[data-status="occurrence"] .status-ring::after {
+            background: var(--amber);
+            animation: breathe 1.1s ease-in-out infinite;
+        }
+
+        body[data-status="auth-error"] .status-ring {
+            background: var(--red-bg);
+        }
+
+        body[data-status="auth-error"] .status-ring::after {
+            background: var(--red);
+        }
+
+        @keyframes breathe {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(0, 0, 0, .08);
+            }
+            50% {
+                transform: scale(1.18);
+                box-shadow: 0 0 0 8px rgba(0, 0, 0, .04);
+            }
+        }
+
+        .status-mid {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .status-label {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--gray);
+        }
+
+        body[data-status="running"] .status-label {
+            color: var(--green);
+        }
+
+        body[data-status="occurrence"] .status-label {
+            color: var(--amber);
+        }
+
+        body[data-status="auth-error"] .status-label {
+            color: var(--red);
+        }
+
+        .status-detail {
+            font-size: 15px;
+            color: var(--ink-soft);
+            margin-top: 3px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .status-detail strong {
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        .status-timer {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 30px;
+            font-weight: 600;
+            color: var(--ink);
+            flex-shrink: 0;
+            min-width: 118px;
+            text-align: right;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .live-pip,
+            .status-ring::after {
+                animation: none !important;
+            }
+        }
+
+        /* ---------- Grid ---------- */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width:860px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 22px 22px 24px;
+        }
+
+        .card h2 {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--blue);
+            margin-bottom: 16px;
+        }
+
+        .field {
+            margin-bottom: 14px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--ink-soft);
+            margin-bottom: 5px;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            border: 1px solid var(--border);
+            background: #fbfbfd;
+            border-radius: 9px;
+            padding: 10px 12px;
+            font-size: 14.5px;
+            color: var(--ink);
+            font-family: inherit;
+        }
+
+        .field input:disabled,
+        .field select:disabled {
+            background: var(--gray-bg);
+            color: var(--ink-soft);
+        }
+
+        .field input.mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .field .hint {
+            font-size: 12px;
+            color: var(--ink-soft);
+            margin-top: 5px;
+        }
+
+        .field .hint.warn {
+            color: var(--amber);
+        }
+
+        .readonly-field {
+            border: 1px dashed var(--border);
+            border-radius: 9px;
+            padding: 9px 12px;
+            font-size: 14px;
+            color: var(--ink-soft);
+            background: var(--gray-bg);
+            min-height: 20px;
+        }
+
+        .readonly-field.filled {
+            color: var(--ink);
+            background: #f6f8fc;
+            border-style: solid;
+            border-color: var(--border);
+        }
+
+        .btn {
+            width: 100%;
+            border: none;
+            border-radius: 9px;
+            padding: 12px 16px;
+            font-size: 14.5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: filter .15s ease, opacity .15s ease;
+        }
+
+        .btn svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        .btn:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        .btn:not(:disabled):hover {
+            filter: brightness(1.07);
+        }
+
+        .btn:not(:disabled):active {
+            filter: brightness(.94);
+        }
+
+        .btn-primary {
+            background: var(--blue);
+            color: #fff;
+        }
+
+        .btn-stop {
+            background: var(--ink);
+            color: #fff;
+        }
+
+        .btn-amber {
+            background: var(--amber);
+            color: #fff;
+        }
+
+        .btn-amber-outline {
+            background: var(--amber-bg);
+            color: var(--amber);
+            border: 1px solid #f0d3ad;
+        }
+
+        .active-summary {
+            border: 1px solid var(--border);
+            background: #f8f9fc;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: var(--ink-soft);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 14px;
+        }
+
+        .active-summary div b {
+            display: block;
+            font-size: 13.5px;
+            color: var(--ink);
+            font-weight: 600;
+            margin-top: 1px;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin: 14px 0 16px;
+        }
+
+        .checkbox-row input {
+            width: 17px;
+            height: 17px;
+            accent-color: var(--blue);
+        }
+
+        .checkbox-row label {
+            font-size: 13.5px;
+            color: var(--ink-soft);
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 18px 0;
+        }
+
+        /* ---------- Log ---------- */
+        .log-card {
+            margin-top: 20px;
+        }
+
+        .log-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 340px;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+
+        .log-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--gray);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+
+        .log-row.t-producao {
+            border-left-color: var(--green);
+        }
+
+        .log-row.t-ocorrencia {
+            border-left-color: var(--amber);
+        }
+
+        .log-row .l-icon {
+            flex-shrink: 0;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--green-bg);
+            color: var(--green);
+        }
+
+        .log-row.t-ocorrencia .l-icon {
+            background: var(--amber-bg);
+            color: var(--amber);
+        }
+
+        .log-row .l-icon svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .log-row .l-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .log-row .l-title {
+            font-weight: 600;
+            color: var(--ink);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .log-row .l-sub {
+            color: var(--ink-soft);
+            font-size: 12px;
+            margin-top: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .log-row .l-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12.5px;
+            color: var(--ink-soft);
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .log-row .l-dur {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink);
+            text-align: right;
+            flex-shrink: 0;
+            min-width: 64px;
+        }
+
+        .log-empty {
+            text-align: center;
+            color: var(--ink-soft);
+            font-size: 13.5px;
+            padding: 28px 10px;
+            border: 1px dashed var(--border);
+            border-radius: 10px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 22px;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: var(--ink);
+            color: #fff;
+            padding: 11px 20px;
+            border-radius: 9px;
+            font-size: 13.5px;
+            font-weight: 600;
+            box-shadow: 0 10px 30px -8px rgba(0, 0, 0, .4);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .25s ease, transform .25s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast svg {
+            width: 16px;
+            height: 16px;
+            color: #3fd587;
+        }
+
+        /* ---------- Apontamento interval & alert ---------- */
+        .interval-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 12px;
+            color: var(--ink-soft);
+        }
+
+        .interval-row select {
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            padding: 5px 8px;
+            font-size: 12px;
+            font-family: inherit;
+            color: var(--ink);
+            background: #fff;
+        }
+
+        .apont-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 12.5px;
+            color: var(--ink-soft);
+            margin: -2px 0 14px;
+            flex-wrap: wrap;
+        }
+
+        .apont-meta b {
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        .next-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: var(--gray-bg);
+            color: var(--ink-soft);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            font-size: 12px;
+            transition: background .2s ease, color .2s ease;
+        }
+
+        .next-badge.overdue {
+            background: #fde2e4;
+            color: #c01530;
+            animation: badgePulse 1s steps(1) infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 49% { background: #fde2e4; }
+            50%, 100% { background: #fbc7cb; }
+        }
+
+        .alert-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            border: 10px solid transparent;
+            box-sizing: border-box;
+        }
+
+        body.alerting .alert-overlay {
+            animation: alertFlash 1s steps(1) infinite;
+        }
+        
+        /* ---------- Modal CSS ---------- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(16, 23, 42, 0.45);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            width: 90%;
+            max-width: 360px;
+            transform: translateY(10px);
+            transition: transform 0.2s ease;
+        }
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+        .btn-edit:hover {
+            background-color: var(--gray-bg);
+        }
+
+        @keyframes alertFlash {
+            0%, 49% { border-color: #e0263b; }
+            50%, 100% { border-color: transparent; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .next-badge.overdue {
+                animation: none;
+            }
+            body.alerting .alert-overlay {
+                animation: none;
+                border-color: #e0263b;
+            }
+        }
+    </style>
+</head>
+
+<body data-status="idle">
+
+    <div class="alert-overlay" id="alertOverlay" aria-hidden="true"></div>
+
+    <div class="topbar">
+        <div class="brand">
+            <img src="data:image/png;base64,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" alt="Electro Plastic Logo" style="height: 48px; display: block; margin: 4px 0;">
+        </div>
+        <div class="wall-clock"><span class="live-pip"></span><span id="clockEl">--:--:--</span></div>
+    </div>
+
+    <div class="wrap">
+
+
+
+        <!-- Status banner -->
+        <div class="status-banner" aria-live="polite">
+            <div class="status-ring"></div>
+            <div class="status-mid">
+                <div class="status-label" id="statusLabel">Carregando dados...</div>
+                <div class="status-detail" id="statusDetail">Sincronizando com a base do Google Sheets.</div>
+            </div>
+            <div class="status-timer mono" id="statusTimer">00:00:00</div>
+        </div>
+
+        <div class="grid">
+
+            <!-- PRODUÇÃO -->
+            <div class="card">
+                <h2>Produção</h2>
+
+                <!-- Idle: setup fields -->
+                <div id="startPanel">
+                    <div class="field">
+                        <label for="opInput">Ordem de Produção</label>
+                        <input id="opInput" class="mono"  placeholder="Digite a OP"
+                            autocomplete="off">
+                        <div class="hint" id="opHint">A OP carrega cliente e produto automaticamente.</div>
+                    </div>
+                    <div class="field">
+                        <label>Cliente</label>
+                        <div class="readonly-field" id="clienteField">—</div>
+                    </div>
+                    <div class="field">
+                        <label>Produto</label>
+                        <div class="readonly-field" id="produtoField">—</div>
+                    </div>
+                    <div class="field">
+                        <label for="matriculaInput">Matrícula</label>
+                        <input id="matriculaInput" class="mono" placeholder="Digite a Matrícula"
+                            autocomplete="off">
+                    </div>
+                    <div class="field">
+                        <label for="recursoSelect">Recurso</label>
+                        <select id="recursoSelect">
+                            <option value="">Selecione a máquina</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="startBtn" disabled>
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="5 3 19 12 5 21 5 3" />
+                        </svg>
+                        Iniciar Produção
+                    </button>
+                </div>
+
+                <!-- Active: running / occurrence -->
+                <div id="activePanel" style="display:none;">
+                    <div class="active-summary">
+                        <div>OP<b id="sumOp">—</b></div>
+                        <div>Recurso<b id="sumRecurso">—</b></div>
+                        <div>Matrícula<b id="sumMatricula">—</b></div>
+                        <div>Início<b id="sumInicio">—</b></div>
+                    </div>
+
+                    <div class="apont-meta">
+                        <span style="display: none;">Último apontamento: <b id="sumUltimo">—</b></span>
+                        <span class="next-badge" id="nextBadge" style="display: none;">
+                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="9" />
+                                <polyline points="12 7 12 12 15 14" />
+                            </svg>
+                            <span id="nextTimer">--:--:--</span>
+                        </span>
+                    </div>
+
+                    <div class="field">
+                        <label for="qtdInput">Quantidade Produzida (neste intervalo)</label>
+                        <input id="qtdInput" type="number" min="0" class="mono" placeholder="0">
+                    </div>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="encerrarCheck">
+                        <label for="encerrarCheck">Encerrar esta Ordem de Produção</label>
+                    </div>
+                    <button class="btn btn-stop" id="finalizeBtn" disabled>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        Apontar Produção
+                    </button>
+                    <div class="hint warn" id="finalizeHint" style="display:none;">Finalize a ocorrência em andamento
+                        antes de apontar a produção.</div>
+                </div>
+            </div>
+
+            <!-- OCORRÊNCIA -->
+            <div class="card">
+                <h2>Ocorrência</h2>
+                <div id="occIdleMsg" class="readonly-field" style="text-align:center;">Disponível durante uma produção
+                    ativa.</div>
+
+                <div id="occPanel" style="display:none;">
+                    <div class="field">
+                        <label for="motivoSelect">Motivo da Parada</label>
+                        <select id="motivoSelect">
+                            <option value="">Selecione o motivo</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-amber" id="occBtn" disabled>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
+                            <line x1="12" y1="9" x2="12" y2="13" />
+                            <line x1="12" y1="17" x2="12.01" y2="17" />
+                        </svg>
+                        Iniciar Ocorrência
+                    </button>
+
+                    <div class="divider"></div>
+                    <div class="field" style="margin-bottom:6px;">
+                        <label>Ocorrências desta produção</label>
+                    </div>
+                    <div class="log-list" id="occMiniList" style="max-height:220px;">
+                        <div class="log-empty" id="occMiniEmpty">Nenhuma ocorrência registrada nesta produção.</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- HISTÓRICO -->
+        <div class="card log-card">
+            <h2>Histórico de Apontamentos</h2>
+            <div class="log-list" id="logList">
+                <div class="log-empty" id="logEmpty">Nenhum apontamento registrado ainda. Inicie uma produção para
+                    começar.</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ALERT MODAL -->
+    <div class="modal-overlay" id="alertModal">
+        <div class="modal-content">
+            <h2 style="font-size: 16px; font-weight: 700; color: #003C91; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px;" id="alertTitle">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                Aviso
+            </h2>
+            <div style="font-size: 14px; line-height: 1.5; color: var(--ink); margin-bottom: 20px;" id="alertMessage">
+                Mensagem de alerta.
+            </div>
+            <div style="display: flex;">
+                <button class="btn btn-primary" id="okAlertBtn" style="flex: 1;">Ok, Entendi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIRMATION MODAL -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-content">
+            <h2 style="font-size: 16px; font-weight: 700; color: var(--green, #137a52); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Confirmar Ação
+            </h2>
+            <div style="font-size: 14px; line-height: 1.5; color: var(--ink); margin-bottom: 20px;" id="confirmMessage">
+                Deseja realmente prosseguir?
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-stop" id="cancelConfirmBtn" style="background: var(--gray-bg); color: var(--ink); flex: 1;">Não, Cancelar</button>
+                <button class="btn btn-primary" id="submitConfirmBtn" style="background: var(--green, #137a52); color: #fff; flex: 1;">Sim, Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-content">
+            <h2 style="font-size: 16px; font-weight: 700; color: var(--blue); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em;">Editar Apontamento</h2>
+            <div class="field">
+                <label for="editQtdInput">Nova Quantidade Produzida</label>
+                <input id="editQtdInput" type="number" min="1" class="mono" placeholder="Digite a nova quantidade">
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-stop" id="cancelEditBtn" style="background: var(--gray-bg); color: var(--ink); flex: 1;">Cancelar</button>
+                <button class="btn btn-primary" id="saveEditBtn" style="flex: 1;">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+        </svg>
+        <span id="toastMsg">Apontamento registrado</span>
+    </div>
+
+    <script>
+        (function () {
+            // ---------- Dynamic Configs loaded from backend context ----------
+            const RECURSOS = {{ recursos_json|safe }};
+            const MOTIVOS = {{ motivos_json|safe }};
+            let DB_OPS = {};
+
+            // ---------- State ----------
+            let status = 'idle'; // idle | running | occurrence | auth-error
+            let active = null;   // { op, cliente, produto, matricula, recurso, start, occurrences:[] }
+            let occ = null;       // { motivo, start }
+            let log = [];
+            let lastApontamentoAt = null;
+            let alerting = false;
+
+            // ---------- Elements ----------
+            const $ = id => document.getElementById(id);
+            const clockEl = $('clockEl');
+            const alertOverlay = $('alertOverlay');
+            const statusLabel = $('statusLabel'), statusDetail = $('statusDetail'), statusTimer = $('statusTimer');
+            const opInput = $('opInput'), opHint = $('opHint');
+            const clienteField = $('clienteField'), produtoField = $('produtoField');
+            const matriculaInput = $('matriculaInput'), recursoSelect = $('recursoSelect');
+            const startBtn = $('startBtn'), startPanel = $('startPanel'), activePanel = $('activePanel');
+            const sumOp = $('sumOp'), sumRecurso = $('sumRecurso'), sumMatricula = $('sumMatricula'), sumInicio = $('sumInicio'), sumUltimo = $('sumUltimo');
+            const nextBadge = $('nextBadge'), nextTimer = $('nextTimer');
+            const qtdInput = $('qtdInput'), encerrarCheck = $('encerrarCheck'), finalizeBtn = $('finalizeBtn'), finalizeHint = $('finalizeHint');
+            const occIdleMsg = $('occIdleMsg'), occPanel = $('occPanel'), motivoSelect = $('motivoSelect'), occBtn = $('occBtn');
+            const occMiniList = $('occMiniList'), occMiniEmpty = $('occMiniEmpty');
+            const logList = $('logList'), logEmpty = $('logEmpty');
+            const toast = $('toast'), toastMsg = $('toastMsg');
+
+            // ---------- Helpers ----------
+            const pad = n => String(n).padStart(2, '0');
+            const fmtClock = d => `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+            const fmtDateTime = d => `${pad(d.getDate())}/${pad(d.getMonth() + 1)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+            
+            // Format format helpers specifically for Google Sheets column standards
+            const fmtDate = d => `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+            const fmtTime = d => `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+
+            const fmtDuration = ms => {
+                const s = Math.max(0, Math.floor(ms / 1000));
+                const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+                return `${pad(h)}:${pad(m)}:${pad(sec)}`;
+            };
+
+            function showToast(msg) {
+                toastMsg.textContent = msg;
+                toast.classList.add('show');
+                clearTimeout(showToast._t);
+                showToast._t = setTimeout(() => toast.classList.remove('show'), 2600);
+            }
+
+            function showAlert(message, title = 'Aviso') {
+                return new Promise((resolve) => {
+                    const alertModal = $('alertModal');
+                    const alertMessage = $('alertMessage');
+                    const alertTitle = $('alertTitle');
+                    const okAlertBtn = $('okAlertBtn');
+                    
+                    alertMessage.textContent = message;
+                    alertTitle.innerHTML = `
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        ${title}
+                    `;
+                    alertModal.classList.add('show');
+                    
+                    const onOk = () => {
+                        alertModal.classList.remove('show');
+                        okAlertBtn.removeEventListener('click', onOk);
+                        resolve();
+                    };
+                    
+                    okAlertBtn.addEventListener('click', onOk);
+                });
+            }
+
+            function showConfirm(message) {
+                return new Promise((resolve) => {
+                    const confirmModal = $('confirmModal');
+                    const confirmMessage = $('confirmMessage');
+                    const cancelConfirmBtn = $('cancelConfirmBtn');
+                    const submitConfirmBtn = $('submitConfirmBtn');
+                    
+                    confirmMessage.textContent = message;
+                    confirmModal.classList.add('show');
+                    
+                    const onCancel = () => {
+                        confirmModal.classList.remove('show');
+                        cleanup();
+                        resolve(false);
+                    };
+                    
+                    const onSubmit = () => {
+                        confirmModal.classList.remove('show');
+                        cleanup();
+                        resolve(true);
+                    };
+                    
+                    function cleanup() {
+                        cancelConfirmBtn.removeEventListener('click', onCancel);
+                        submitConfirmBtn.removeEventListener('click', onSubmit);
+                    }
+                    
+                    cancelConfirmBtn.addEventListener('click', onCancel);
+                    submitConfirmBtn.addEventListener('click', onSubmit);
+                });
+            }
+
+            // ---------- Apontamento cadence & alert ----------
+
+            function clearAlert() {
+                alerting = false;
+                document.body.classList.remove('alerting');
+                nextBadge.classList.remove('overdue');
+            }
+
+            function getDeadline(baseDate) {
+                const d = new Date(baseDate.getTime());
+                d.setHours(d.getHours() + 1, 0, 0, 0);
+                return d;
+            }
+
+            function checkApontamento(now) {
+                if (status === 'idle' || !active || status === 'auth-error') {
+                    nextTimer.textContent = '--:--:--';
+                    if (alerting) clearAlert();
+                    return;
+                }
+                const deadline = getDeadline(lastApontamentoAt);
+                const remaining = deadline - now;
+                if (remaining <= 0) {
+                    if (!alerting) {
+                        alerting = true;
+                        document.body.classList.add('alerting');
+                        nextBadge.classList.add('overdue');
+                    }
+                    nextTimer.textContent = 'Atrasado';
+                } else {
+                    if (alerting) clearAlert();
+                    nextTimer.textContent = fmtDuration(remaining);
+                }
+            }
+
+            // ---------- Init selectors ----------
+            RECURSOS.forEach(r => {
+                const o = document.createElement('option'); o.value = r; o.textContent = r; recursoSelect.appendChild(o);
+            });
+            MOTIVOS.forEach(m => {
+                const o = document.createElement('option'); o.value = m; o.textContent = m; motivoSelect.appendChild(o);
+            });
+
+            // ---------- Fetch state and setup OPs ----------
+            async function initApp() {
+                try {
+                    const response = await fetch('/api/ops/');
+                    const data = await response.json();
+                    
+                    if (response.status === 401 && data.error === 'needs_authentication') {
+                        status = 'auth-error';
+                        document.body.dataset.status = status;
+                        statusLabel.textContent = 'Erro de Autenticação';
+                        statusDetail.innerHTML = '<strong>Necessário autenticar o Google Sheets:</strong> execute o comando <code>python manage.py authenticate_sheets</code>';
+                        disableAllControls();
+                        return;
+                    }
+                    
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Falha ao buscar OPs do Google Sheets.');
+                    }
+                    
+                    DB_OPS = data;
+
+                    // Restore state from Django Session
+                    await restoreActiveState();
+                    
+                } catch (e) {
+                    status = 'auth-error';
+                    document.body.dataset.status = status;
+                    statusLabel.textContent = 'Erro de Conexão';
+                    statusDetail.textContent = 'Não foi possível conectar ao Google Sheets: ' + e.message;
+                    disableAllControls();
+                }
+            }
+
+            function disableAllControls() {
+                opInput.disabled = true;
+                matriculaInput.disabled = true;
+                recursoSelect.disabled = true;
+                startBtn.disabled = true;
+                qtdInput.disabled = true;
+                encerrarCheck.disabled = true;
+                finalizeBtn.disabled = true;
+                motivoSelect.disabled = true;
+                occBtn.disabled = true;
+            }
+
+            // ---------- Django Session persistence ----------
+            async function saveActiveState() {
+                if (status === 'auth-error') return;
+                try {
+                    await fetch('/api/active-state/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            active_state: {
+                                status,
+                                active,
+                                occ,
+                                lastApontamentoAt: lastApontamentoAt ? lastApontamentoAt.toISOString() : null
+                            }
+                        })
+                    });
+                } catch (e) {
+                    console.error('Failed to sync session state to backend:', e);
+                }
+            }
+
+            async function clearActiveState() {
+                try {
+                    await fetch('/api/active-state/', { method: 'DELETE' });
+                } catch (e) {
+                    console.error('Failed to clear session state on backend:', e);
+                }
+            }
+
+            async function restoreActiveState() {
+                try {
+                    const response = await fetch('/api/active-state/');
+                    const data = await response.json();
+                    
+                    if (data.active_state) {
+                        const state = data.active_state;
+                        status = state.status;
+                        document.body.dataset.status = status;
+                        
+                        if (state.active) {
+                            active = state.active;
+                            active.start = new Date(active.start);
+                            if (active.occurrences) {
+                                active.occurrences.forEach(o => {
+                                    o.start = new Date(o.start);
+                                    if (o.end) o.end = new Date(o.end);
+                                });
+                            }
+                        }
+                        
+                        if (state.occ) {
+                            occ = state.occ;
+                            occ.start = new Date(occ.start);
+                        }
+                        
+                        if (state.lastApontamentoAt) {
+                            lastApontamentoAt = new Date(state.lastApontamentoAt);
+                        }
+
+                        if (status === 'running' || status === 'occurrence') {
+                            sumOp.textContent = active.op;
+                            sumRecurso.textContent = active.recurso;
+                            sumMatricula.textContent = active.matricula;
+                            sumInicio.textContent = fmtDateTime(active.start);
+                            sumUltimo.textContent = lastApontamentoAt && lastApontamentoAt.getTime() !== active.start.getTime() 
+                                ? fmtClock(lastApontamentoAt) 
+                                : '—';
+                            
+                            startPanel.style.display = 'none';
+                            activePanel.style.display = 'block';
+                            occIdleMsg.style.display = 'none';
+                            occPanel.style.display = 'block';
+                            
+                            if (status === 'occurrence') {
+                                motivoSelect.value = occ.motivo;
+                                motivoSelect.disabled = true;
+                                occBtn.disabled = false;
+                                occBtn.innerHTML = iconStop() + ' Finalizar Ocorrência';
+                                occBtn.classList.remove('btn-amber'); occBtn.classList.add('btn-amber-outline');
+                            } else {
+                                motivoSelect.disabled = false;
+                                motivoSelect.value = '';
+                                occBtn.disabled = true;
+                                occBtn.innerHTML = iconAlert() + ' Iniciar Ocorrência';
+                                occBtn.classList.remove('btn-amber-outline'); occBtn.classList.add('btn-amber');
+                            }
+                            
+                            renderOccMini();
+                            validateFinalize();
+                        }
+                    } else {
+                        // Reset visual loaded status
+                        status = 'idle';
+                        document.body.dataset.status = status;
+                    }
+                } catch (e) {
+                    console.error('Failed to restore active state:', e);
+                }
+            }
+
+            // ---------- OP lookup ----------
+            opInput.addEventListener('input', () => {
+                const code = opInput.value.trim();
+                const rec = DB_OPS[code];
+                if (rec) {
+                    clienteField.textContent = rec.cliente;
+                    produtoField.textContent = rec.produto;
+                    clienteField.classList.add('filled');
+                    produtoField.classList.add('filled');
+                    opHint.textContent = 'OP encontrada — cliente e produto carregados automaticamente.';
+                    opHint.classList.remove('warn');
+                } else {
+                    clienteField.textContent = '—'; produtoField.textContent = '—';
+                    clienteField.classList.remove('filled'); produtoField.classList.remove('filled');
+                    opHint.textContent = code ? 'OP não encontrada na base. Verifique o número.' : 'A OP carrega cliente e produto automaticamente.';
+                    opHint.classList.toggle('warn', !!code);
+                }
+                validateStart();
+            });
+            matriculaInput.addEventListener('input', validateStart);
+            recursoSelect.addEventListener('change', validateStart);
+
+            function validateStart() {
+                const op = opInput.value.trim();
+                const ok = !!DB_OPS[op] && matriculaInput.value.trim() !== '' && recursoSelect.value !== '';
+                startBtn.disabled = !ok;
+            }
+
+            // ---------- Start production ----------
+            startBtn.addEventListener('click', async () => {
+                const op = opInput.value.trim();
+                const rec = DB_OPS[op];
+                active = {
+                    op, cliente: rec.cliente, produto: rec.produto,
+                    matricula: matriculaInput.value.trim(),
+                    recurso: recursoSelect.value,
+                    start: new Date(),
+                    occurrences: []
+                };
+                status = 'running';
+                document.body.dataset.status = status;
+                lastApontamentoAt = active.start;
+                clearAlert();
+
+                sumOp.textContent = active.op;
+                sumRecurso.textContent = active.recurso;
+                sumMatricula.textContent = active.matricula;
+                sumInicio.textContent = fmtDateTime(active.start);
+                sumUltimo.textContent = '—';
+
+                startPanel.style.display = 'none';
+                activePanel.style.display = 'block';
+                occIdleMsg.style.display = 'none';
+                occPanel.style.display = 'block';
+
+                qtdInput.value = '';
+                encerrarCheck.checked = false;
+                motivoSelect.value = '';
+                occBtn.disabled = true;
+                occBtn.innerHTML = iconAlert() + ' Iniciar Ocorrência';
+                occBtn.classList.remove('btn-amber-outline'); occBtn.classList.add('btn-amber');
+                renderOccMini();
+                validateFinalize();
+                
+                await saveActiveState();
+            });
+
+            function iconAlert() {
+                return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+            }
+            function iconStop() {
+                return `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>`;
+            }
+
+            // ---------- Finalize production ----------
+            qtdInput.addEventListener('input', validateFinalize);
+            function validateFinalize() {
+                const qtdOk = qtdInput.value !== '' && Number(qtdInput.value) > 0;
+                const blockedByOcc = status === 'occurrence';
+                finalizeBtn.disabled = !qtdOk || blockedByOcc;
+                finalizeHint.style.display = blockedByOcc ? 'block' : 'none';
+            }
+
+            finalizeBtn.addEventListener('click', async () => {
+                if (encerrarCheck.checked) {
+                    const confirmClose = await showConfirm("Deseja realmente encerrar esta Ordem de Produção? Esta ação não pode ser desfeita.");
+                    if (!confirmClose) {
+                        return;
+                    }
+                }
+                const end = new Date();
+                const originalStart = lastApontamentoAt;
+                
+                finalizeBtn.disabled = true;
+                const prevLabel = finalizeBtn.innerHTML;
+                finalizeBtn.innerHTML = 'Enviando...';
+                
+                try {
+                    // Send to Google Sheets backend endpoint
+                    const payload = {
+                        op_id: active.op,
+                        cliente: active.cliente,
+                        descricao_produto: active.produto,
+                        data: fmtDate(end),
+                        hora: fmtTime(end),
+                        matricula: active.matricula,
+                        maquina: active.recurso,
+                        op_encerrada: encerrarCheck.checked,
+                        quantidade: Number(qtdInput.value)
+                    };
+                    
+                    const response = await fetch('/api/apontamentos/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    const resData = await response.json();
+                    if (!response.ok) {
+                        throw new Error(resData.message || 'Falha ao registrar apontamento no Google Sheets.');
+                    }
+                    
+                    // Local log representation
+                    const entry = {
+                        type: 'producao',
+                        op: active.op, cliente: active.cliente, produto: active.produto,
+                        matricula: active.matricula, recurso: active.recurso,
+                        start: originalStart, end,
+                        duration: end - originalStart,
+                        quantidade: Number(qtdInput.value),
+                        encerrouOP: encerrarCheck.checked
+                    };
+                    log.unshift(entry);
+                    renderLog();
+
+                    lastApontamentoAt = end;
+                    clearAlert();
+
+                    if (encerrarCheck.checked) {
+                        showToast('Apontamento registrado — OP encerrada');
+                        await clearActiveState();
+
+                        // reset to idle
+                        status = 'idle'; active = null; occ = null;
+                        document.body.dataset.status = status;
+                        startPanel.style.display = 'block';
+                        activePanel.style.display = 'none';
+                        occPanel.style.display = 'none';
+                        occIdleMsg.style.display = 'block';
+
+                        opInput.value = '';
+                        clienteField.textContent = '—'; produtoField.textContent = '—';
+                        clienteField.classList.remove('filled'); produtoField.classList.remove('filled');
+                        opHint.textContent = 'A OP carrega cliente e produto automaticamente.';
+                        opHint.classList.remove('warn');
+                        recursoSelect.value = '';
+                        validateStart();
+                    } else {
+                        showToast('Apontamento registrado — produção continua');
+                        sumUltimo.textContent = fmtClock(end);
+                        qtdInput.value = '';
+                        encerrarCheck.checked = false;
+                        validateFinalize();
+                        await saveActiveState();
+                    }
+                } catch (e) {
+                    await showAlert('Erro ao registrar apontamento: ' + e.message, 'Erro');
+                    finalizeBtn.disabled = false;
+                } finally {
+                    finalizeBtn.innerHTML = prevLabel;
+                }
+            });
+
+            // ---------- Occurrence ----------
+            motivoSelect.addEventListener('change', () => {
+                if (status === 'running') occBtn.disabled = motivoSelect.value === '';
+            });
+
+            occBtn.addEventListener('click', async () => {
+                if (status === 'running') {
+                    // start occurrence
+                    occ = { motivo: motivoSelect.value, start: new Date() };
+                    status = 'occurrence';
+                    document.body.dataset.status = status;
+                    motivoSelect.disabled = true;
+                    occBtn.innerHTML = iconStop() + ' Finalizar Ocorrência';
+                    occBtn.classList.remove('btn-amber'); occBtn.classList.add('btn-amber-outline');
+                    validateFinalize();
+                    await saveActiveState();
+                } else if (status === 'occurrence') {
+                    // finish occurrence
+                    const end = new Date();
+                    occBtn.disabled = true;
+                    const prevLabel = occBtn.innerHTML;
+                    occBtn.innerHTML = 'Enviando...';
+                    
+                    try {
+                        const payload = {
+                            op_id: active.op,
+                            cliente: active.cliente,
+                            descricao_produto: active.produto,
+                            ocorrencia: occ.motivo,
+                            data_inicio: fmtDate(occ.start),
+                            hora_inicio: fmtTime(occ.start),
+                            data_fim: fmtDate(end),
+                            hora_fim: fmtTime(end)
+                        };
+                        
+                        const response = await fetch('/api/ocorrencias/', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        
+                        const resData = await response.json();
+                        if (!response.ok) {
+                            throw new Error(resData.message || 'Falha ao registrar ocorrência no Google Sheets.');
+                        }
+                        
+                        const entry = { motivo: occ.motivo, start: occ.start, end, duration: end - occ.start };
+                        active.occurrences.unshift(entry);
+                        status = 'running';
+                        document.body.dataset.status = status;
+                        motivoSelect.disabled = false;
+                        motivoSelect.value = '';
+                        occBtn.disabled = true;
+                        occBtn.innerHTML = iconAlert() + ' Iniciar Ocorrência';
+                        occBtn.classList.remove('btn-amber-outline'); occBtn.classList.add('btn-amber');
+                        occ = null;
+                        
+                        renderOccMini();
+                        validateFinalize();
+                        showToast('Ocorrência finalizada');
+                        await saveActiveState();
+                        
+                    } catch (e) {
+                        await showAlert('Erro ao finalizar ocorrência: ' + e.message, 'Erro');
+                        occBtn.disabled = false;
+                        occBtn.innerHTML = prevLabel;
+                    }
+                }
+            });
+
+            function renderOccMini() {
+                if (!active || active.occurrences.length === 0) {
+                    occMiniEmpty.style.display = 'block';
+                    occMiniList.innerHTML = '';
+                    occMiniList.appendChild(occMiniEmpty);
+                    return;
+                }
+                occMiniEmpty.style.display = 'none';
+                occMiniList.innerHTML = '';
+                active.occurrences.forEach(o => {
+                    occMiniList.appendChild(buildLogRow({
+                        type: 'ocorrencia', title: o.motivo, sub: 'Durante a OP ' + active.op,
+                        time: `${fmtClock(o.start)} → ${fmtClock(o.end)}`, dur: fmtDuration(o.duration)
+                    }));
+                });
+            }
+
+            // ---------- Log rendering ----------
+            function buildLogRow({ type, title, sub, time, dur, editIndex = null }) {
+                const row = document.createElement('div');
+                row.className = 'log-row t-' + type;
+                const icon = type === 'producao'
+                    ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+                    : iconAlert();
+                    
+                const editButtonHtml = (type === 'producao' && editIndex !== null)
+                    ? `<button class="btn-edit" data-index="${editIndex}" style="background: none; border: none; padding: 4px; cursor: pointer; color: var(--blue); margin-left: 12px; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px;" title="Editar quantidade">
+                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                       </button>`
+                    : '';
+
+                row.innerHTML = `
+                  <div class="l-icon">${icon}</div>
+                  <div class="l-main">
+                    <div class="l-title">${title}</div>
+                    <div class="l-sub">${sub}</div>
+                  </div>
+                  <div class="l-time">${time}</div>
+                  <div class="l-dur" style="display: flex; align-items: center; gap: 8px;">
+                    <span>${dur}</span>
+                    ${editButtonHtml}
+                  </div>`;
+                return row;
+            }
+
+            function renderLog() {
+                if (log.length === 0) {
+                    logList.innerHTML = '';
+                    logList.appendChild(logEmpty);
+                    logEmpty.style.display = 'block';
+                    return;
+                }
+                logList.innerHTML = '';
+                log.forEach((e, idx) => {
+                    const row = buildLogRow({
+                        type: 'producao',
+                        title: `OP ${e.op} · ${e.produto}`,
+                        sub: `${e.cliente} · Matrícula ${e.matricula} · ${e.recurso}${e.encerrouOP ? ' · OP encerrada' : ''}`,
+                        time: `${fmtClock(e.start)} → ${fmtClock(e.end)}`,
+                        dur: `${e.quantidade} un · ${fmtDuration(e.duration)}`,
+                        editIndex: idx
+                    });
+                    
+                    const editBtn = row.querySelector('.btn-edit');
+                    if (editBtn) {
+                        editBtn.addEventListener('click', (event) => {
+                            event.stopPropagation();
+                            openEditModal(idx);
+                        });
+                    }
+                    
+                    logList.appendChild(row);
+                });
+            }
+
+            // ---------- Ticking clock & live timers ----------
+            function tick() {
+                const now = new Date();
+                clockEl.textContent = fmtClock(now);
+                checkApontamento(now);
+
+                if (status === 'running') {
+                    statusLabel.textContent = 'Produzindo';
+                    statusDetail.innerHTML = `OP <strong>${active.op}</strong> · ${active.recurso} · ${active.produto}`;
+                    statusTimer.textContent = fmtDuration(now - active.start);
+                } else if (status === 'occurrence') {
+                    statusLabel.textContent = 'Parada — ' + occ.motivo;
+                    statusDetail.innerHTML = `OP <strong>${active.op}</strong> em espera · ${active.recurso}`;
+                    statusTimer.textContent = fmtDuration(now - occ.start);
+                } else if (status === 'idle') {
+                    statusLabel.textContent = 'Aguardando início';
+                    statusDetail.textContent = 'Selecione a ordem de produção para começar.';
+                    statusTimer.textContent = '00:00:00';
+                }
+            }
+            
+                        // ---------- Edit Modal Logic ----------
+            let editingIndex = null;
+            const editModal = $('editModal'), editQtdInput = $('editQtdInput');
+            const cancelEditBtn = $('cancelEditBtn'), saveEditBtn = $('saveEditBtn');
+            
+            function openEditModal(index) {
+                editingIndex = index;
+                const entry = log[index];
+                editQtdInput.value = entry.quantidade;
+                editModal.classList.add('show');
+            }
+            
+            function closeEditModal() {
+                editingIndex = null;
+                editModal.classList.remove('show');
+            }
+            
+            cancelEditBtn.addEventListener('click', closeEditModal);
+            
+            saveEditBtn.addEventListener('click', async () => {
+                if (editingIndex === null) return;
+                
+                const newQtd = Number(editQtdInput.value);
+                if (isNaN(newQtd) || newQtd <= 0) {
+                    await showAlert('Por favor, insira uma quantidade válida maior que zero.', 'Quantidade Inválida');
+                    return;
+                }
+                
+                const entry = log[editingIndex];
+                
+                saveEditBtn.disabled = true;
+                const originalText = saveEditBtn.innerHTML;
+                saveEditBtn.innerHTML = 'Salvando...';
+                
+                try {
+                    const payload = {
+                        filter: {
+                            op_id: entry.op,
+                            data: fmtDate(entry.end),
+                            hora: fmtTime(entry.end),
+                            matricula: entry.matricula,
+                            maquina: entry.recurso
+                        },
+                        new_quantidade: newQtd
+                    };
+                    
+                    const response = await fetch('/api/apontamentos/edit/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    const data = await response.json();
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Falha ao atualizar o apontamento no Google Sheets.');
+                    }
+                    
+                    // Update locally
+                    entry.quantidade = newQtd;
+                    
+                    // Re-render
+                    renderLog();
+                    closeEditModal();
+                    showToast('Apontamento atualizado com sucesso!');
+                    
+                } catch (e) {
+                    await showAlert('Erro ao atualizar quantidade: ' + e.message, 'Erro');
+                } finally {
+                    saveEditBtn.disabled = false;
+                    saveEditBtn.innerHTML = originalText;
+                }
+            });
+
+            // Start clock ticks
+            setInterval(tick, 1000);
+            
+            // Run initialization on load
+            initApp();
+
+        })();
+    </script>
+</body>
+
+</html>

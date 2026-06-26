@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electro Plastic · Terminal de Produção</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --blue: #003c92;
+            --blue-deep: #00214a;
+            --ink: #10172a;
+            --ink-soft: #5c6678;
+            --bg: #f1f3f7;
+            --surface: #ffffff;
+            --border: #e2e6ef;
+            --green: #137a52;
+            --green-bg: #e5f3ec;
+            --amber: #b15e0a;
+            --amber-bg: #fbecdc;
+            --gray: #9aa3b3;
+            --gray-bg: #eef0f4;
+            --radius: 14px;
+            --shadow: 0 1px 2px rgba(16, 23, 42, .04), 0 8px 24px -12px rgba(16, 23, 42, .10);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--ink);
+            font-family: 'Inter', system-ui, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            margin: 0;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        button {
+            font-family: inherit;
+        }
+
+        :focus-visible {
+            outline: 2px solid var(--blue);
+            outline-offset: 2px;
+        }
+
+        /* ---------- Header ---------- */
+        .topbar {
+            background: var(--blue-deep);
+            color: #fff;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .brand-mark svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .brand-text h1 {
+            font-size: 16px;
+            letter-spacing: .02em;
+            font-weight: 700;
+        }
+
+        .brand-text span {
+            display: block;
+            font-size: 11px;
+            color: #aebde0;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            margin-top: 1px;
+        }
+
+        .wall-clock {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: .03em;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .live-pip {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #3fd587;
+            animation: pip 2s ease-in-out infinite;
+        }
+
+        @keyframes pip {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: .25;
+            }
+        }
+
+        /* ---------- Layout ---------- */
+        .wrap {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 24px 20px 60px;
+        }
+
+        /* ---------- Status banner ---------- */
+        .status-banner {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            transition: border-color .25s ease;
+        }
+
+        .status-ring {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: var(--gray-bg);
+            position: relative;
+        }
+
+        .status-ring::after {
+            content: '';
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--gray);
+        }
+
+        body[data-status="running"] .status-ring {
+            background: var(--green-bg);
+        }
+
+        body[data-status="running"] .status-ring::after {
+            background: var(--green);
+            animation: breathe 1.8s ease-in-out infinite;
+        }
+
+        body[data-status="occurrence"] .status-ring {
+            background: var(--amber-bg);
+        }
+
+        body[data-status="occurrence"] .status-ring::after {
+            background: var(--amber);
+            animation: breathe 1.1s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(0, 0, 0, .08);
+            }
+
+            50% {
+                transform: scale(1.18);
+                box-shadow: 0 0 0 8px rgba(0, 0, 0, .04);
+            }
+        }
+
+        .status-mid {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .status-label {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--gray);
+        }
+
+        body[data-status="running"] .status-label {
+            color: var(--green);
+        }
+
+        body[data-status="occurrence"] .status-label {
+            color: var(--amber);
+        }
+
+        .status-detail {
+            font-size: 15px;
+            color: var(--ink-soft);
+            margin-top: 3px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .status-detail strong {
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        .status-timer {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 30px;
+            font-weight: 600;
+            color: var(--ink);
+            flex-shrink: 0;
+            min-width: 118px;
+            text-align: right;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .live-pip,
+            .status-ring::after {
+                animation: none !important;
+            }
+        }
+
+        /* ---------- Grid ---------- */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width:860px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 22px 22px 24px;
+        }
+
+        .card h2 {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--blue);
+            margin-bottom: 16px;
+        }
+
+        .field {
+            margin-bottom: 14px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--ink-soft);
+            margin-bottom: 5px;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            border: 1px solid var(--border);
+            background: #fbfbfd;
+            border-radius: 9px;
+            padding: 10px 12px;
+            font-size: 14.5px;
+            color: var(--ink);
+            font-family: inherit;
+        }
+
+        .field input:disabled,
+        .field select:disabled {
+            background: var(--gray-bg);
+            color: var(--ink-soft);
+        }
+
+        .field input.mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .field .hint {
+            font-size: 12px;
+            color: var(--ink-soft);
+            margin-top: 5px;
+        }
+
+        .field .hint.warn {
+            color: var(--amber);
+        }
+
+        .readonly-field {
+            border: 1px dashed var(--border);
+            border-radius: 9px;
+            padding: 9px 12px;
+            font-size: 14px;
+            color: var(--ink-soft);
+            background: var(--gray-bg);
+            min-height: 20px;
+        }
+
+        .readonly-field.filled {
+            color: var(--ink);
+            background: #f6f8fc;
+            border-style: solid;
+            border-color: var(--border);
+        }
+
+        .btn {
+            width: 100%;
+            border: none;
+            border-radius: 9px;
+            padding: 12px 16px;
+            font-size: 14.5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: filter .15s ease, opacity .15s ease;
+        }
+
+        .btn svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        .btn:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        .btn:not(:disabled):hover {
+            filter: brightness(1.07);
+        }
+
+        .btn:not(:disabled):active {
+            filter: brightness(.94);
+        }
+
+        .btn-primary {
+            background: var(--blue);
+            color: #fff;
+        }
+
+        .btn-stop {
+            background: var(--ink);
+            color: #fff;
+        }
+
+        .btn-amber {
+            background: var(--amber);
+            color: #fff;
+        }
+
+        .btn-amber-outline {
+            background: var(--amber-bg);
+            color: var(--amber);
+            border: 1px solid #f0d3ad;
+        }
+
+        .active-summary {
+            border: 1px solid var(--border);
+            background: #f8f9fc;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: var(--ink-soft);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 14px;
+        }
+
+        .active-summary div b {
+            display: block;
+            font-size: 13.5px;
+            color: var(--ink);
+            font-weight: 600;
+            margin-top: 1px;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin: 14px 0 16px;
+        }
+
+        .checkbox-row input {
+            width: 17px;
+            height: 17px;
+            accent-color: var(--blue);
+        }
+
+        .checkbox-row label {
+            font-size: 13.5px;
+            color: var(--ink-soft);
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 18px 0;
+        }
+
+        /* ---------- Log ---------- */
+        .log-card {
+            margin-top: 20px;
+        }
+
+        .log-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 340px;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+
+        .log-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--gray);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+
+        .log-row.t-producao {
+            border-left-color: var(--green);
+        }
+
+        .log-row.t-ocorrencia {
+            border-left-color: var(--amber);
+        }
+
+        .log-row .l-icon {
+            flex-shrink: 0;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--green-bg);
+            color: var(--green);
+        }
+
+        .log-row.t-ocorrencia .l-icon {
+            background: var(--amber-bg);
+            color: var(--amber);
+        }
+
+        .log-row .l-icon svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .log-row .l-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .log-row .l-title {
+            font-weight: 600;
+            color: var(--ink);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .log-row .l-sub {
+            color: var(--ink-soft);
+            font-size: 12px;
+            margin-top: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .log-row .l-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12.5px;
+            color: var(--ink-soft);
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .log-row .l-dur {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink);
+            text-align: right;
+            flex-shrink: 0;
+            min-width: 64px;
+        }
+
+        .log-empty {
+            text-align: center;
+            color: var(--ink-soft);
+            font-size: 13.5px;
+            padding: 28px 10px;
+            border: 1px dashed var(--border);
+            border-radius: 10px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 22px;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: var(--ink);
+            color: #fff;
+            padding: 11px 20px;
+            border-radius: 9px;
+            font-size: 13.5px;
+            font-weight: 600;
+            box-shadow: 0 10px 30px -8px rgba(0, 0, 0, .4);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .25s ease, transform .25s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast svg {
+            width: 16px;
+            height: 16px;
+            color: #3fd587;
+        }
+
+        /* ---------- Apontamento interval & alert ---------- */
+        .interval-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 12px;
+            color: var(--ink-soft);
+        }
+
+        .interval-row select {
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            padding: 5px 8px;
+            font-size: 12px;
+            font-family: inherit;
+            color: var(--ink);
+            background: #fff;
+        }
+
+        .apont-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 12.5px;
+            color: var(--ink-soft);
+            margin: -2px 0 14px;
+            flex-wrap: wrap;
+        }
+
+        .apont-meta b {
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        .next-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: var(--gray-bg);
+            color: var(--ink-soft);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            font-size: 12px;
+            transition: background .2s ease, color .2s ease;
+        }
+
+        .next-badge.overdue {
+            background: #fde2e4;
+            color: #c01530;
+            animation: badgePulse 1s steps(1) infinite;
+        }
+
+        @keyframes badgePulse {
+
+            0%,
+            49% {
+                background: #fde2e4;
+            }
+
+            50%,
+            100% {
+                background: #fbc7cb;
+            }
+        }
+
+        .alert-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            border: 10px solid transparent;
+            box-sizing: border-box;
+        }
+
+        body.alerting .alert-overlay {
+            animation: alertFlash 1s steps(1) infinite;
+        }
+
+        @keyframes alertFlash {
+
+            0%,
+            49% {
+                border-color: #e0263b;
+            }
+
+            50%,
+            100% {
+                border-color: transparent;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .next-badge.overdue {
+                animation: none;
+            }
+
+            body.alerting .alert-overlay {
+                animation: none;
+                border-color: #e0263b;
+            }
+        }
+    </style>
+</head>
+
+<body data-status="idle">
+
+    <div class="alert-overlay" id="alertOverlay" aria-hidden="true"></div>
+
+    <div class="topbar">
+        <div class="brand">
+            <div class="brand-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M12 2a10 10 0 1 0 7.07 2.93" />
+                    <path d="M12 2v6l4-3" />
+                </svg>
+            </div>
+            <div class="brand-text">
+                <h1>ELECTRO PLASTIC</h1>
+                <span>Terminal de Produção</span>
+            </div>
+        </div>
+        <div class="wall-clock"><span class="live-pip"></span><span id="clockEl">--:--:--</span></div>
+    </div>
+
+    <div class="wrap">
+
+        <div class="interval-row">
+            <span>Intervalo de apontamento</span>
+            <select id="intervalSelect">
+                <option value="120000" selected>2 min (teste)</option>
+                <option value="3600000">60 min (produção)</option>
+            </select>
+        </div>
+
+        <!-- Status banner -->
+        <div class="status-banner" aria-live="polite">
+            <div class="status-ring"></div>
+            <div class="status-mid">
+                <div class="status-label" id="statusLabel">Aguardando início</div>
+                <div class="status-detail" id="statusDetail">Selecione a ordem de produção para começar.</div>
+            </div>
+            <div class="status-timer mono" id="statusTimer">00:00:00</div>
+        </div>
+
+        <div class="grid">
+
+            <!-- PRODUÇÃO -->
+            <div class="card">
+                <h2>Produção</h2>
+
+                <!-- Idle: setup fields -->
+                <div id="startPanel">
+                    <div class="field">
+                        <label for="opInput">Ordem de Produção</label>
+                        <input id="opInput" class="mono" list="opList" placeholder="Digite a OP"
+                            autocomplete="off">
+                        <datalist id="opList"></datalist>
+                        <div class="hint" id="opHint">A OP carrega cliente e produto automaticamente.</div>
+                    </div>
+                    <div class="field">
+                        <label>Cliente</label>
+                        <div class="readonly-field" id="clienteField">—</div>
+                    </div>
+                    <div class="field">
+                        <label>Produto</label>
+                        <div class="readonly-field" id="produtoField">—</div>
+                    </div>
+                    <div class="field">
+                        <label for="matriculaInput">Matrícula</label>
+                        <input id="matriculaInput" class="mono" placeholder="Digite a matrícula"
+                            autocomplete="off">
+                    </div>
+                    <div class="field">
+                        <label for="recursoSelect">Recurso</label>
+                        <select id="recursoSelect">
+                            <option value="">Selecione a máquina</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="startBtn" disabled>
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="5 3 19 12 5 21 5 3" />
+                        </svg>
+                        Iniciar Produção
+                    </button>
+                </div>
+
+                <!-- Active: running / occurrence -->
+                <div id="activePanel" style="display:none;">
+                    <div class="active-summary">
+                        <div>OP<b id="sumOp">—</b></div>
+                        <div>Recurso<b id="sumRecurso">—</b></div>
+                        <div>Matrícula<b id="sumMatricula">—</b></div>
+                        <div>Início<b id="sumInicio">—</b></div>
+                    </div>
+
+                    <div class="apont-meta">
+                        <span>Último apontamento: <b id="sumUltimo">—</b></span>
+                        <span class="next-badge" id="nextBadge">
+                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="9" />
+                                <polyline points="12 7 12 12 15 14" />
+                            </svg>
+                            <span id="nextTimer">--:--:--</span>
+                        </span>
+                    </div>
+
+                    <div class="field">
+                        <label for="qtdInput">Quantidade Produzida (neste intervalo)</label>
+                        <input id="qtdInput" type="number" min="0" class="mono" placeholder="0">
+                    </div>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="encerrarCheck">
+                        <label for="encerrarCheck">Encerrar esta Ordem de Produção</label>
+                    </div>
+                    <button class="btn btn-stop" id="finalizeBtn" disabled>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        Apontar Produção
+                    </button>
+                    <div class="hint warn" id="finalizeHint" style="display:none;">Finalize a ocorrência em andamento
+                        antes de apontar a produção.</div>
+                </div>
+            </div>
+
+            <!-- OCORRÊNCIA -->
+            <div class="card">
+                <h2>Ocorrência</h2>
+                <div id="occIdleMsg" class="readonly-field" style="text-align:center;">Disponível durante uma produção
+                    ativa.</div>
+
+                <div id="occPanel" style="display:none;">
+                    <div class="field">
+                        <label for="motivoSelect">Motivo da Parada</label>
+                        <select id="motivoSelect">
+                            <option value="">Selecione o motivo</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-amber" id="occBtn" disabled>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
+                            <line x1="12" y1="9" x2="12" y2="13" />
+                            <line x1="12" y1="17" x2="12.01" y2="17" />
+                        </svg>
+                        Iniciar Ocorrência
+                    </button>
+
+                    <div class="divider"></div>
+                    <div class="field" style="margin-bottom:6px;">
+                        <label>Ocorrências desta produção</label>
+                    </div>
+                    <div class="log-list" id="occMiniList" style="max-height:220px;">
+                        <div class="log-empty" id="occMiniEmpty">Nenhuma ocorrência registrada nesta produção.</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- HISTÓRICO -->
+        <div class="card log-card">
+            <h2>Histórico de Apontamentos</h2>
+            <div class="log-list" id="logList">
+                <div class="log-empty" id="logEmpty">Nenhum apontamento registrado ainda. Inicie uma produção para
+                    começar.</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="toast" id="toast">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+        </svg>
+        <span id="toastMsg">Apontamento registrado</span>
+    </div>
+
+    <script>
+        (function () {
+            // ---------- Mock integration data (in a real deployment this comes from the ERP) ----------
+            const DB_OPS = {
+                '042543': { cliente: 'GLOBAL DISTRIBUIDORA DA AMAZONIA LTDA', produto: 'SACOLA FORTEPLAS 60X70 C/500 FARDOS C/100 UN' },
+                '042611': { cliente: 'SUPERMERCADOS BOM PREÇO S.A.', produto: 'SACO LIXO REFORÇADO 100L C/100 UN' },
+                '042598': { cliente: 'DISTRIBUIDORA NORTE EMBALAGENS LTDA', produto: 'FILME STRETCH 50CM X 300M' },
+            };
+            const RECURSOS = ['MS1000.4', 'EXT200.1', 'INJ150.2', 'COEX300.3'];
+            const MOTIVOS = ['Troca de Bobina', 'Manutenção Corretiva', 'Manutenção Preventiva', 'Falta de Matéria-Prima', 'Queda de Energia', 'Setup / Ajuste', 'Outros'];
+
+            // ---------- State ----------
+            let status = 'idle'; // idle | running | occurrence
+            let active = null;   // { op, cliente, produto, matricula, recurso, start, occurrences:[] }
+            let occ = null;       // { motivo, start }
+            let log = [];
+            let intervalMs = 120000;     // apontamento cadence — 2 min in test mode, 60 min in production
+            let lastApontamentoAt = null;
+            let alerting = false;
+
+            // ---------- Elements ----------
+            const $ = id => document.getElementById(id);
+            const clockEl = $('clockEl');
+            const intervalSelect = $('intervalSelect'), alertOverlay = $('alertOverlay');
+            const statusLabel = $('statusLabel'), statusDetail = $('statusDetail'), statusTimer = $('statusTimer');
+            const opInput = $('opInput'), opList = $('opList'), opHint = $('opHint');
+            const clienteField = $('clienteField'), produtoField = $('produtoField');
+            const matriculaInput = $('matriculaInput'), recursoSelect = $('recursoSelect');
+            const startBtn = $('startBtn'), startPanel = $('startPanel'), activePanel = $('activePanel');
+            const sumOp = $('sumOp'), sumRecurso = $('sumRecurso'), sumMatricula = $('sumMatricula'), sumInicio = $('sumInicio'), sumUltimo = $('sumUltimo');
+            const nextBadge = $('nextBadge'), nextTimer = $('nextTimer');
+            const qtdInput = $('qtdInput'), encerrarCheck = $('encerrarCheck'), finalizeBtn = $('finalizeBtn'), finalizeHint = $('finalizeHint');
+            const occIdleMsg = $('occIdleMsg'), occPanel = $('occPanel'), motivoSelect = $('motivoSelect'), occBtn = $('occBtn');
+            const occMiniList = $('occMiniList'), occMiniEmpty = $('occMiniEmpty');
+            const logList = $('logList'), logEmpty = $('logEmpty');
+            const toast = $('toast'), toastMsg = $('toastMsg');
+
+            // ---------- Helpers ----------
+            const pad = n => String(n).padStart(2, '0');
+            const fmtClock = d => `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+            const fmtDateTime = d => `${pad(d.getDate())}/${pad(d.getMonth() + 1)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+            const fmtDuration = ms => {
+                const s = Math.max(0, Math.floor(ms / 1000));
+                const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+                return `${pad(h)}:${pad(m)}:${pad(sec)}`;
+            };
+
+            function showToast(msg) {
+                toastMsg.textContent = msg;
+                toast.classList.add('show');
+                clearTimeout(showToast._t);
+                showToast._t = setTimeout(() => toast.classList.remove('show'), 2600);
+            }
+
+            // ---------- Apontamento cadence & alert ----------
+            intervalSelect.addEventListener('change', () => {
+                intervalMs = Number(intervalSelect.value);
+            });
+
+            function clearAlert() {
+                alerting = false;
+                document.body.classList.remove('alerting');
+                nextBadge.classList.remove('overdue');
+            }
+
+            function checkApontamento(now) {
+                if (status === 'idle' || !active) {
+                    nextTimer.textContent = '--:--:--';
+                    if (alerting) clearAlert();
+                    return;
+                }
+                const remaining = intervalMs - (now - lastApontamentoAt);
+                if (remaining <= 0) {
+                    if (!alerting) {
+                        alerting = true;
+                        document.body.classList.add('alerting');
+                        nextBadge.classList.add('overdue');
+                    }
+                    nextTimer.textContent = 'Atrasado';
+                } else {
+                    nextTimer.textContent = fmtDuration(remaining);
+                }
+            }
+
+            // ---------- Init selects ----------
+            Object.keys(DB_OPS).forEach(op => {
+                const o = document.createElement('option'); o.value = op; opList.appendChild(o);
+            });
+            RECURSOS.forEach(r => {
+                const o = document.createElement('option'); o.value = r; o.textContent = r; recursoSelect.appendChild(o);
+            });
+            MOTIVOS.forEach(m => {
+                const o = document.createElement('option'); o.value = m; o.textContent = m; motivoSelect.appendChild(o);
+            });
+
+            // ---------- OP lookup ----------
+            opInput.addEventListener('input', () => {
+                const code = opInput.value.trim();
+                const rec = DB_OPS[code];
+                if (rec) {
+                    clienteField.textContent = rec.cliente;
+                    produtoField.textContent = rec.produto;
+                    clienteField.classList.add('filled');
+                    produtoField.classList.add('filled');
+                    opHint.textContent = 'OP encontrada — cliente e produto carregados automaticamente.';
+                    opHint.classList.remove('warn');
+                } else {
+                    clienteField.textContent = '—'; produtoField.textContent = '—';
+                    clienteField.classList.remove('filled'); produtoField.classList.remove('filled');
+                    opHint.textContent = code ? 'OP não encontrada na base. Verifique o número.' : 'A OP carrega cliente e produto automaticamente.';
+                    opHint.classList.toggle('warn', !!code);
+                }
+                validateStart();
+            });
+            matriculaInput.addEventListener('input', validateStart);
+            recursoSelect.addEventListener('change', validateStart);
+
+            function validateStart() {
+                const op = opInput.value.trim();
+                const ok = !!DB_OPS[op] && matriculaInput.value.trim() !== '' && recursoSelect.value !== '';
+                startBtn.disabled = !ok;
+            }
+
+            // ---------- Start production ----------
+            startBtn.addEventListener('click', () => {
+                const op = opInput.value.trim();
+                const rec = DB_OPS[op];
+                active = {
+                    op, cliente: rec.cliente, produto: rec.produto,
+                    matricula: matriculaInput.value.trim(),
+                    recurso: recursoSelect.value,
+                    start: new Date(),
+                    occurrences: []
+                };
+                status = 'running';
+                document.body.dataset.status = status;
+                lastApontamentoAt = active.start;
+                clearAlert();
+
+                sumOp.textContent = active.op;
+                sumRecurso.textContent = active.recurso;
+                sumMatricula.textContent = active.matricula;
+                sumInicio.textContent = fmtDateTime(active.start);
+                sumUltimo.textContent = '—';
+
+                startPanel.style.display = 'none';
+                activePanel.style.display = 'block';
+                occIdleMsg.style.display = 'none';
+                occPanel.style.display = 'block';
+
+                qtdInput.value = '';
+                encerrarCheck.checked = false;
+                motivoSelect.value = '';
+                occBtn.disabled = true;
+                occBtn.innerHTML = iconAlert() + ' Iniciar Ocorrência';
+                occBtn.classList.remove('btn-amber-outline'); occBtn.classList.add('btn-amber');
+                renderOccMini();
+                validateFinalize();
+            });
+
+            function iconAlert() {
+                return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+            }
+            function iconStop() {
+                return `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>`;
+            }
+
+            // ---------- Finalize production ----------
+            qtdInput.addEventListener('input', validateFinalize);
+            function validateFinalize() {
+                const qtdOk = qtdInput.value !== '' && Number(qtdInput.value) > 0;
+                const blockedByOcc = status === 'occurrence';
+                finalizeBtn.disabled = !qtdOk || blockedByOcc;
+                finalizeHint.style.display = blockedByOcc ? 'block' : 'none';
+            }
+
+            finalizeBtn.addEventListener('click', () => {
+                const end = new Date();
+                const entry = {
+                    type: 'producao',
+                    op: active.op, cliente: active.cliente, produto: active.produto,
+                    matricula: active.matricula, recurso: active.recurso,
+                    start: lastApontamentoAt, end,
+                    duration: end - lastApontamentoAt,
+                    quantidade: Number(qtdInput.value),
+                    encerrouOP: encerrarCheck.checked
+                };
+                log.unshift(entry);
+                renderLog();
+
+                lastApontamentoAt = end;
+                clearAlert();
+
+                if (encerrarCheck.checked) {
+                    showToast('Apontamento registrado — OP encerrada');
+
+                    // reset to idle
+                    status = 'idle'; active = null; occ = null;
+                    document.body.dataset.status = status;
+                    startPanel.style.display = 'block';
+                    activePanel.style.display = 'none';
+                    occPanel.style.display = 'none';
+                    occIdleMsg.style.display = 'block';
+
+                    opInput.value = '';
+                    clienteField.textContent = '—'; produtoField.textContent = '—';
+                    clienteField.classList.remove('filled'); produtoField.classList.remove('filled');
+                    opHint.textContent = 'A OP carrega cliente e produto automaticamente.';
+                    opHint.classList.remove('warn');
+                    recursoSelect.value = '';
+                    validateStart();
+                } else {
+                    showToast('Apontamento registrado — produção continua');
+                    sumUltimo.textContent = fmtClock(end);
+                    qtdInput.value = '';
+                    encerrarCheck.checked = false;
+                    validateFinalize();
+                }
+            });
+
+            // ---------- Occurrence ----------
+            motivoSelect.addEventListener('change', () => {
+                if (status === 'running') occBtn.disabled = motivoSelect.value === '';
+            });
+
+            occBtn.addEventListener('click', () => {
+                if (status === 'running') {
+                    // start occurrence
+                    occ = { motivo: motivoSelect.value, start: new Date() };
+                    status = 'occurrence';
+                    document.body.dataset.status = status;
+                    motivoSelect.disabled = true;
+                    occBtn.innerHTML = iconStop() + ' Finalizar Ocorrência';
+                    occBtn.classList.remove('btn-amber'); occBtn.classList.add('btn-amber-outline');
+                    validateFinalize();
+                } else if (status === 'occurrence') {
+                    // finish occurrence
+                    const end = new Date();
+                    const entry = { motivo: occ.motivo, start: occ.start, end, duration: end - occ.start };
+                    active.occurrences.unshift(entry);
+                    status = 'running';
+                    document.body.dataset.status = status;
+                    motivoSelect.disabled = false;
+                    motivoSelect.value = '';
+                    occBtn.disabled = true;
+                    occBtn.innerHTML = iconAlert() + ' Iniciar Ocorrência';
+                    occBtn.classList.remove('btn-amber-outline'); occBtn.classList.add('btn-amber');
+                    occ = null;
+                    renderOccMini();
+                    validateFinalize();
+                    showToast('Ocorrência finalizada');
+                }
+            });
+
+            function renderOccMini() {
+                if (!active || active.occurrences.length === 0) {
+                    occMiniEmpty.style.display = 'block';
+                    occMiniList.innerHTML = '';
+                    occMiniList.appendChild(occMiniEmpty);
+                    return;
+                }
+                occMiniEmpty.style.display = 'none';
+                occMiniList.innerHTML = '';
+                active.occurrences.forEach(o => {
+                    occMiniList.appendChild(buildLogRow({
+                        type: 'ocorrencia', title: o.motivo, sub: 'Durante a OP ' + active.op,
+                        time: `${fmtClock(o.start)} → ${fmtClock(o.end)}`, dur: fmtDuration(o.duration)
+                    }));
+                });
+            }
+
+            // ---------- Log rendering ----------
+            function buildLogRow({ type, title, sub, time, dur }) {
+                const row = document.createElement('div');
+                row.className = 'log-row t-' + type;
+                const icon = type === 'producao'
+                    ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+                    : iconAlert();
+                row.innerHTML = `
+      <div class="l-icon">${icon}</div>
+      <div class="l-main">
+        <div class="l-title">${title}</div>
+        <div class="l-sub">${sub}</div>
+      </div>
+      <div class="l-time">${time}</div>
+      <div class="l-dur">${dur}</div>`;
+                return row;
+            }
+
+            function renderLog() {
+                if (log.length === 0) {
+                    logList.innerHTML = '';
+                    logList.appendChild(logEmpty);
+                    logEmpty.style.display = 'block';
+                    return;
+                }
+                logList.innerHTML = '';
+                log.forEach(e => {
+                    logList.appendChild(buildLogRow({
+                        type: 'producao',
+                        title: `OP ${e.op} · ${e.produto}`,
+                        sub: `${e.cliente} · Matrícula ${e.matricula} · ${e.recurso}${e.encerrouOP ? ' · OP encerrada' : ''}`,
+                        time: `${fmtClock(e.start)} → ${fmtClock(e.end)}`,
+                        dur: `${e.quantidade} un · ${fmtDuration(e.duration)}`
+                    }));
+                });
+            }
+
+            // ---------- Ticking clock & live timers ----------
+            function tick() {
+                const now = new Date();
+                clockEl.textContent = fmtClock(now);
+                checkApontamento(now);
+
+                if (status === 'running') {
+                    statusLabel.textContent = 'Produzindo';
+                    statusDetail.innerHTML = `OP <strong>${active.op}</strong> · ${active.recurso} · ${active.produto}`;
+                    statusTimer.textContent = fmtDuration(now - active.start);
+                } else if (status === 'occurrence') {
+                    statusLabel.textContent = 'Parada — ' + occ.motivo;
+                    statusDetail.innerHTML = `OP <strong>${active.op}</strong> em espera · ${active.recurso}`;
+                    statusTimer.textContent = fmtDuration(now - occ.start);
+                } else {
+                    statusLabel.textContent = 'Aguardando início';
+                    statusDetail.textContent = 'Selecione a ordem de produção para começar.';
+                    statusTimer.textContent = '00:00:00';
+                }
+            }
+            tick();
+            setInterval(tick, 1000);
+
+        })();
+    </script>
+</body>
+
+</html>
