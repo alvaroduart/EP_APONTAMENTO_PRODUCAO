@@ -85,6 +85,10 @@ STATICFILES_DIRS = []
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Session Configuration
+# Use cookie-based sessions to avoid database writes in serverless hosting (Vercel)
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
+
 # Google Sheets Configuration
 SPREADSHEET_ID = os.environ.get('SPREADSHEET_ID', '1hbXN9-LmP-rrNG0Iv5a-TEa09q0vdJzcGgn40P9M720')
 CREDENTIALS_FILE = BASE_DIR / 'credentials.json'
