@@ -72,3 +72,45 @@ class ProductionTerminalTests(TestCase):
             
             # Assert that repository method was called with correct parameters
             mock_repo.update_apontamento.assert_called_once_with(payload['filter'], 150)
+
+    def test_save_apontamento_repository(self):
+        """Test that save_apontamento correctly finds next empty row and updates columns A to I."""
+        from unittest.mock import MagicMock
+        from producao.infrastructure.repositories import GoogleSheetsProducaoRepository
+        from producao.domain.entities import Apontamento
+
+        repo = GoogleSheetsProducaoRepository()
+        
+        # Mock worksheet
+        mock_worksheet = MagicMock()
+        repo._get_worksheet_by_id = MagicMock(return_value=mock_worksheet)
+        
+        # col_values(1) returns 5 values (e.g. 5 rows including header)
+        mock_worksheet.col_values.return_value = ['OP', '101', '102', '103', '104']
+        
+        apontamento = Apontamento(
+            op_id="12345",
+            cliente="Cliente Teste",
+            descricao_produto="Produto Teste",
+            data="28/06/2026",
+            hora="20:00:00",
+            matricula="999",
+            maquina="M1",
+            op_encerrada="Não",
+            quantidade=100
+        )
+        
+        repo.save_apontamento(apontamento)
+        
+        # It should check col_values of column 1 (A)
+        mock_worksheet.col_values.assert_called_once_with(1)
+        
+        # It should update row 6 (5 existing + 1)
+        mock_worksheet.update.assert_called_once_with(
+            values=[[
+                "12345", "Cliente Teste", "Produto Teste",
+                "28/06/2026", "20:00:00", "999", "M1", "Não", 100
+            ]],
+            range_name="A6:I6",
+            raw=False
+        )

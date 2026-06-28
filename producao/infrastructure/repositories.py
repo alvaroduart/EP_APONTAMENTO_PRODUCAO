@@ -65,7 +65,14 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
     def save_apontamento(self, apontamento: Apontamento) -> None:
         # Aba 1: Apontamentos (gid = 0)
         sheet = self._get_worksheet_by_id(0)
-        sheet.append_row([
+        
+        # Obter os valores da coluna A para encontrar a próxima linha vazia
+        col_a_values = sheet.col_values(1)
+        next_row = len(col_a_values) + 1
+        
+        # Limitar a atualização estritamente até a coluna I (A:I)
+        # para evitar sobrescrever fórmulas pessoais nas colunas seguintes (J, K...)
+        values = [
             apontamento.op_id,
             apontamento.cliente,
             apontamento.descricao_produto,
@@ -75,7 +82,13 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
             apontamento.maquina,
             apontamento.op_encerrada,
             apontamento.quantidade
-        ])
+        ]
+        
+        sheet.update(
+            values=[values],
+            range_name=f"A{next_row}:I{next_row}",
+            raw=False
+        )
 
     def save_ocorrencia(self, ocorrencia: Ocorrencia) -> None:
         # Aba 2: Ocorrencias (gid = 1265473594)
