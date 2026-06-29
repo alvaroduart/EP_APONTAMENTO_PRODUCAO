@@ -644,7 +644,7 @@
             <!-- Card Grid -->
             <div class="card-grid">
                 {% for card in section.cards %}
-                <div class="card status-{{ card.status|lower }} {% if card.is_live %}live-card{% endif %}">
+                <div class="card status-{{ card.status_class }} {% if card.is_live %}live-card{% endif %}">
                     <div class="card-top">
                         <div class="card-title">
                             <h4>{{ card.name }}</h4>

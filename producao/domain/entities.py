@@ -17,6 +17,7 @@ class Ocorrencia:
     hora_inicio: str  # HH:MM:SS
     data_fim: Optional[str] = None  # DD/MM/YYYY
     hora_fim: Optional[str] = None  # HH:MM:SS
+    maquina: Optional[str] = None
 
 @dataclass
 class Apontamento:

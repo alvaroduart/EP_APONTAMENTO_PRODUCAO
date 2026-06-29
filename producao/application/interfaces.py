@@ -27,3 +27,8 @@ class IProducaoRepository(ABC):
     def update_apontamento(self, filter_data: dict, new_quantidade: int) -> bool:
         """Update an existing appointment's quantity in repository."""
         pass
+
+    @abstractmethod
+    def finalize_ocorrencia(self, op_id: str, data_inicio: str, hora_inicio: str, data_fim: str, hora_fim: str) -> bool:
+        """Finalize an existing open occurrence by updating its end date and time."""
+        pass

@@ -9,7 +9,8 @@ from producao.application.use_cases import (
     ListarOPsUseCase,
     ApontarProducaoUseCase,
     RegistrarOcorrenciaUseCase,
-    EditarApontamentoUseCase
+    EditarApontamentoUseCase,
+    FinalizarOcorrenciaUseCase
 )
 from producao.presentation.serializers import validate_fields
 from producao.domain.exceptions import BusinessError
@@ -90,7 +91,7 @@ def ocorrencias(request):
         data = json.loads(request.body)
         err = validate_fields(data, [
             'op_id', 'cliente', 'descricao_produto', 'ocorrencia', 
-            'data_inicio', 'hora_inicio'
+            'data_inicio', 'hora_inicio', 'maquina'
         ])
         if err:
             return JsonResponse({'error': 'validation_error', 'message': err}, status=400)
@@ -106,7 +107,8 @@ def ocorrencias(request):
             data_inicio=str(data['data_inicio']),
             hora_inicio=str(data['hora_inicio']),
             data_fim=data.get('data_fim'),
-            hora_fim=data.get('hora_fim')
+            hora_fim=data.get('hora_fim'),
+            maquina=str(data['maquina'])
         )
         
         return JsonResponse({
@@ -115,6 +117,41 @@ def ocorrencias(request):
         })
     except BusinessError as e:
         return JsonResponse({'error': 'business_error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': 'error', 'message': str(e)}, status=500)
+
+@csrf_exempt
+def finalize_ocorrencia(request):
+    """API endpoint to finalize an open occurrence in Google Sheets."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+        
+    try:
+        data = json.loads(request.body)
+        err = validate_fields(data, [
+            'op_id', 'data_inicio', 'hora_inicio', 'data_fim', 'hora_fim'
+        ])
+        if err:
+            return JsonResponse({'error': 'validation_error', 'message': err}, status=400)
+            
+        repo = GoogleSheetsProducaoRepository()
+        use_case = FinalizarOcorrenciaUseCase(repo)
+        
+        success = use_case.execute(
+            op_id=str(data['op_id']),
+            data_inicio=str(data['data_inicio']),
+            hora_inicio=str(data['hora_inicio']),
+            data_fim=str(data['data_fim']),
+            hora_fim=str(data['hora_fim'])
+        )
+        
+        if success:
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Ocorrência finalizada com sucesso no Google Sheets'
+            })
+        else:
+            return JsonResponse({'error': 'not_found', 'message': 'Ocorrência aberta correspondente não encontrada'}, status=404)
     except Exception as e:
         return JsonResponse({'error': 'error', 'message': str(e)}, status=500)
 
@@ -187,13 +224,15 @@ def admin_dashboard(request):
         # 3. Fetch occurrences for open occurrence check
         ocorrencias_sheet = repo._get_worksheet_by_id(1265473594)
         ocorrencias_rows = ocorrencias_sheet.get_all_values()
-        open_op_occurrences = set()
+        open_machine_occurrences = {}
         for row in ocorrencias_rows[1:]:
-            if len(row) >= 8:
+            if len(row) >= 9:
                 op_id = row[0].strip()
                 data_fim = row[6].strip()
-                if not data_fim:
-                    open_op_occurrences.add(op_id)
+                motive = row[3].strip()
+                maquina = row[8].strip()
+                if not data_fim and maquina:
+                    open_machine_occurrences[maquina] = motive
 
         # Helper function to clean floats
         def clean_float(val_str):
@@ -281,24 +320,29 @@ def admin_dashboard(request):
                 elif mid == 'F75002': target_speed = 214.0
                 elif mid == 'HS1001': target_speed = 99.0
 
-                if pts:
-                    # Get the latest pointing
-                    latest = pts[-1]
-                    op_id = latest['op_id']
-                    op_encerrada = latest['op_encerrada']
-                    
-                    if op_id in open_op_occurrences:
-                        status = 'Manutenção'
-                    elif op_encerrada == 'Sim':
-                        status = 'Ociosa'
+                if mid in open_machine_occurrences:
+                    status = open_machine_occurrences[mid]
+                    status_class = 'manutencao'
+                else:
+                    if pts:
+                        latest = pts[-1]
+                        op_encerrada = latest['op_encerrada']
+                        if op_encerrada == 'Sim':
+                            status = 'Ociosa'
+                            status_class = 'ociosa'
+                        else:
+                            status = 'Operando'
+                            status_class = 'operando'
                     else:
-                        status = 'Operando'
+                        status = 'Ociosa'
+                        status_class = 'ociosa'
 
-                    # Get QTD PRODUZIDA (Column J - hora_hora) and QTD ACUMULADA (Column I - quantidade) from the last appearance
+                if pts:
+                    latest = pts[-1]
                     qtd_produzida = latest.get('hora_hora', '—')
                     qtd_acumulada = latest.get('quantidade', '—')
-
-                    # Find the latest non-empty OEE efficiency value from Column M for this machine
+                    cliente = latest.get('cliente', '')
+                    
                     eff = 0
                     for ap in reversed(pts):
                         oee_val = ap.get('oee_eficiencia', '').strip()
@@ -306,37 +350,34 @@ def admin_dashboard(request):
                             eff = clean_oee(oee_val)
                             break
 
-                    # Find the latest non-empty Performance Acumulada from Column N for this machine
                     perf_acumulada = 0
                     for ap in reversed(pts):
                         perf_val = ap.get('performance_acumulada_raw', '').strip()
                         if perf_val:
                             perf_acumulada = clean_oee(perf_val)
                             break
-
-                    cat_cards.append({
-                        'code': mid,
-                        'name': display_name,
-                        'status': status,
-                        'qtd_produzida': qtd_produzida,
-                        'qtd_acumulada': qtd_acumulada,
-                        'performance_acumulada': perf_acumulada,
-                        'efficiency': eff,
-                        'cliente': latest.get('cliente', ''),
-                        'is_live': True
-                    })
+                            
+                    is_live = True
                 else:
-                    cat_cards.append({
-                        'code': mid,
-                        'name': display_name,
-                        'status': 'Ociosa',
-                        'qtd_produzida': '—',
-                        'qtd_acumulada': '—',
-                        'performance_acumulada': 0,
-                        'efficiency': 0,
-                        'cliente': '—',
-                        'is_live': False
-                    })
+                    qtd_produzida = '—'
+                    qtd_acumulada = '—'
+                    cliente = '—'
+                    eff = 0
+                    perf_acumulada = 0
+                    is_live = False
+
+                cat_cards.append({
+                    'code': mid,
+                    'name': display_name,
+                    'status': status,
+                    'status_class': status_class,
+                    'qtd_produzida': qtd_produzida,
+                    'qtd_acumulada': qtd_acumulada,
+                    'performance_acumulada': perf_acumulada,
+                    'efficiency': eff,
+                    'cliente': cliente,
+                    'is_live': is_live
+                })
             sections.append({
                 'name': cat_name,
                 'cards': cat_cards

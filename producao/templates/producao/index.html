@@ -1431,17 +1431,7 @@
             occBtn.addEventListener('click', async () => {
                 if (status === 'running') {
                     // start occurrence
-                    occ = { motivo: motivoSelect.value, start: new Date() };
-                    status = 'occurrence';
-                    document.body.dataset.status = status;
-                    motivoSelect.disabled = true;
-                    occBtn.innerHTML = iconStop() + ' Finalizar Ocorrência';
-                    occBtn.classList.remove('btn-amber'); occBtn.classList.add('btn-amber-outline');
-                    validateFinalize();
-                    await saveActiveState();
-                } else if (status === 'occurrence') {
-                    // finish occurrence
-                    const end = new Date();
+                    const start = new Date();
                     occBtn.disabled = true;
                     const prevLabel = occBtn.innerHTML;
                     occBtn.innerHTML = 'Enviando...';
@@ -1451,11 +1441,10 @@
                             op_id: active.op,
                             cliente: active.cliente,
                             descricao_produto: active.produto,
-                            ocorrencia: occ.motivo,
-                            data_inicio: fmtDate(occ.start),
-                            hora_inicio: fmtTime(occ.start),
-                            data_fim: fmtDate(end),
-                            hora_fim: fmtTime(end)
+                            ocorrencia: motivoSelect.value,
+                            data_inicio: fmtDate(start),
+                            hora_inicio: fmtTime(start),
+                            maquina: active.recurso
                         };
                         
                         const response = await fetch('/api/ocorrencias/', {
@@ -1466,7 +1455,51 @@
                         
                         const resData = await response.json();
                         if (!response.ok) {
-                            throw new Error(resData.message || 'Falha ao registrar ocorrência no Google Sheets.');
+                            throw new Error(resData.message || 'Falha ao registrar início da ocorrência no Google Sheets.');
+                        }
+                        
+                        occ = { motivo: motivoSelect.value, start: start };
+                        status = 'occurrence';
+                        document.body.dataset.status = status;
+                        motivoSelect.disabled = true;
+                        occBtn.innerHTML = iconStop() + ' Finalizar Ocorrência';
+                        occBtn.classList.remove('btn-amber'); occBtn.classList.add('btn-amber-outline');
+                        validateFinalize();
+                        await saveActiveState();
+                        showToast('Ocorrência iniciada');
+                    } catch (e) {
+                        await showAlert('Erro ao iniciar ocorrência: ' + e.message, 'Erro');
+                    } finally {
+                        occBtn.disabled = false;
+                        if (status === 'running') {
+                            occBtn.innerHTML = prevLabel;
+                        }
+                    }
+                } else if (status === 'occurrence') {
+                    // finish occurrence
+                    const end = new Date();
+                    occBtn.disabled = true;
+                    const prevLabel = occBtn.innerHTML;
+                    occBtn.innerHTML = 'Enviando...';
+                    
+                    try {
+                        const payload = {
+                            op_id: active.op,
+                            data_inicio: fmtDate(occ.start),
+                            hora_inicio: fmtTime(occ.start),
+                            data_fim: fmtDate(end),
+                            hora_fim: fmtTime(end)
+                        };
+                        
+                        const response = await fetch('/api/ocorrencias/finalize/', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        
+                        const resData = await response.json();
+                        if (!response.ok) {
+                            throw new Error(resData.message || 'Falha ao finalizar ocorrência no Google Sheets.');
                         }
                         
                         const entry = { motivo: occ.motivo, start: occ.start, end, duration: end - occ.start };

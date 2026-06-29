@@ -160,7 +160,8 @@ class ProductionTerminalTests(TestCase):
             # Mock worksheet for occurrences
             mock_ws_ocorr = MagicMock()
             mock_ws_ocorr.get_all_values.return_value = [
-                ['Ordem Produção', 'Cliente', 'Descrição Produto', 'Ocorrência', 'Data Inicio', 'Hora Inicio', 'Data Fim', 'Hora Fim']
+                ['Ordem Produção', 'Cliente', 'Descrição Produto', 'Ocorrência', 'Data Inicio', 'Hora Inicio', 'Data Fim', 'Hora Fim', 'Maquina'],
+                ['44579', 'INTERBRANDS FOODS LTDA', 'SACO PP TRANSP 25.02.000077', 'Banheiro', '28/06/2026', '20:00:00', '', '', 'F75002']
             ]
             
             # Map get_worksheet mock by ID
@@ -176,6 +177,64 @@ class ProductionTerminalTests(TestCase):
             response = self.client.get(reverse('admin_dashboard'))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, "Módulo PCP")
-            self.assertContains(response, "Extrusora Monocamada EX-01")
-            self.assertContains(response, "Extrusora Larga Silagem EX-03")
+            self.assertContains(response, "Solda Lateral")
+            self.assertContains(response, "Varejo")
+            self.assertContains(response, "Banheiro")
+
+    def test_finalize_ocorrencia_api_success(self):
+        """Test finalizing an occurrence with success via mocked repository."""
+        from unittest.mock import patch
+        
+        with patch('producao.presentation.views.GoogleSheetsProducaoRepository') as mock_repo_class:
+            mock_repo = mock_repo_class.return_value
+            mock_repo.finalize_ocorrencia.return_value = True
+            
+            payload = {
+                'op_id': '17711',
+                'data_inicio': '26/06/2026',
+                'hora_inicio': '08:45:00',
+                'data_fim': '26/06/2026',
+                'hora_fim': '09:00:00'
+            }
+            
+            response = self.client.post(
+                reverse('finalize_ocorrencia'),
+                data=json.dumps(payload),
+                content_type='application/json'
+            )
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {
+                'status': 'success',
+                'message': 'Ocorrência finalizada com sucesso no Google Sheets'
+            })
+            mock_repo.finalize_ocorrencia.assert_called_once_with(
+                '17711', '26/06/2026', '08:45:00', '26/06/2026', '09:00:00'
+            )
+
+    def test_finalize_ocorrencia_api_not_found(self):
+        """Test finalizing a non-existent occurrence yields 404."""
+        from unittest.mock import patch
+        
+        with patch('producao.presentation.views.GoogleSheetsProducaoRepository') as mock_repo_class:
+            mock_repo = mock_repo_class.return_value
+            mock_repo.finalize_ocorrencia.return_value = False
+            
+            payload = {
+                'op_id': '00000',
+                'data_inicio': '26/06/2026',
+                'hora_inicio': '08:45:00',
+                'data_fim': '26/06/2026',
+                'hora_fim': '09:00:00'
+            }
+            
+            response = self.client.post(
+                reverse('finalize_ocorrencia'),
+                data=json.dumps(payload),
+                content_type='application/json'
+            )
+            self.assertEqual(response.status_code, 404)
+            self.assertEqual(response.json(), {
+                'error': 'not_found',
+                'message': 'Ocorrência aberta correspondente não encontrada'
+            })
 

@@ -119,7 +119,10 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
     def save_ocorrencia(self, ocorrencia: Ocorrencia) -> None:
         # Aba 2: Ocorrencias (gid = 1265473594)
         sheet = self._get_worksheet_by_id(1265473594)
-        sheet.append_row([
+        col_a_values = sheet.col_values(1)
+        next_row = len(col_a_values) + 1
+        
+        values = [
             ocorrencia.op_id,
             ocorrencia.cliente,
             ocorrencia.descricao_produto,
@@ -127,8 +130,15 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
             ocorrencia.data_inicio,
             ocorrencia.hora_inicio,
             ocorrencia.data_fim or "",
-            ocorrencia.hora_fim or ""
-        ])
+            ocorrencia.hora_fim or "",
+            ocorrencia.maquina or ""
+        ]
+        
+        sheet.update(
+            values=[values],
+            range_name=f"A{next_row}:I{next_row}",
+            raw=False
+        )
 
     def update_apontamento(self, filter_data: dict, new_quantidade: int) -> bool:
         # Aba 1: Apontamentos (gid = 0)
@@ -148,6 +158,29 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
                 
                 # Update Quantity (Col 9 in 1-based index)
                 sheet.update_cell(idx, 9, new_quantidade)
+                return True
+                
+        return False
+
+    def finalize_ocorrencia(self, op_id: str, data_inicio: str, hora_inicio: str, data_fim: str, hora_fim: str) -> bool:
+        # Aba 2: Ocorrencias (gid = 1265473594)
+        sheet = self._get_worksheet_by_id(1265473594)
+        rows = sheet.get_all_values()
+        
+        if not rows:
+            return False
+            
+        for idx, row in enumerate(rows[1:], start=2):
+            if (len(row) >= 6 and
+                row[0].strip() == str(op_id).strip() and
+                row[4].strip() == str(data_inicio).strip() and
+                row[5].strip() == str(hora_inicio).strip() and
+                (len(row) <= 6 or not row[6].strip())):
+                
+                # Column G is Data Fim (7th col)
+                sheet.update_cell(idx, 7, data_fim)
+                # Column H is Hora Fim (8th col)
+                sheet.update_cell(idx, 8, hora_fim)
                 return True
                 
         return False

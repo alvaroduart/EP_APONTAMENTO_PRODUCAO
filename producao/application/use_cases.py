@@ -64,7 +64,8 @@ class RegistrarOcorrenciaUseCase:
         data_inicio: str,
         hora_inicio: str,
         data_fim: Optional[str] = None,
-        hora_fim: Optional[str] = None
+        hora_fim: Optional[str] = None,
+        maquina: Optional[str] = None
     ) -> Ocorrencia:
         entry = Ocorrencia(
             op_id=op_id,
@@ -74,7 +75,8 @@ class RegistrarOcorrenciaUseCase:
             data_inicio=data_inicio,
             hora_inicio=hora_inicio,
             data_fim=data_fim,
-            hora_fim=hora_fim
+            hora_fim=hora_fim,
+            maquina=maquina
         )
         self.repo.save_ocorrencia(entry)
         return entry
@@ -85,3 +87,10 @@ class EditarApontamentoUseCase:
 
     def execute(self, filter_data: dict, new_quantidade: int) -> bool:
         return self.repo.update_apontamento(filter_data, new_quantidade)
+
+class FinalizarOcorrenciaUseCase:
+    def __init__(self, repo: IProducaoRepository):
+        self.repo = repo
+
+    def execute(self, op_id: str, data_inicio: str, hora_inicio: str, data_fim: str, hora_fim: str) -> bool:
+        return self.repo.finalize_ocorrencia(op_id, data_inicio, hora_inicio, data_fim, hora_fim)
