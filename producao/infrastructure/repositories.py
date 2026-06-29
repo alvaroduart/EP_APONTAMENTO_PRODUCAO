@@ -171,10 +171,8 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
             return False
             
         for idx, row in enumerate(rows[1:], start=2):
-            if (len(row) >= 6 and
+            if (len(row) >= 7 and
                 row[0].strip() == str(op_id).strip() and
-                row[4].strip() == str(data_inicio).strip() and
-                row[5].strip() == str(hora_inicio).strip() and
                 (len(row) <= 6 or not row[6].strip())):
                 
                 # Column G is Data Fim (7th col)
