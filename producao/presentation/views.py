@@ -294,14 +294,9 @@ def admin_dashboard(request):
                     else:
                         status = 'Operando'
 
-                    # Get quantity from the very last appearance of the machine
-                    qtd_produzida = latest.get('quantidade', '—')
-
-                    # Calculate QTD ACUMULADA: sum of Column I for all appearances of this machine
-                    total_qtd = 0.0
-                    for ap in pts:
-                        total_qtd += clean_float(ap.get('quantidade', '0'))
-                    qtd_acumulada = f"{int(total_qtd):,}".replace(',', '.')
+                    # Get QTD PRODUZIDA (Column J - hora_hora) and QTD ACUMULADA (Column I - quantidade) from the last appearance
+                    qtd_produzida = latest.get('hora_hora', '—')
+                    qtd_acumulada = latest.get('quantidade', '—')
 
                     # Find the latest non-empty OEE efficiency value from Column M for this machine
                     eff = 0
