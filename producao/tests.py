@@ -114,3 +114,68 @@ class ProductionTerminalTests(TestCase):
             range_name="A6:I6",
             raw=False
         )
+
+    def test_admin_dashboard_with_mock(self):
+        """Test that the admin dashboard view renders successfully with mocked repository data."""
+        from unittest.mock import patch, MagicMock
+        
+        with patch('producao.presentation.views.GoogleSheetsProducaoRepository') as mock_repo_class:
+            mock_repo = mock_repo_class.return_value
+            # Mock list_apontamentos_raw
+            mock_repo.list_apontamentos_raw.return_value = [
+                {
+                    'op_id': '44579',
+                    'cliente': 'INTERBRANDS FOODS LTDA',
+                    'descricao_produto': 'SACO PP TRANSP 25.02.000077',
+                    'data': '28/06/2026',
+                    'hora': '20:02:47',
+                    'matricula': '111',
+                    'maquina': 'P1307',
+                    'op_encerrada': 'Não',
+                    'quantidade': '33.000',
+                    'hora_hora': '8.000',
+                },
+                {
+                    'op_id': '42115',
+                    'cliente': 'AGILBAG CONTAINERS E EMB. FLEXIVEIS LTDA',
+                    'descricao_produto': 'MANGA PEBD',
+                    'data': '28/06/2026',
+                    'hora': '20:03:53',
+                    'matricula': '112',
+                    'maquina': 'MAQ.01',
+                    'op_encerrada': 'Não',
+                    'quantidade': '10.000',
+                    'hora_hora': '1.000',
+                }
+            ]
+            
+            # Mock worksheet for base OPs
+            mock_ws_ops = MagicMock()
+            mock_ws_ops.get_all_values.return_value = [
+                ['NUMERO OP ', 'CODIGO PRODUTO ', 'DESCRIÇÃO PRODUTO ', 'NOME CLIENTE ', 'GRAMA SACO', 'QUANTIDADE OP'],
+                ['44579', 'PASCPPLI00155AA', 'SACO PP TRANSP 25.02.000077', 'INTERBRANDS FOODS LTDA', '4,593', '7932.9'],
+                ['42115', 'PASCPELI00419AA', 'MANGA PEBD', 'AGILBAG CONTAINERS E EMB. FLEXIVEIS LTDA', '204,4', '2044']
+            ]
+            
+            # Mock worksheet for occurrences
+            mock_ws_ocorr = MagicMock()
+            mock_ws_ocorr.get_all_values.return_value = [
+                ['Ordem Produção', 'Cliente', 'Descrição Produto', 'Ocorrência', 'Data Inicio', 'Hora Inicio', 'Data Fim', 'Hora Fim']
+            ]
+            
+            # Map get_worksheet mock by ID
+            def mock_get_worksheet(gid):
+                if gid == 1488139834:
+                    return mock_ws_ops
+                elif gid == 1265473594:
+                    return mock_ws_ocorr
+                return MagicMock()
+                
+            mock_repo._get_worksheet_by_id = mock_get_worksheet
+            
+            response = self.client.get(reverse('admin_dashboard'))
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, "Módulo PCP")
+            self.assertContains(response, "Extrusora Monocamada EX-01")
+            self.assertContains(response, "Extrusora Larga Silagem EX-03")
+

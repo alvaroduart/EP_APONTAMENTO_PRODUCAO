@@ -62,6 +62,31 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
                 return op
         return None
 
+    def list_apontamentos_raw(self) -> List[dict]:
+        # Aba 1: Apontamentos (gid = 0)
+        sheet = self._get_worksheet_by_id(0)
+        rows = sheet.get_all_values()
+        if not rows:
+            return []
+            
+        apontamentos = []
+        for r in rows[1:]:
+            if len(r) >= 10:
+                apontamentos.append({
+                    'op_id': r[0].strip(),
+                    'cliente': r[1].strip(),
+                    'descricao_produto': r[2].strip(),
+                    'data': r[3].strip(),
+                    'hora': r[4].strip(),
+                    'matricula': r[5].strip(),
+                    'maquina': r[6].strip(),
+                    'op_encerrada': r[7].strip(),
+                    'quantidade': r[8].strip(),
+                    'hora_hora': r[9].strip(),  # Column J
+                    'oee_eficiencia': r[12].strip() if len(r) > 12 else "",  # Column M
+                })
+        return apontamentos
+
     def save_apontamento(self, apontamento: Apontamento) -> None:
         # Aba 1: Apontamentos (gid = 0)
         sheet = self._get_worksheet_by_id(0)

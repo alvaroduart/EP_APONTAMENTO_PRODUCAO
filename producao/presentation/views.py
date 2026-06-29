@@ -167,3 +167,172 @@ def editar_apontamento(request):
             
     except Exception as e:
         return JsonResponse({'error': 'error', 'message': str(e)}, status=500)
+
+def admin_dashboard(request):
+    """Renders the administrative dashboard with machine efficiencies."""
+    try:
+        repo = GoogleSheetsProducaoRepository()
+        
+        # 1. Fetch pointings and sheets
+        apontamentos = repo.list_apontamentos_raw()
+        
+        # 2. Fetch OPs for grams lookup
+        base_ops_sheet = repo._get_worksheet_by_id(1488139834)
+        ops_rows = base_ops_sheet.get_all_values()
+        op_grams = {}
+        for row in ops_rows[1:]:
+            if len(row) >= 5:
+                op_grams[row[0].strip()] = row[4].strip()
+                
+        # 3. Fetch occurrences for open occurrence check
+        ocorrencias_sheet = repo._get_worksheet_by_id(1265473594)
+        ocorrencias_rows = ocorrencias_sheet.get_all_values()
+        open_op_occurrences = set()
+        for row in ocorrencias_rows[1:]:
+            if len(row) >= 8:
+                op_id = row[0].strip()
+                data_fim = row[6].strip()
+                if not data_fim:
+                    open_op_occurrences.add(op_id)
+
+        # Helper function to clean floats
+        def clean_float(val_str):
+            if not val_str:
+                return 0.0
+            try:
+                val_clean = val_str.replace(' ', '').strip()
+                if ',' in val_clean and '.' in val_clean:
+                    val_clean = val_clean.replace('.', '').replace(',', '.')
+                elif ',' in val_clean:
+                    val_clean = val_clean.replace(',', '.')
+                parts = val_clean.split('.')
+                if len(parts) == 2 and len(parts[1]) == 3:
+                    val_clean = val_clean.replace('.', '')
+                return float(val_clean)
+            except Exception:
+                return 0.0
+
+        # Helper function to clean OEE percentage values from Column M
+        def clean_oee(val_str):
+            if not val_str:
+                return 0
+            try:
+                val_clean = val_str.replace(' ', '').strip()
+                is_percent = '%' in val_clean
+                val_clean = val_clean.replace('%', '')
+                if ',' in val_clean and '.' in val_clean:
+                    val_clean = val_clean.replace('.', '').replace(',', '.')
+                elif ',' in val_clean:
+                    val_clean = val_clean.replace(',', '.')
+                parts = val_clean.split('.')
+                if len(parts) == 2 and len(parts[1]) == 3:
+                    val_clean = val_clean.replace('.', '')
+                
+                val_num = float(val_clean)
+                if val_num <= 1.0 and val_num > 0 and not is_percent:
+                    val_num = val_num * 100
+                return int(round(val_num))
+            except Exception:
+                return 0
+
+
+        # Define categories configuration
+        categories_config = {
+            'Solda Lateral': ['HS1002', 'HS1001', 'HS1201', 'HS1003', 'MS1004', 'MS1202', 'MS1002', 'MS1003', 'MS1001', 'F75002', 'HSC 70', 'HSC 11', 'SCW700', 'CS600'],
+            'Varejo': ['P1301', 'P1302', 'P1303', 'P1304', 'P1305', 'P1306', 'P1307', 'P1308', 'PRV1'],
+            'Solda Fundo': ['MAQ.01', 'MAQ.02', 'P1401', 'P1402', 'P1403', 'F75001', 'SM-01']
+        }
+
+        sections = []
+        for cat_name, mids in categories_config.items():
+            cat_cards = []
+            for mid in mids:
+                pts = [ap for ap in apontamentos if ap['maquina'] == mid]
+                
+                # Use machine code directly as requested
+                display_name = mid
+                
+                # Determine target speed based on category / specific machine
+                target_speed = 100.0
+                if cat_name == 'Varejo':
+                    target_speed = 200.0
+                elif cat_name == 'Solda Lateral':
+                    target_speed = 100.0
+                elif cat_name == 'Solda Fundo':
+                    target_speed = 200.0
+                
+                # Specific overrides
+                if mid == 'MAQ.01': target_speed = 284.0
+                elif mid == 'MAQ.02': target_speed = 250.0
+                elif mid == 'P1307': target_speed = 45.0
+                elif mid == 'F75001': target_speed = 200.0
+                elif mid == 'F75002': target_speed = 214.0
+                elif mid == 'HS1001': target_speed = 99.0
+
+                if pts:
+                    # Get the latest pointing
+                    latest = pts[-1]
+                    op_id = latest['op_id']
+                    op_encerrada = latest['op_encerrada']
+                    
+                    if op_id in open_op_occurrences:
+                        status = 'Manutenção'
+                    elif op_encerrada == 'Sim':
+                        status = 'Ociosa'
+                    else:
+                        status = 'Operando'
+
+                    hora_hora_val = clean_float(latest['hora_hora'])
+                    grams_val = clean_float(op_grams.get(op_id, '0'))
+                    
+                    if grams_val > 0:
+                        speed_kgh = (hora_hora_val * grams_val) / 1000.0
+                    else:
+                        speed_kgh = 0.0
+
+                    if speed_kgh > 0:
+                        speed_str = f"{int(round(speed_kgh))} kg/h"
+                    else:
+                        speed_str = 'Parada'
+
+                    # Find the latest non-empty OEE efficiency value from Column M for this machine
+                    eff = 0
+                    for ap in reversed(pts):
+                        oee_val = ap.get('oee_eficiencia', '').strip()
+                        if oee_val:
+                            eff = clean_oee(oee_val)
+                            break
+                    
+                    if status in ['Manutenção', 'Ociosa']:
+                        speed_str = 'Parada'
+
+                    cat_cards.append({
+                        'code': mid,
+                        'name': display_name,
+                        'status': status,
+                        'speed': speed_str,
+                        'efficiency': eff,
+                        'is_live': True
+                    })
+                else:
+                    cat_cards.append({
+                        'code': mid,
+                        'name': display_name,
+                        'status': 'Ociosa',
+                        'speed': 'Parada',
+                        'efficiency': 0,
+                        'is_live': False
+                    })
+            sections.append({
+                'name': cat_name,
+                'cards': cat_cards
+            })
+
+        context = {
+            'sections': sections
+        }
+        return render(request, 'producao/admin_dashboard.html', context)
+    except FileNotFoundError as e:
+        return render(request, 'producao/admin_dashboard.html', {'error': 'needs_authentication', 'message': str(e)})
+    except Exception as e:
+        return render(request, 'producao/admin_dashboard.html', {'error': 'error', 'message': str(e)})

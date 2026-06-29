@@ -8,4 +8,5 @@ urlpatterns = [
     path('api/ocorrencias/', views.ocorrencias, name='ocorrencias'),
     path('api/active-state/', views.active_state, name='active_state'),
     path('api/apontamentos/edit/', views.editar_apontamento, name='editar_apontamento'),
+    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
 ]
