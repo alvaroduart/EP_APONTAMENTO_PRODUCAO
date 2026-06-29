@@ -1499,7 +1499,11 @@
                         
                         const resData = await response.json();
                         if (!response.ok) {
-                            throw new Error(resData.message || 'Falha ao finalizar ocorrência no Google Sheets.');
+                            if (response.status === 404) {
+                                showToast('Ocorrência já finalizada no sistema. Sincronizando...');
+                            } else {
+                                throw new Error(resData.message || 'Falha ao finalizar ocorrência no Google Sheets.');
+                            }
                         }
                         
                         const entry = { motivo: occ.motivo, start: occ.start, end, duration: end - occ.start };
@@ -1515,7 +1519,9 @@
                         
                         renderOccMini();
                         validateFinalize();
-                        showToast('Ocorrência finalizada');
+                        if (response.ok) {
+                            showToast('Ocorrência finalizada');
+                        }
                         await saveActiveState();
                         
                     } catch (e) {
