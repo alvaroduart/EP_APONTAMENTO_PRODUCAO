@@ -294,13 +294,14 @@ def admin_dashboard(request):
                     else:
                         status = 'Operando'
 
-                    # Find the latest non-empty quantity produced from Column I for this machine
-                    qtd_produzida = '—'
-                    for ap in reversed(pts):
-                        qtd_val = ap.get('quantidade', '').strip()
-                        if qtd_val:
-                            qtd_produzida = qtd_val
-                            break
+                    # Get quantity from the very last appearance of the machine
+                    qtd_produzida = latest.get('quantidade', '—')
+
+                    # Calculate QTD ACUMULADA: sum of Column I for all appearances of this machine
+                    total_qtd = 0.0
+                    for ap in pts:
+                        total_qtd += clean_float(ap.get('quantidade', '0'))
+                    qtd_acumulada = f"{int(total_qtd):,}".replace(',', '.')
 
                     # Find the latest non-empty OEE efficiency value from Column M for this machine
                     eff = 0
@@ -310,11 +311,21 @@ def admin_dashboard(request):
                             eff = clean_oee(oee_val)
                             break
 
+                    # Find the latest non-empty Performance Acumulada from Column N for this machine
+                    perf_acumulada = 0
+                    for ap in reversed(pts):
+                        perf_val = ap.get('performance_acumulada_raw', '').strip()
+                        if perf_val:
+                            perf_acumulada = clean_oee(perf_val)
+                            break
+
                     cat_cards.append({
                         'code': mid,
                         'name': display_name,
                         'status': status,
                         'qtd_produzida': qtd_produzida,
+                        'qtd_acumulada': qtd_acumulada,
+                        'performance_acumulada': perf_acumulada,
                         'efficiency': eff,
                         'cliente': latest.get('cliente', ''),
                         'is_live': True
@@ -325,6 +336,8 @@ def admin_dashboard(request):
                         'name': display_name,
                         'status': 'Ociosa',
                         'qtd_produzida': '—',
+                        'qtd_acumulada': '—',
+                        'performance_acumulada': 0,
                         'efficiency': 0,
                         'cliente': '—',
                         'is_live': False

@@ -266,7 +266,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 170px;
+            min-height: 210px;
         }
 
         .card:hover {
@@ -670,6 +670,20 @@
                                     {% else %}eff-danger
                                     {% endif %}">
                                     {{ card.efficiency }}%
+                                </span>
+                            </div>
+                            <div class="metric" style="margin-top: 10px;">
+                                <span class="metric-label">QTD ACUMULADA</span>
+                                <span class="metric-value">{{ card.qtd_acumulada }}</span>
+                            </div>
+                            <div class="metric" style="margin-top: 10px;">
+                                <span class="metric-label">PERF. ACUMULADA</span>
+                                <span class="metric-value 
+                                    {% if card.performance_acumulada >= 80 %}eff-good
+                                    {% elif card.performance_acumulada >= 60 %}eff-warning
+                                    {% else %}eff-danger
+                                    {% endif %}">
+                                    {{ card.performance_acumulada }}%
                                 </span>
                             </div>
                         </div>

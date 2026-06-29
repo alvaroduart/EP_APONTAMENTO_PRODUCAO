@@ -84,6 +84,7 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
                     'quantidade': r[8].strip(),
                     'hora_hora': r[9].strip(),  # Column J
                     'oee_eficiencia': r[12].strip() if len(r) > 12 else "",  # Column M
+                    'performance_acumulada_raw': r[13].strip() if len(r) > 13 else "",  # Column N
                 })
         return apontamentos
 
