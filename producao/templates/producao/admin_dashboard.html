@@ -84,6 +84,16 @@
             margin-bottom: 28px;
             gap: 4px;
             border: 1px solid var(--border);
+            max-width: 100%;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        
+        .tabs-container::-webkit-scrollbar {
+            display: none; /* Hide scrollbar for Chrome, Safari and Opera */
         }
 
         .tab-btn {
@@ -97,6 +107,7 @@
             border-radius: 10px;
             transition: var(--transition);
             font-family: inherit;
+            flex-shrink: 0;
         }
 
         .tab-btn:hover {
@@ -465,6 +476,101 @@
         .btn-alert-action:hover {
             opacity: 0.9;
         }
+
+        /* ---------- Responsive Media Queries ---------- */
+        @media (max-width: 768px) {
+            .wrap {
+                padding: 16px 12px;
+            }
+
+            .header-block {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 16px;
+            }
+
+            .header-title h2 {
+                font-size: 22px;
+            }
+
+            .refresh-widget {
+                align-self: flex-start;
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .topbar {
+                padding: 12px 16px;
+                flex-direction: column;
+                gap: 12px;
+                align-items: center;
+                text-align: center;
+            }
+
+            .brand img {
+                height: 38px !important;
+            }
+
+            .tabs-container {
+                margin-bottom: 20px;
+                border-radius: 12px;
+                padding: 4px;
+            }
+
+            .tab-btn {
+                padding: 8px 16px;
+                font-size: 13px;
+                border-radius: 8px;
+            }
+
+            .section-box {
+                padding: 16px;
+                border-radius: 16px;
+                margin-bottom: 16px;
+            }
+
+            .section-header {
+                margin-bottom: 16px;
+                padding-bottom: 12px;
+            }
+
+            .section-header h3 {
+                font-size: 16px;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .card {
+                padding: 16px;
+                min-height: auto;
+            }
+
+            .card-title h4 {
+                font-size: 15px;
+            }
+
+            .metric-value {
+                font-size: 16px;
+            }
+
+            .alert-box {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+                gap: 12px;
+                padding: 12px 16px;
+            }
+
+            .btn-alert-action {
+                width: 100%;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 
@@ -542,7 +648,7 @@
                     <div class="card-top">
                         <div class="card-title">
                             <h4>{{ card.name }}</h4>
-                            <span>Código: {{ card.code }}</span>
+                            <span>{{ card.cliente }}</span>
                         </div>
                         <div class="status-badge">
                             <span class="dot"></span>
@@ -553,11 +659,11 @@
                     <div>
                         <div class="card-body">
                             <div class="metric">
-                                <span class="metric-label">Velocidade</span>
-                                <span class="metric-value">{{ card.speed }}</span>
+                                <span class="metric-label">QTD PRODUZIDA</span>
+                                <span class="metric-value">{{ card.qtd_produzida }}</span>
                             </div>
                             <div class="metric">
-                                <span class="metric-label">OEE Eficiência</span>
+                                <span class="metric-label">PERFORMANCE/H</span>
                                 <span class="metric-value 
                                     {% if card.efficiency >= 80 %}eff-good
                                     {% elif card.efficiency >= 60 %}eff-warning

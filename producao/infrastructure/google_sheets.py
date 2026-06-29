@@ -11,9 +11,10 @@ def get_sheets_client():
     if token_json_str:
         # Load credentials directly from environment variable (ideal for Vercel)
         info = json.loads(token_json_str)
+        token_scopes = info.get('scopes', ['https://www.googleapis.com/auth/spreadsheets'])
         creds = Credentials.from_authorized_user_info(
             info,
-            scopes=['https://www.googleapis.com/auth/spreadsheets']
+            scopes=token_scopes
         )
     else:
         # Fallback to local token file
@@ -23,9 +24,18 @@ def get_sheets_client():
                 f"Arquivo de token não encontrado em: {token_path}. "
                 "Por favor, execute o comando: python manage.py authenticate_sheets"
             )
+        
+        # Load local token scopes dynamically to avoid scope mismatch errors during refresh
+        try:
+            with open(token_path, 'r', encoding='utf-8') as f:
+                token_data = json.load(f)
+            token_scopes = token_data.get('scopes', ['https://www.googleapis.com/auth/spreadsheets'])
+        except Exception:
+            token_scopes = ['https://www.googleapis.com/auth/spreadsheets']
+
         creds = Credentials.from_authorized_user_file(
             token_path, 
-            scopes=['https://www.googleapis.com/auth/spreadsheets']
+            scopes=token_scopes
         )
     
     if creds and creds.expired and creds.refresh_token:

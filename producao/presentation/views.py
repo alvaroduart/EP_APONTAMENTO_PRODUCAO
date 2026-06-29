@@ -212,6 +212,18 @@ def admin_dashboard(request):
             except Exception:
                 return 0.0
 
+        # Helper function to clean weight in grams (retains decimal points for small weights)
+        def clean_grams(val_str):
+            if not val_str:
+                return 0.0
+            try:
+                val_clean = val_str.replace(' ', '').strip()
+                val_clean = val_clean.replace(',', '.')
+                return float(val_clean)
+            except Exception:
+                return 0.0
+
+
         # Helper function to clean OEE percentage values from Column M
         def clean_oee(val_str):
             if not val_str:
@@ -282,18 +294,13 @@ def admin_dashboard(request):
                     else:
                         status = 'Operando'
 
-                    hora_hora_val = clean_float(latest['hora_hora'])
-                    grams_val = clean_float(op_grams.get(op_id, '0'))
-                    
-                    if grams_val > 0:
-                        speed_kgh = (hora_hora_val * grams_val) / 1000.0
-                    else:
-                        speed_kgh = 0.0
-
-                    if speed_kgh > 0:
-                        speed_str = f"{int(round(speed_kgh))} kg/h"
-                    else:
-                        speed_str = 'Parada'
+                    # Find the latest non-empty quantity produced from Column I for this machine
+                    qtd_produzida = '—'
+                    for ap in reversed(pts):
+                        qtd_val = ap.get('quantidade', '').strip()
+                        if qtd_val:
+                            qtd_produzida = qtd_val
+                            break
 
                     # Find the latest non-empty OEE efficiency value from Column M for this machine
                     eff = 0
@@ -302,16 +309,14 @@ def admin_dashboard(request):
                         if oee_val:
                             eff = clean_oee(oee_val)
                             break
-                    
-                    if status in ['Manutenção', 'Ociosa']:
-                        speed_str = 'Parada'
 
                     cat_cards.append({
                         'code': mid,
                         'name': display_name,
                         'status': status,
-                        'speed': speed_str,
+                        'qtd_produzida': qtd_produzida,
                         'efficiency': eff,
+                        'cliente': latest.get('cliente', ''),
                         'is_live': True
                     })
                 else:
@@ -319,8 +324,9 @@ def admin_dashboard(request):
                         'code': mid,
                         'name': display_name,
                         'status': 'Ociosa',
-                        'speed': 'Parada',
+                        'qtd_produzida': '—',
                         'efficiency': 0,
+                        'cliente': '—',
                         'is_live': False
                     })
             sections.append({
