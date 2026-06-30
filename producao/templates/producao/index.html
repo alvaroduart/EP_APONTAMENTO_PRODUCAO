@@ -944,6 +944,21 @@
         </div>
     </div>
 
+    <!-- PROMPT MODAL -->
+    <div class="modal-overlay" id="promptModal">
+        <div class="modal-content">
+            <h2 style="font-size: 16px; font-weight: 700; color: var(--blue); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em;" id="promptTitle">Lançar Aparas</h2>
+            <div class="field">
+                <label for="promptInput" id="promptLabel">Quantidade de aparas (kg):</label>
+                <input id="promptInput" class="mono" type="text" placeholder="0,00" autocomplete="off">
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-stop" id="cancelPromptBtn" style="background: var(--gray-bg); color: var(--ink); flex: 1;">Cancelar</button>
+                <button class="btn btn-primary" id="submitPromptBtn" style="flex: 1;">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
             stroke-linejoin="round">
@@ -1063,6 +1078,53 @@
                     
                     cancelConfirmBtn.addEventListener('click', onCancel);
                     submitConfirmBtn.addEventListener('click', onSubmit);
+                });
+            }
+
+            function showPrompt(message, defaultValue = '') {
+                return new Promise((resolve) => {
+                    const promptModal = $('promptModal');
+                    const promptLabel = $('promptLabel');
+                    const promptInput = $('promptInput');
+                    const cancelPromptBtn = $('cancelPromptBtn');
+                    const submitPromptBtn = $('submitPromptBtn');
+                    
+                    promptLabel.textContent = message;
+                    promptInput.value = defaultValue;
+                    promptModal.classList.add('show');
+                    promptInput.focus();
+                    promptInput.select();
+                    
+                    const onCancel = () => {
+                        promptModal.classList.remove('show');
+                        cleanup();
+                        resolve(null);
+                    };
+                    
+                    const onSubmit = () => {
+                        const val = promptInput.value.trim();
+                        promptModal.classList.remove('show');
+                        cleanup();
+                        resolve(val);
+                    };
+                    
+                    const onKeydown = (e) => {
+                        if (e.key === 'Enter') {
+                            onSubmit();
+                        } else if (e.key === 'Escape') {
+                            onCancel();
+                        }
+                    };
+                    
+                    function cleanup() {
+                        cancelPromptBtn.removeEventListener('click', onCancel);
+                        submitPromptBtn.removeEventListener('click', onSubmit);
+                        promptInput.removeEventListener('keydown', onKeydown);
+                    }
+                    
+                    cancelPromptBtn.addEventListener('click', onCancel);
+                    submitPromptBtn.addEventListener('click', onSubmit);
+                    promptInput.addEventListener('keydown', onKeydown);
                 });
             }
 
@@ -1339,16 +1401,23 @@
             }
 
             finalizeBtn.addEventListener('click', async () => {
-                if (encerrarCheck.checked) {
-                    const confirmClose = await showConfirm("Deseja realmente encerrar esta Ordem de Produção? Esta ação não pode ser desfeita.");
+                let aparas = 0;
+                if (encerrarCheck.checked || encerrarTurnoCheck.checked) {
+                    const confirmClose = await showConfirm(
+                        encerrarCheck.checked
+                            ? "Deseja realmente encerrar esta Ordem de Produção? Esta ação não pode ser desfeita."
+                            : "Deseja realmente encerrar este Turno? Esta ação não pode ser desfeita."
+                    );
                     if (!confirmClose) {
                         return;
                     }
-                } else if (encerrarTurnoCheck.checked) {
-                    const confirmClose = await showConfirm("Deseja realmente encerrar este Turno? Esta ação não pode ser desfeita.");
-                    if (!confirmClose) {
+                    
+                    const aparasVal = await showPrompt("Quantidade de aparas (kg):", "0,00");
+                    if (aparasVal === null) {
                         return;
                     }
+                    
+                    aparas = Number(aparasVal.replace(',', '.')) || 0;
                 }
                 const end = new Date();
                 const originalStart = lastApontamentoAt;
@@ -1368,7 +1437,8 @@
                         matricula: active.matricula,
                         maquina: active.recurso,
                         op_encerrada: encerrarCheck.checked,
-                        quantidade: Number(qtdInput.value)
+                        quantidade: Number(qtdInput.value),
+                        aparas: aparas
                     };
                     
                     const response = await fetch('/api/apontamentos/', {

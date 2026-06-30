@@ -97,7 +97,8 @@ class ProductionTerminalTests(TestCase):
             matricula="999",
             maquina="M1",
             op_encerrada="Não",
-            quantidade=100
+            quantidade=100,
+            aparas=0.0
         )
         
         repo.save_apontamento(apontamento)
@@ -109,9 +110,9 @@ class ProductionTerminalTests(TestCase):
         mock_worksheet.update.assert_called_once_with(
             values=[[
                 "12345", "Cliente Teste", "Produto Teste",
-                "28/06/2026", "20:00:00", "999", "M1", "Não", 100
+                "28/06/2026", "20:00:00", "999", "M1", "Não", 100, 0.0
             ]],
-            range_name="A6:I6",
+            range_name="A6:J6",
             raw=False
         )
 

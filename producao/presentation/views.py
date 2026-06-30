@@ -69,7 +69,8 @@ def apontamentos(request):
             matricula=str(data['matricula']),
             maquina=str(data['maquina']),
             op_encerrada=bool(data['op_encerrada']),
-            quantidade=int(data['quantidade'])
+            quantidade=int(data['quantidade']),
+            aparas=float(data.get('aparas', 0.0))
         )
         
         return JsonResponse({

@@ -30,3 +30,4 @@ class Apontamento:
     maquina: str
     op_encerrada: str  # "Sim" or "Não"
     quantidade: int
+    aparas: float = 0.0

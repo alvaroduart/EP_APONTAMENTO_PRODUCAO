@@ -96,8 +96,8 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
         col_a_values = sheet.col_values(1)
         next_row = len(col_a_values) + 1
         
-        # Limitar a atualização estritamente até a coluna I (A:I)
-        # para evitar sobrescrever fórmulas pessoais nas colunas seguintes (J, K...)
+        # Limitar a atualização estritamente até a coluna J (A:J)
+        # para evitar sobrescrever fórmulas pessoais nas colunas seguintes (K, L...)
         values = [
             apontamento.op_id,
             apontamento.cliente,
@@ -107,12 +107,13 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
             apontamento.matricula,
             apontamento.maquina,
             apontamento.op_encerrada,
-            apontamento.quantidade
+            apontamento.quantidade,
+            apontamento.aparas
         ]
         
         sheet.update(
             values=[values],
-            range_name=f"A{next_row}:I{next_row}",
+            range_name=f"A{next_row}:J{next_row}",
             raw=False
         )
 
