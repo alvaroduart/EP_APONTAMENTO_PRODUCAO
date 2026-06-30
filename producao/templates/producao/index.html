@@ -827,6 +827,10 @@
                         <input type="checkbox" id="encerrarCheck">
                         <label for="encerrarCheck">Encerrar esta Ordem de Produção</label>
                     </div>
+                    <div class="checkbox-row" style="margin-top: 8px;">
+                        <input type="checkbox" id="encerrarTurnoCheck">
+                        <label for="encerrarTurnoCheck">Encerrar turno</label>
+                    </div>
                     <button class="btn btn-stop" id="finalizeBtn" disabled>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
@@ -974,7 +978,7 @@
             const startBtn = $('startBtn'), startPanel = $('startPanel'), activePanel = $('activePanel');
             const sumOp = $('sumOp'), sumRecurso = $('sumRecurso'), sumMatricula = $('sumMatricula'), sumInicio = $('sumInicio'), sumUltimo = $('sumUltimo');
             const nextBadge = $('nextBadge'), nextTimer = $('nextTimer');
-            const qtdInput = $('qtdInput'), encerrarCheck = $('encerrarCheck'), finalizeBtn = $('finalizeBtn'), finalizeHint = $('finalizeHint');
+            const qtdInput = $('qtdInput'), encerrarCheck = $('encerrarCheck'), encerrarTurnoCheck = $('encerrarTurnoCheck'), finalizeBtn = $('finalizeBtn'), finalizeHint = $('finalizeHint');
             const occIdleMsg = $('occIdleMsg'), occPanel = $('occPanel'), motivoSelect = $('motivoSelect'), occBtn = $('occBtn');
             const occMiniList = $('occMiniList'), occMiniEmpty = $('occMiniEmpty');
             const logList = $('logList'), logEmpty = $('logEmpty');
@@ -1307,6 +1311,7 @@
 
                 qtdInput.value = '';
                 encerrarCheck.checked = false;
+                encerrarTurnoCheck.checked = false;
                 motivoSelect.value = '';
                 occBtn.disabled = true;
                 occBtn.innerHTML = iconAlert() + ' Iniciar Ocorrência';
@@ -1336,6 +1341,11 @@
             finalizeBtn.addEventListener('click', async () => {
                 if (encerrarCheck.checked) {
                     const confirmClose = await showConfirm("Deseja realmente encerrar esta Ordem de Produção? Esta ação não pode ser desfeita.");
+                    if (!confirmClose) {
+                        return;
+                    }
+                } else if (encerrarTurnoCheck.checked) {
+                    const confirmClose = await showConfirm("Deseja realmente encerrar este Turno? Esta ação não pode ser desfeita.");
                     if (!confirmClose) {
                         return;
                     }
@@ -1388,8 +1398,8 @@
                     lastApontamentoAt = end;
                     clearAlert();
 
-                    if (encerrarCheck.checked) {
-                        showToast('Apontamento registrado — OP encerrada');
+                    if (encerrarCheck.checked || encerrarTurnoCheck.checked) {
+                        showToast(encerrarCheck.checked ? 'Apontamento registrado — OP encerrada' : 'Apontamento registrado — Turno encerrado');
                         await clearActiveState();
 
                         // reset to idle
@@ -1412,6 +1422,7 @@
                         sumUltimo.textContent = fmtClock(end);
                         qtdInput.value = '';
                         encerrarCheck.checked = false;
+                        encerrarTurnoCheck.checked = false;
                         validateFinalize();
                         await saveActiveState();
                     }
