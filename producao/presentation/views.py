@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timezone, timedelta
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -209,6 +210,9 @@ def editar_apontamento(request):
 def admin_dashboard(request):
     """Renders the administrative dashboard with machine efficiencies."""
     try:
+        tz_brazil = timezone(timedelta(hours=-3))
+        now_brazil = datetime.now(tz_brazil)
+        
         repo = GoogleSheetsProducaoRepository()
         
         # 1. Fetch pointings and sheets
@@ -321,9 +325,11 @@ def admin_dashboard(request):
                 elif mid == 'F75002': target_speed = 214.0
                 elif mid == 'HS1001': target_speed = 99.0
 
+                is_live = False
                 if mid in open_machine_occurrences:
                     status = open_machine_occurrences[mid]
                     status_class = 'manutencao'
+                    is_live = True
                 else:
                     if pts:
                         latest = pts[-1]
@@ -334,6 +340,22 @@ def admin_dashboard(request):
                         else:
                             status = 'Operando'
                             status_class = 'operando'
+                            is_live = True
+                            
+                            # Check if latest pointing is older than 1h10
+                            try:
+                                d_str = latest.get('data', '').strip()
+                                h_str = latest.get('hora', '').strip()
+                                if d_str and h_str:
+                                    dt_pointing = datetime.strptime(f"{d_str} {h_str}", "%d/%m/%Y %H:%M:%S")
+                                    dt_pointing = dt_pointing.replace(tzinfo=tz_brazil)
+                                    age = now_brazil - dt_pointing
+                                    if age > timedelta(hours=1, minutes=10):
+                                        status = 'Ociosa'
+                                        status_class = 'ociosa'
+                                        is_live = False
+                            except Exception:
+                                pass
                     else:
                         status = 'Ociosa'
                         status_class = 'ociosa'
@@ -370,15 +392,12 @@ def admin_dashboard(request):
                         if perf_val:
                             perf_acumulada = clean_oee(perf_val)
                             break
-                            
-                    is_live = True
                 else:
                     qtd_produzida = '—'
                     qtd_acumulada = '—'
                     cliente = '—'
                     eff = 0
                     perf_acumulada = 0
-                    is_live = False
 
                 cat_cards.append({
                     'code': mid,

@@ -182,6 +182,98 @@ class ProductionTerminalTests(TestCase):
             self.assertContains(response, "Varejo")
             self.assertContains(response, "Banheiro")
 
+    def test_machine_status_timeout_ociosa(self):
+        """Test that a machine with a pointing older than 1h10 is shown as Ociosa, while one within 1h10 is Operando."""
+        from unittest.mock import patch, MagicMock
+        from datetime import datetime, timezone, timedelta
+        
+        tz_brazil = timezone(timedelta(hours=-3))
+        now_brazil = datetime.now(tz_brazil)
+        
+        # Pointing 1: older than 1h10 (e.g. 2 hours ago)
+        old_time = now_brazil - timedelta(hours=2)
+        old_date_str = old_time.strftime("%d/%m/%Y")
+        old_hour_str = old_time.strftime("%H:%M:%S")
+        
+        # Pointing 2: recent (e.g. 30 minutes ago)
+        recent_time = now_brazil - timedelta(minutes=30)
+        recent_date_str = recent_time.strftime("%d/%m/%Y")
+        recent_hour_str = recent_time.strftime("%H:%M:%S")
+        
+        with patch('producao.presentation.views.GoogleSheetsProducaoRepository') as mock_repo_class:
+            mock_repo = mock_repo_class.return_value
+            mock_repo.list_apontamentos_raw.return_value = [
+                {
+                    'op_id': '111',
+                    'cliente': 'Client A',
+                    'descricao_produto': 'Prod A',
+                    'data': old_date_str,
+                    'hora': old_hour_str,
+                    'matricula': '101',
+                    'maquina': 'MAQ.01',
+                    'op_encerrada': 'Não',
+                    'quantidade': '100',
+                    'hora_hora': '10',
+                    'performance_h': '85%',
+                    'performance_acm': '80%',
+                },
+                {
+                    'op_id': '222',
+                    'cliente': 'Client B',
+                    'descricao_produto': 'Prod B',
+                    'data': recent_date_str,
+                    'hora': recent_hour_str,
+                    'matricula': '102',
+                    'maquina': 'MAQ.02',
+                    'op_encerrada': 'Não',
+                    'quantidade': '200',
+                    'hora_hora': '20',
+                    'performance_h': '95%',
+                    'performance_acm': '90%',
+                }
+            ]
+            
+            mock_ws_ops = MagicMock()
+            mock_ws_ops.get_all_values.return_value = [
+                ['NUMERO OP', 'CODIGO PRODUTO', 'DESCRIÇÃO PRODUTO', 'NOME CLIENTE', 'GRAMA SACO', 'QUANTIDADE OP'],
+                ['111', 'PASCPPLI00155AA', 'Prod A', 'Client A', '5', '1000'],
+                ['222', 'PASCPPLI00155AA', 'Prod B', 'Client B', '6', '2000']
+            ]
+            
+            mock_ws_ocorr = MagicMock()
+            mock_ws_ocorr.get_all_values.return_value = [
+                ['Ordem Produção', 'Cliente', 'Descrição Produto', 'Ocorrência', 'Data Inicio', 'Hora Inicio', 'Data Fim', 'Hora Fim', 'Maquina']
+            ]
+            
+            def mock_get_worksheet(gid):
+                if gid == 1488139834:
+                    return mock_ws_ops
+                elif gid == 1265473594:
+                    return mock_ws_ocorr
+                return MagicMock()
+                
+            mock_repo._get_worksheet_by_id = mock_get_worksheet
+            
+            response = self.client.get(reverse('admin_dashboard'))
+            self.assertEqual(response.status_code, 200)
+            
+            sections = response.context['sections']
+            
+            maq01_card = None
+            maq02_card = None
+            for section in sections:
+                for card in section['cards']:
+                    if card['code'] == 'MAQ.01':
+                        maq01_card = card
+                    elif card['code'] == 'MAQ.02':
+                        maq02_card = card
+            
+            self.assertIsNotNone(maq01_card)
+            self.assertIsNotNone(maq02_card)
+            
+            self.assertEqual(maq01_card['status'], 'Ociosa')
+            self.assertEqual(maq02_card['status'], 'Operando')
+
     def test_finalize_ocorrencia_api_success(self):
         """Test finalizing an occurrence with success via mocked repository."""
         from unittest.mock import patch
