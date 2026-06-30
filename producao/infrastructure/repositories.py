@@ -71,7 +71,7 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
             
         apontamentos = []
         for r in rows[1:]:
-            if len(r) >= 10:
+            if len(r) >= 8:
                 apontamentos.append({
                     'op_id': r[0].strip(),
                     'cliente': r[1].strip(),
@@ -81,10 +81,11 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
                     'matricula': r[5].strip(),
                     'maquina': r[6].strip(),
                     'op_encerrada': r[7].strip(),
-                    'quantidade': r[8].strip(),
-                    'hora_hora': r[9].strip(),  # Column J
-                    'oee_eficiencia': r[12].strip() if len(r) > 12 else "",  # Column M
-                    'performance_acumulada_raw': r[13].strip() if len(r) > 13 else "",  # Column N
+                    'quantidade': r[8].strip() if len(r) > 8 else "",
+                    'aparas': r[9].strip() if len(r) > 9 else "",
+                    'hora_hora': r[10].strip() if len(r) > 10 else "",
+                    'performance_h': r[13].strip() if len(r) > 13 else "",
+                    'performance_acm': r[14].strip() if len(r) > 14 else "",
                 })
         return apontamentos
 

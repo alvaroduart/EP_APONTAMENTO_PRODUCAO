@@ -340,20 +340,33 @@ def admin_dashboard(request):
 
                 if pts:
                     latest = pts[-1]
-                    qtd_produzida = latest.get('hora_hora', '—')
-                    qtd_acumulada = latest.get('quantidade', '—')
+                    
+                    qtd_produzida = '—'
+                    for ap in reversed(pts):
+                        val = ap.get('hora_hora', '').strip()
+                        if val:
+                            qtd_produzida = val
+                            break
+                            
+                    qtd_acumulada = '—'
+                    for ap in reversed(pts):
+                        val = ap.get('quantidade', '').strip()
+                        if val:
+                            qtd_acumulada = val
+                            break
+                            
                     cliente = latest.get('cliente', '')
                     
                     eff = 0
                     for ap in reversed(pts):
-                        oee_val = ap.get('oee_eficiencia', '').strip()
+                        oee_val = ap.get('performance_h', '').strip()
                         if oee_val:
                             eff = clean_oee(oee_val)
                             break
 
                     perf_acumulada = 0
                     for ap in reversed(pts):
-                        perf_val = ap.get('performance_acumulada_raw', '').strip()
+                        perf_val = ap.get('performance_acm', '').strip()
                         if perf_val:
                             perf_acumulada = clean_oee(perf_val)
                             break
