@@ -1,4 +1,5 @@
 import json
+from unittest.mock import patch, MagicMock
 from django.test import TestCase
 from django.urls import reverse
 
@@ -182,21 +183,25 @@ class ProductionTerminalTests(TestCase):
             self.assertContains(response, "Varejo")
             self.assertContains(response, "Banheiro")
 
-    def test_machine_status_timeout_ociosa(self):
+    @patch('producao.presentation.views.datetime')
+    def test_machine_status_timeout_ociosa(self, mock_datetime_class):
         """Test that a machine with a pointing older than 1h10 is shown as Ociosa, while one within 1h10 is Operando."""
-        from unittest.mock import patch, MagicMock
         from datetime import datetime, timezone, timedelta
         
         tz_brazil = timezone(timedelta(hours=-3))
-        now_brazil = datetime.now(tz_brazil)
         
-        # Pointing 1: older than 1h10 (e.g. 2 hours ago)
-        old_time = now_brazil - timedelta(hours=2)
+        # Mock datetime.now inside views.py to return a fixed time (12:00 PM)
+        fixed_now = datetime(2026, 6, 30, 12, 0, 0, tzinfo=tz_brazil)
+        mock_datetime_class.now.return_value = fixed_now
+        mock_datetime_class.strptime.side_effect = lambda *args, **kwargs: datetime.strptime(*args, **kwargs)
+        
+        # Pointing 1: older than 1h10 (e.g. 2 hours ago = 10:00 AM)
+        old_time = fixed_now - timedelta(hours=2)
         old_date_str = old_time.strftime("%d/%m/%Y")
         old_hour_str = old_time.strftime("%H:%M:%S")
         
-        # Pointing 2: recent (e.g. 30 minutes ago)
-        recent_time = now_brazil - timedelta(minutes=30)
+        # Pointing 2: recent (e.g. 30 minutes ago = 11:30 AM)
+        recent_time = fixed_now - timedelta(minutes=30)
         recent_date_str = recent_time.strftime("%d/%m/%Y")
         recent_hour_str = recent_time.strftime("%H:%M:%S")
         

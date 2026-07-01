@@ -215,8 +215,26 @@ def admin_dashboard(request):
         
         repo = GoogleSheetsProducaoRepository()
         
+        # Determine the start of the current production day (6:00 AM)
+        if now_brazil.hour >= 6:
+            start_of_day = now_brazil.replace(hour=6, minute=0, second=0, microsecond=0)
+        else:
+            start_of_day = (now_brazil - timedelta(days=1)).replace(hour=6, minute=0, second=0, microsecond=0)
+            
         # 1. Fetch pointings and sheets
-        apontamentos = repo.list_apontamentos_raw()
+        raw_apontamentos = repo.list_apontamentos_raw()
+        apontamentos = []
+        for ap in raw_apontamentos:
+            try:
+                d_str = ap.get('data', '').strip()
+                h_str = ap.get('hora', '').strip()
+                if d_str and h_str:
+                    dt_pointing = datetime.strptime(f"{d_str} {h_str}", "%d/%m/%Y %H:%M:%S")
+                    dt_pointing = dt_pointing.replace(tzinfo=tz_brazil)
+                    if dt_pointing >= start_of_day:
+                        apontamentos.append(ap)
+            except Exception:
+                pass
         
         # 2. Fetch OPs for grams lookup
         base_ops_sheet = repo._get_worksheet_by_id(1488139834)
