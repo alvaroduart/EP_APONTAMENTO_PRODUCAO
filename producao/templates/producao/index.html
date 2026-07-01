@@ -823,6 +823,10 @@
                         <label for="qtdInput">Quantidade Produzida (neste intervalo)</label>
                         <input id="qtdInput" type="number" min="0" class="mono" placeholder="0">
                     </div>
+                    <div class="field" style="margin-top: 12px;">
+                        <label for="aparasInput">Aparas (kg)</label>
+                        <input id="aparasInput" type="text" class="mono" placeholder="0,00">
+                    </div>
                     <div class="checkbox-row">
                         <input type="checkbox" id="encerrarCheck">
                         <label for="encerrarCheck">Encerrar esta Ordem de Produção</label>
@@ -944,20 +948,7 @@
         </div>
     </div>
 
-    <!-- PROMPT MODAL -->
-    <div class="modal-overlay" id="promptModal">
-        <div class="modal-content">
-            <h2 style="font-size: 16px; font-weight: 700; color: var(--blue); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em;" id="promptTitle">Lançar Aparas</h2>
-            <div class="field">
-                <label for="promptInput" id="promptLabel">Quantidade de aparas (kg):</label>
-                <input id="promptInput" class="mono" type="text" placeholder="0,00" autocomplete="off">
-            </div>
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="btn btn-stop" id="cancelPromptBtn" style="background: var(--gray-bg); color: var(--ink); flex: 1;">Cancelar</button>
-                <button class="btn btn-primary" id="submitPromptBtn" style="flex: 1;">Confirmar</button>
-            </div>
-        </div>
-    </div>
+
 
     <div class="toast" id="toast">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -993,7 +984,7 @@
             const startBtn = $('startBtn'), startPanel = $('startPanel'), activePanel = $('activePanel');
             const sumOp = $('sumOp'), sumRecurso = $('sumRecurso'), sumMatricula = $('sumMatricula'), sumInicio = $('sumInicio'), sumUltimo = $('sumUltimo');
             const nextBadge = $('nextBadge'), nextTimer = $('nextTimer');
-            const qtdInput = $('qtdInput'), encerrarCheck = $('encerrarCheck'), encerrarTurnoCheck = $('encerrarTurnoCheck'), finalizeBtn = $('finalizeBtn'), finalizeHint = $('finalizeHint');
+            const qtdInput = $('qtdInput'), aparasInput = $('aparasInput'), encerrarCheck = $('encerrarCheck'), encerrarTurnoCheck = $('encerrarTurnoCheck'), finalizeBtn = $('finalizeBtn'), finalizeHint = $('finalizeHint');
             const occIdleMsg = $('occIdleMsg'), occPanel = $('occPanel'), motivoSelect = $('motivoSelect'), occBtn = $('occBtn');
             const occMiniList = $('occMiniList'), occMiniEmpty = $('occMiniEmpty');
             const logList = $('logList'), logEmpty = $('logEmpty');
@@ -1081,52 +1072,6 @@
                 });
             }
 
-            function showPrompt(message, defaultValue = '') {
-                return new Promise((resolve) => {
-                    const promptModal = $('promptModal');
-                    const promptLabel = $('promptLabel');
-                    const promptInput = $('promptInput');
-                    const cancelPromptBtn = $('cancelPromptBtn');
-                    const submitPromptBtn = $('submitPromptBtn');
-                    
-                    promptLabel.textContent = message;
-                    promptInput.value = defaultValue;
-                    promptModal.classList.add('show');
-                    promptInput.focus();
-                    promptInput.select();
-                    
-                    const onCancel = () => {
-                        promptModal.classList.remove('show');
-                        cleanup();
-                        resolve(null);
-                    };
-                    
-                    const onSubmit = () => {
-                        const val = promptInput.value.trim();
-                        promptModal.classList.remove('show');
-                        cleanup();
-                        resolve(val);
-                    };
-                    
-                    const onKeydown = (e) => {
-                        if (e.key === 'Enter') {
-                            onSubmit();
-                        } else if (e.key === 'Escape') {
-                            onCancel();
-                        }
-                    };
-                    
-                    function cleanup() {
-                        cancelPromptBtn.removeEventListener('click', onCancel);
-                        submitPromptBtn.removeEventListener('click', onSubmit);
-                        promptInput.removeEventListener('keydown', onKeydown);
-                    }
-                    
-                    cancelPromptBtn.addEventListener('click', onCancel);
-                    submitPromptBtn.addEventListener('click', onSubmit);
-                    promptInput.addEventListener('keydown', onKeydown);
-                });
-            }
 
             // ---------- Apontamento cadence & alert ----------
 
@@ -1372,6 +1317,7 @@
                 occPanel.style.display = 'block';
 
                 qtdInput.value = '';
+                aparasInput.value = '';
                 encerrarCheck.checked = false;
                 encerrarTurnoCheck.checked = false;
                 motivoSelect.value = '';
@@ -1401,26 +1347,21 @@
             }
 
             finalizeBtn.addEventListener('click', async () => {
-                let aparas = 0;
-                if (encerrarCheck.checked || encerrarTurnoCheck.checked) {
-                    const confirmClose = await showConfirm(
-                        encerrarCheck.checked
-                            ? "Deseja realmente encerrar esta Ordem de Produção? Esta ação não pode ser desfeita."
-                            : "Deseja realmente encerrar este Turno? Esta ação não pode ser desfeita."
-                    );
+                if (encerrarCheck.checked) {
+                    const confirmClose = await showConfirm("Deseja realmente encerrar esta Ordem de Produção? Esta ação não pode ser desfeita.");
                     if (!confirmClose) {
                         return;
                     }
-                    
-                    const aparasVal = await showPrompt("Quantidade de aparas (kg):", "0,00");
-                    if (aparasVal === null) {
+                } else if (encerrarTurnoCheck.checked) {
+                    const confirmClose = await showConfirm("Deseja realmente encerrar este Turno? Esta ação não pode ser desfeita.");
+                    if (!confirmClose) {
                         return;
                     }
-                    
-                    aparas = Number(aparasVal.replace(',', '.')) || 0;
                 }
                 const end = new Date();
                 const originalStart = lastApontamentoAt;
+                const aparasVal = aparasInput.value.trim();
+                const aparas = Number(aparasVal.replace(',', '.')) || 0;
                 
                 finalizeBtn.disabled = true;
                 const prevLabel = finalizeBtn.innerHTML;
@@ -1481,6 +1422,7 @@
                         occIdleMsg.style.display = 'block';
 
                         opInput.value = '';
+                        aparasInput.value = '';
                         clienteField.textContent = '—'; produtoField.textContent = '—';
                         clienteField.classList.remove('filled'); produtoField.classList.remove('filled');
                         opHint.textContent = 'A OP carrega cliente e produto automaticamente.';
@@ -1491,6 +1433,7 @@
                         showToast('Apontamento registrado — produção continua');
                         sumUltimo.textContent = fmtClock(end);
                         qtdInput.value = '';
+                        aparasInput.value = '';
                         encerrarCheck.checked = false;
                         encerrarTurnoCheck.checked = false;
                         validateFinalize();
