@@ -1340,7 +1340,7 @@
             // ---------- Finalize production ----------
             qtdInput.addEventListener('input', validateFinalize);
             function validateFinalize() {
-                const qtdOk = qtdInput.value !== '' && Number(qtdInput.value) > 0;
+                const qtdOk = qtdInput.value !== '' && Number(qtdInput.value) >= 0;
                 const blockedByOcc = status === 'occurrence';
                 finalizeBtn.disabled = !qtdOk || blockedByOcc;
                 finalizeHint.style.display = blockedByOcc ? 'block' : 'none';
