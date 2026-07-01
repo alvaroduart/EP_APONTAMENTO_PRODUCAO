@@ -312,9 +312,9 @@ def admin_dashboard(request):
 
         # Define categories configuration
         categories_config = {
-            'Solda Lateral': ['HS1002', 'HS1001', 'HS1201', 'HS1003', 'MS1004', 'MS1202', 'MS1002', 'MS1003', 'MS1001', 'F75002', 'HSC 70', 'HSC 11', 'SCW700', 'CS600'],
+            'Solda Lateral': ['HS1002', 'HS1001', 'HS1201', 'HS1003', 'MS1004', 'MS1202', 'F75002', 'HSC 70', 'HSC 11', 'SCW700', 'CS600'],
             'Varejo': ['P1301', 'P1302', 'P1303', 'P1304', 'P1305', 'P1306', 'P1307', 'P1308', 'PRV1'],
-            'Solda Fundo': ['MAQ.01', 'MAQ.02', 'P1401', 'P1402', 'P1403', 'F75001', 'SM-01']
+            'Solda Fundo': ['MAQ.01', 'MAQ.02', 'P1401', 'P1402', 'P1403', 'F75001']
         }
 
         sections = []

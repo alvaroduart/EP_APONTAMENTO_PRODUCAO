@@ -571,6 +571,348 @@
                 text-align: center;
             }
         }
+
+        /* ---------- Slideshow TV ---------- */
+        .slideshow-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+        }
+
+        .slideshow-btn {
+            background: var(--gray-bg);
+            border: 1px solid var(--border);
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: var(--transition);
+            color: var(--ink);
+        }
+
+        .slideshow-btn:hover {
+            background: var(--border);
+            transform: scale(1.05);
+        }
+
+        .slideshow-btn:active {
+            transform: scale(0.95);
+        }
+
+        #slideshow-play-pause-btn {
+            background: var(--blue-badge-bg);
+            border-color: rgba(59, 130, 246, 0.2);
+            color: var(--blue-badge-dark);
+        }
+
+        #slideshow-play-pause-btn:hover {
+            background: rgba(59, 130, 246, 0.15);
+        }
+
+        /* Large TV Card Styling */
+        .tv-card {
+            min-height: 420px;
+            padding: 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-radius: 24px;
+            border: 2px solid var(--border);
+            background: var(--surface);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tv-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 10px;
+            height: 100%;
+            background: var(--gray);
+            transition: var(--transition);
+        }
+
+        .tv-card.status-operando::before { background: var(--green); }
+        .tv-card.status-ociosa::before { background: var(--gray); }
+        .tv-card.status-manutencao::before { background: var(--red); }
+        .tv-card.status-fila::before { background: var(--blue-badge); }
+
+        /* TV Card glowing states */
+        .tv-card.status-operando {
+            border-color: rgba(16, 185, 129, 0.35);
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.06), 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+
+        .tv-card.status-manutencao {
+            border-color: rgba(239, 68, 68, 0.35);
+            box-shadow: 0 20px 40px rgba(239, 68, 68, 0.06), 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+
+        .tv-card.status-ociosa {
+            border-color: var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .tv-card.status-fila {
+            border-color: rgba(59, 130, 246, 0.35);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.06), 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+
+        .tv-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 32px;
+            width: 100%;
+        }
+
+        .tv-machine-name {
+            font-size: 72px;
+            font-weight: 700;
+            color: var(--ink);
+            line-height: 1.1;
+            letter-spacing: -0.04em;
+            margin: 0;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .tv-client-name {
+            font-size: 22px;
+            color: var(--ink-soft);
+            margin-top: 16px;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .tv-badge {
+            font-size: 18px;
+            padding: 10px 24px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .tv-badge .dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+        }
+
+        .status-operando .tv-badge {
+            background: var(--green-bg);
+            color: var(--green-dark);
+        }
+        .status-operando .tv-badge .dot {
+            background: var(--green);
+            animation: pulse 1.6s infinite;
+        }
+
+        .status-ociosa .tv-badge {
+            background: var(--gray-bg);
+            color: var(--gray);
+        }
+        .status-ociosa .tv-badge .dot {
+            background: var(--gray);
+        }
+
+        .status-manutencao .tv-badge {
+            background: var(--red-bg);
+            color: var(--red-dark);
+        }
+        .status-manutencao .tv-badge .dot {
+            background: var(--red);
+            animation: pulse 1.0s infinite;
+        }
+
+        .status-fila .tv-badge {
+            background: var(--blue-badge-bg);
+            color: var(--blue-badge-dark);
+        }
+        .status-fila .tv-badge .dot {
+            background: var(--blue-badge);
+        }
+
+        .tv-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+            margin-top: 48px;
+            border-top: 1px solid var(--border);
+            padding-top: 36px;
+            width: 100%;
+        }
+
+        .tv-metric {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .tv-metric:not(:last-child) {
+            border-right: 1px solid var(--border);
+            padding-right: 24px;
+        }
+
+        .tv-metric-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .tv-metric-value {
+            font-size: 46px;
+            font-weight: 700;
+            line-height: 1.1;
+            color: var(--ink);
+        }
+        
+        .tv-metric-value.mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .tv-live-tag {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--blue);
+            background: rgba(0, 60, 146, 0.08);
+            padding: 4px 12px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-left: auto;
+            margin-top: 8px;
+            display: inline-block;
+        }
+
+        /* Responsive TV styles */
+        @media (max-width: 992px) {
+            .tv-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 24px;
+            }
+            .tv-metric:nth-child(2) {
+                border-right: none;
+            }
+            .tv-card {
+                padding: 32px;
+            }
+            .tv-machine-name {
+                font-size: 54px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .tv-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .tv-metric {
+                border-right: none !important;
+                padding-right: 0 !important;
+            }
+            .tv-machine-name {
+                font-size: 40px;
+            }
+            .tv-badge {
+                font-size: 14px;
+                padding: 6px 14px;
+            }
+        }
+
+        /* Card Status Backgrounds */
+        .card.status-operando {
+            background: rgba(34, 197, 94, 0.05) !important;
+            border-color: rgba(34, 197, 94, 0.2) !important;
+        }
+        .card.status-ociosa {
+            background: rgba(239, 68, 68, 0.05) !important;
+            border-color: rgba(239, 68, 68, 0.2) !important;
+        }
+        .card.status-manutencao {
+            background: rgba(245, 158, 11, 0.05) !important;
+            border-color: rgba(245, 158, 11, 0.2) !important;
+        }
+        .card.status-fila {
+            background: rgba(59, 130, 246, 0.05) !important;
+            border-color: rgba(59, 130, 246, 0.2) !important;
+        }
+
+        /* Fullscreen styles */
+        #slideshow-fullscreen-area.is-fullscreen {
+            padding: 32px !important;
+            background: var(--bg) !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+            box-sizing: border-box !important;
+            justify-content: flex-start !important;
+            overflow: hidden !important; /* Enforces absolute fullscreen fit without scrollbars */
+        }
+
+        #slideshow-fullscreen-area.is-fullscreen #slideshow-group-title {
+            font-size: 42px !important;
+        }
+
+        #slideshow-fullscreen-area.is-fullscreen .tv-group-grid {
+            gap: 20px !important;
+            flex-grow: 1 !important;
+        }
+
+        #slideshow-fullscreen-area.is-fullscreen .card {
+            padding: 24px !important;
+            min-height: 220px !important;
+        }
+
+        #slideshow-fullscreen-area.is-fullscreen .card h4 {
+            font-size: 26px !important;
+        }
+
+        #slideshow-fullscreen-area.is-fullscreen .card span {
+            font-size: 16px !important;
+        }
+
+        #slideshow-fullscreen-area.is-fullscreen .card .status-badge {
+            font-size: 16px !important;
+            padding: 6px 14px !important;
+        }
+
+        #slideshow-fullscreen-area.is-fullscreen .card .status-badge .dot {
+            width: 10px !important;
+            height: 10px !important;
+        }
+
+        #slideshow-fullscreen-area.is-fullscreen .card .metric-label {
+            font-size: 13px !important;
+        }
+
+        #slideshow-fullscreen-area.is-fullscreen .card .metric-value {
+            font-size: 24px !important;
+        }
+
+        #slideshow-fullscreen-area.is-fullscreen .card .live-tag {
+            font-size: 14px !important;
+            padding: 4px 10px !important;
+        }
     </style>
 </head>
 
@@ -619,6 +961,8 @@
                     <option value="5">5s</option>
                     <option value="10">10s</option>
                     <option value="30" selected>30s</option>
+                    <option value="60">1 min</option>
+                    <option value="120">2 min</option>
                 </select>
                 <div class="countdown-circle">
                     <span id="countdown" class="countdown-num">30</span>
@@ -632,7 +976,8 @@
             {% for section in sections %}
             <button class="tab-btn" data-tab="{{ section.name|slugify }}" onclick="switchTab('{{ section.name|slugify }}', this)">{{ section.name }}</button>
             {% endfor %}
-            <button class="tab-btn" data-tab="historico" onclick="switchTab('historico', this)">Histórico</button>
+            <button class="tab-btn" data-tab="historico" style="display: none;" onclick="switchTab('historico', this)">Histórico</button>
+            <button class="tab-btn" data-tab="slideshow" onclick="switchTab('slideshow', this)">Slideshow TV</button>
         </div>
 
         {% for section in sections %}
@@ -645,7 +990,7 @@
             <!-- Card Grid -->
             <div class="card-grid">
                 {% for card in section.cards %}
-                <div class="card status-{{ card.status_class }} {% if card.is_live %}live-card{% endif %}">
+                <div class="card status-{{ card.status_class }} {% if card.is_live %}live-card{% endif %}" onclick="showMachineHistory('{{ card.name|escapejs }}')" style="cursor: pointer;">
                     <div class="card-top">
                         <div class="card-title">
                             <h4>{{ card.name }}</h4>
@@ -699,25 +1044,86 @@
         </div>
         {% endfor %}
 
+        <!-- Section Box for Slideshow TV -->
+        <div id="slideshow-section" class="section-box" data-section="slideshow" style="display: none;">
+            <!-- Slideshow Control Header -->
+            <div class="slideshow-header">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: var(--ink);">Slideshow Parque Fabril</h3>
+                    <span style="background: var(--blue-badge-bg); color: var(--blue-badge-dark); padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase;">Modo TV</span>
+                </div>
+                
+                <!-- Controls bar -->
+                <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+                    <!-- Category Filter -->
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <label for="slideshow-filter-select" style="font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em;">Filtrar Categoria</label>
+                        <select id="slideshow-filter-select" onchange="changeSlideshowFilter(this.value)" style="border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-size: 13px; outline: none; background: var(--surface); color: var(--ink); font-family: inherit; min-width: 140px;">
+                            <option value="all">Todas</option>
+                            {% for section in sections %}
+                            <option value="{{ section.name|slugify }}">{{ section.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Slide Duration -->
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <label for="slideshow-duration-select" style="font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em;">Tempo do Slide</label>
+                        <select id="slideshow-duration-select" onchange="changeSlideshowDuration(this.value)" style="border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-size: 13px; outline: none; background: var(--surface); color: var(--ink); font-family: inherit;">
+                            <option value="5">5s</option>
+                            <option value="10" selected>10s</option>
+                            <option value="15">15s</option>
+                            <option value="20">20s</option>
+                            <option value="30">30s</option>
+                            <option value="60">1 min</option>
+                            <option value="120">2 min</option>
+                        </select>
+                    </div>
+
+                    <!-- Playback controls -->
+                    <div style="display: flex; gap: 6px; align-self: flex-end;">
+                        <button class="slideshow-btn" onclick="prevSlide()" title="Anterior">◀</button>
+                        <button id="slideshow-play-pause-btn" class="slideshow-btn" onclick="toggleSlideshowPlay()" title="Pausar / Iniciar">⏸</button>
+                        <button class="slideshow-btn" onclick="nextSlide()" title="Próximo">▶</button>
+                        <button id="slideshow-fullscreen-btn" class="slideshow-btn" onclick="toggleFullscreen()" title="Tela Cheia">⛶</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fullscreen Area -->
+            <div id="slideshow-fullscreen-area" style="position: relative; background: transparent; border-radius: inherit;">
+                <!-- Floating Exit button (only visible in fullscreen) -->
+                <button id="fullscreen-exit-btn" onclick="toggleFullscreen()" style="position: absolute; top: 24px; right: 24px; display: none; background: rgba(0,0,0,0.5); color: white; border: none; width: 44px; height: 44px; border-radius: 50%; font-size: 20px; cursor: pointer; justify-content: center; align-items: center; z-index: 10000; transition: var(--transition);" onmouseover="this.style.background='rgba(0,0,0,0.7)'" onmouseout="this.style.background='rgba(0,0,0,0.5)'">
+                    ✕
+                </button>
+
+                <!-- Progress Bar -->
+                <div style="width: 100%; height: 6px; background: var(--gray-bg); border-radius: 3px; overflow: hidden; margin-bottom: 24px; position: relative;">
+                    <div id="slideshow-progress-bar" style="height: 100%; width: 0%; background: var(--blue-deep); transition: width 0.1s linear; border-radius: 3px;"></div>
+                </div>
+
+                <!-- Slide Content area -->
+                <div id="slideshow-content-container">
+                    <!-- Rendered dynamically by javascript -->
+                </div>
+            </div>
+        </div>
+
         <!-- Section Box for Histórico -->
         <div class="section-box" data-section="historico" style="display: none;">
             <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
-                <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: var(--ink);">Histórico de Apontamentos</h3>
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <button onclick="goBackToDashboard()" style="background: var(--surface); color: var(--ink); border: 1px solid var(--border); padding: 8px 16px; font-size: 13px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm);" onmouseover="this.style.background='var(--gray-bg)'" onmouseout="this.style.background='var(--surface)'">
+                        ← Voltar
+                    </button>
+                    <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: var(--ink);">Histórico de Apontamentos</h3>
+                </div>
                 
                 <!-- Filters bar -->
                 <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
                     <div style="display: flex; flex-direction: column; gap: 6px;">
                         <label for="filter-date" style="font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em;">Filtrar Data</label>
                         <input type="date" id="filter-date" onchange="applyHistoryFilters()" style="border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-size: 13px; outline: none; background: var(--surface); color: var(--ink); font-family: inherit;">
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 6px;">
-                        <label for="filter-machine" style="font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em;">Filtrar Máquina</label>
-                        <select id="filter-machine" onchange="applyHistoryFilters()" style="border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-size: 13px; outline: none; background: var(--surface); color: var(--ink); font-family: inherit; min-width: 140px;">
-                            <option value="">Todas</option>
-                            {% for rec in recursos %}
-                            <option value="{{ rec }}">{{ rec }}</option>
-                            {% endfor %}
-                        </select>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 6px; align-self: flex-end;">
                         <button class="btn-nav" onclick="clearHistoryFilters()" style="background: var(--gray-bg); color: var(--ink); border: 1px solid var(--border); padding: 8px 16px; font-size: 13px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: var(--transition); height: 35px; display: flex; align-items: center; justify-content: center;">Limpar Filtros</button>
@@ -731,14 +1137,13 @@
                     <thead>
                         <tr style="background: var(--gray-bg); border-bottom: 1px solid var(--border); font-weight: 600; color: var(--ink-soft); text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em;">
                             <th style="padding: 14px 20px;">Data/Hora</th>
-                            <th style="padding: 14px 20px;">Ordem Produção</th>
-                            <th style="padding: 14px 20px;">Máquina</th>
-                            <th style="padding: 14px 20px;">Matrícula</th>
+                            <th style="padding: 14px 20px;">OP</th>
                             <th style="padding: 14px 20px;">Cliente</th>
-                            <th style="padding: 14px 20px;">Produto</th>
+                            <th style="padding: 14px 20px;">Descrição do Produto</th>
                             <th style="padding: 14px 20px; text-align: right;">Quantidade</th>
-                            <th style="padding: 14px 20px; text-align: right;">Aparas (kg)</th>
-                            <th style="padding: 14px 20px; text-align: center;">Status OP</th>
+                            <th style="padding: 14px 20px; text-align: right;">Aparas</th>
+                            <th style="padding: 14px 20px; text-align: right;">Performance</th>
+                            <th style="padding: 14px 20px; text-align: right;">Performance ACM</th>
                         </tr>
                     </thead>
                     <tbody id="history-table-body">
@@ -750,12 +1155,6 @@
                             <td style="padding: 12px 20px; font-weight: 600; color: var(--blue-deep);">
                                 {{ item.op_id }}
                             </td>
-                            <td style="padding: 12px 20px; font-weight: 600; color: var(--ink);">
-                                {{ item.maquina }}
-                            </td>
-                            <td style="padding: 12px 20px; font-family: 'JetBrains Mono', monospace; color: var(--ink-soft); font-size: 12px;">
-                                {{ item.matricula }}
-                            </td>
                             <td style="padding: 12px 20px; color: var(--ink); font-size: 13px; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ item.cliente }}">
                                 {{ item.cliente }}
                             </td>
@@ -766,19 +1165,18 @@
                                 {{ item.quantidade }}
                             </td>
                             <td style="padding: 12px 20px; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--red); font-size: 13px; font-weight: 500;">
-                                {{ item.aparas|default:"0,00" }}
+                                {{ item.aparas|default:"—" }}
                             </td>
-                            <td style="padding: 12px 20px; text-align: center;">
-                                {% if item.op_encerrada == 'Sim' %}
-                                <span style="background: var(--red-bg); color: var(--red-dark); padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em;">Encerrada</span>
-                                {% else %}
-                                <span style="background: var(--green-bg); color: var(--green-dark); padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em;">Aberta</span>
-                                {% endif %}
+                            <td style="padding: 12px 20px; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--ink); font-size: 13px;">
+                                {{ item.performance_h|default:"—" }}
+                            </td>
+                            <td style="padding: 12px 20px; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--ink); font-size: 13px;">
+                                {{ item.performance_acm|default:"—" }}
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="9" style="padding: 32px; text-align: center; color: var(--ink-soft);">Nenhum apontamento histórico encontrado.</td>
+                            <td colspan="8" style="padding: 32px; text-align: center; color: var(--ink-soft);">Nenhum apontamento histórico encontrado.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -791,6 +1189,71 @@
         // Auto-refresh countdown logic
         let timeLeft = 30;
         let refreshInterval = null;
+
+        async function refreshDashboardData() {
+            try {
+                const response = await fetch(window.location.href);
+                if (!response.ok) throw new Error('Network response was not ok');
+                const htmlText = await response.text();
+                
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlText, 'text/html');
+                
+                // 1. Extract new slideshow groups from the script tag
+                const scripts = doc.querySelectorAll('script');
+                let slideshowGroupsScriptText = '';
+                for (const script of scripts) {
+                    if (script.textContent.includes('const slideshowGroups')) {
+                        slideshowGroupsScriptText = script.textContent;
+                        break;
+                    }
+                }
+                
+                if (slideshowGroupsScriptText) {
+                    const regex = /const\s+slideshowGroups\s*=\s*([\s\S]*?);\s*let\s+slideshowIndex/m;
+                    const match = slideshowGroupsScriptText.match(regex);
+                    if (match && match[1]) {
+                        try {
+                            const newGroups = new Function(`return ${match[1]}`)();
+                            if (newGroups && Array.isArray(newGroups)) {
+                                slideshowGroups.length = 0;
+                                slideshowGroups.push(...newGroups);
+                                renderActiveSlide();
+                            }
+                        } catch (e) {
+                            console.error('Failed to parse updated slideshowGroups:', e);
+                        }
+                    }
+                }
+                
+                // 2. Update background tabs (Visão Global cards, etc.)
+                document.querySelectorAll('.section-box').forEach(box => {
+                    const sectionName = box.getAttribute('data-section');
+                    if (sectionName && sectionName !== 'slideshow' && sectionName !== 'historico') {
+                        const newBox = doc.querySelector(`.section-box[data-section="${sectionName}"]`);
+                        if (newBox) {
+                            box.innerHTML = newBox.innerHTML;
+                        }
+                    }
+                });
+                
+                // Update history table if present
+                const historyBox = document.querySelector('.section-box[data-section="historico"]');
+                const newHistoryBox = doc.querySelector('.section-box[data-section="historico"]');
+                if (historyBox && newHistoryBox) {
+                    const oldBody = document.getElementById('history-table-body');
+                    const newBody = newHistoryBox.querySelector('#history-table-body');
+                    if (oldBody && newBody) {
+                        oldBody.innerHTML = newBody.innerHTML;
+                        applyHistoryFilters();
+                    }
+                }
+                
+                console.log('Dashboard data updated successfully via AJAX.');
+            } catch (err) {
+                console.error('Failed to refresh dashboard data:', err);
+            }
+        }
 
         function startTimer() {
             clearInterval(refreshInterval);
@@ -809,7 +1272,9 @@
                 document.getElementById('countdown').innerText = timeLeft;
                 if (timeLeft <= 0) {
                     clearInterval(refreshInterval);
-                    window.location.reload();
+                    refreshDashboardData().then(() => {
+                        startTimer();
+                    });
                 }
             }, 1000);
         }
@@ -828,10 +1293,19 @@
 
             // Show/hide section boxes
             document.querySelectorAll('.section-box').forEach(box => {
-                if (sectionName === 'all' || box.getAttribute('data-section') === sectionName) {
-                    box.style.display = 'block';
+                const boxSection = box.getAttribute('data-section');
+                if (sectionName === 'all') {
+                    if (boxSection !== 'historico' && boxSection !== 'slideshow') {
+                        box.style.display = 'block';
+                    } else {
+                        box.style.display = 'none';
+                    }
                 } else {
-                    box.style.display = 'none';
+                    if (boxSection === sectionName) {
+                        box.style.display = 'block';
+                    } else {
+                        box.style.display = 'none';
+                    }
                 }
             });
 
@@ -843,14 +1317,26 @@
                 startTimer();
             }
 
+            // Manage slideshow play state depending on tab
+            if (sectionName === 'slideshow') {
+                resetSlideProgress();
+                if (!slideshowPaused) {
+                    startSlideshowIntervals();
+                }
+            } else {
+                stopSlideshowIntervals();
+            }
+
             // Save choice in localStorage
             localStorage.setItem('pcp_active_tab', sectionName);
         }
 
         // History Client-side Filters
+        let activeFilteredMachine = '';
+
         function applyHistoryFilters() {
             const filterDateInput = document.getElementById('filter-date').value;
-            const filterMachine = document.getElementById('filter-machine').value;
+            const filterMachine = activeFilteredMachine;
             
             let targetDateStr = "";
             if (filterDateInput) {
@@ -876,13 +1362,340 @@
         
         function clearHistoryFilters() {
             document.getElementById('filter-date').value = '';
-            document.getElementById('filter-machine').value = '';
+            activeFilteredMachine = '';
             applyHistoryFilters();
         }
+
+        function showMachineHistory(machineName) {
+            // Exit fullscreen if active
+            if (document.fullscreenElement) {
+                document.exitFullscreen().catch(err => console.log(err));
+            }
+
+            // Find tab button for historico and trigger tab switch
+            const historyBtn = document.querySelector('.tab-btn[data-tab="historico"]');
+            if (historyBtn) {
+                switchTab('historico', historyBtn);
+            }
+            
+            // Set machine filter and clear date filter
+            activeFilteredMachine = machineName;
+            
+            const filterDateEl = document.getElementById('filter-date');
+            if (filterDateEl) {
+                filterDateEl.value = '';
+            }
+            
+            // Apply history filters client-side
+            applyHistoryFilters();
+        }
+
+        function goBackToDashboard() {
+            const allBtn = document.querySelector('.tab-btn[data-tab="all"]');
+            if (allBtn) {
+                switchTab('all', allBtn);
+            }
+        }
+
+        // Slideshow TV Data and State
+        const slideshowGroups = [
+            {% for section in sections %}
+            {
+                name: "{{ section.name|escapejs }}",
+                slug: "{{ section.name|slugify|escapejs }}",
+                cards: [
+                    {% for card in section.cards %}
+                    {
+                        code: "{{ card.code|escapejs }}",
+                        name: "{{ card.name|escapejs }}",
+                        status: "{{ card.status|escapejs }}",
+                        statusClass: "{{ card.status_class|escapejs }}",
+                        qtdProduzida: "{{ card.qtd_produzida|escapejs }}",
+                        qtdAcumulada: "{{ card.qtd_acumulada|escapejs }}",
+                        efficiency: {{ card.efficiency|default:0 }},
+                        performanceAcumulada: {{ card.performance_acumulada|default:0 }},
+                        cliente: "{{ card.cliente|escapejs }}",
+                        isLive: {% if card.is_live %}true{% else %}false{% endif %}
+                    },
+                    {% endfor %}
+                ]
+            },
+            {% endfor %}
+        ];
+
+        let slideshowIndex = 0;
+        let slideshowPaused = false;
+        let slideshowDuration = 10; // seconds
+        let slideshowFilter = 'all';
+        let slideshowProgressTimer = null;
+        let slideProgressElapsed = 0; // ms elapsed for current slide
+
+        function getFilteredGroups() {
+            if (slideshowFilter === 'all') {
+                return slideshowGroups;
+            }
+            return slideshowGroups.filter(g => g.slug === slideshowFilter);
+        }
+
+        function initSlideshow() {
+            // Load saved settings
+            slideshowFilter = localStorage.getItem('pcp_slideshow_filter') || 'all';
+            const filterEl = document.getElementById('slideshow-filter-select');
+            if (filterEl) filterEl.value = slideshowFilter;
+
+            slideshowDuration = parseInt(localStorage.getItem('pcp_slideshow_duration')) || 10;
+            const durationEl = document.getElementById('slideshow-duration-select');
+            if (durationEl) durationEl.value = slideshowDuration;
+
+            slideshowPaused = localStorage.getItem('pcp_slideshow_paused') === 'true';
+            updatePlayPauseButtonUI();
+
+            const savedIndex = parseInt(localStorage.getItem('pcp_slideshow_index')) || 0;
+            const filtered = getFilteredGroups();
+            if (savedIndex >= 0 && savedIndex < filtered.length) {
+                slideshowIndex = savedIndex;
+            } else {
+                slideshowIndex = 0;
+            }
+
+            renderActiveSlide();
+
+            if (!slideshowPaused && localStorage.getItem('pcp_active_tab') === 'slideshow') {
+                startSlideshowIntervals();
+            }
+        }
+
+        function renderActiveSlide() {
+            const filtered = getFilteredGroups();
+            const container = document.getElementById('slideshow-content-container');
+            
+            if (!container) return;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div style="padding: 60px; text-align: center; color: var(--ink-soft); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);">
+                        <p style="font-size: 18px; font-weight: 500;">Nenhum grupo encontrado.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            if (slideshowIndex >= filtered.length) {
+                slideshowIndex = 0;
+            }
+
+            const group = filtered[slideshowIndex];
+            const cards = group.cards;
+            
+            // Enforce columns based on active group (Solda Lateral needs 4 columns to avoid clipping)
+            let cols = 3;
+            if (group.name.includes("Solda Lateral")) {
+                cols = 4;
+            }
+            const rows = Math.ceil(cards.length / cols);
+            
+            let cardsHtml = '';
+            cards.forEach(card => {
+                let effClass = 'eff-good';
+                if (card.efficiency >= 80) effClass = 'eff-good';
+                else if (card.efficiency >= 60) effClass = 'eff-warning';
+                else effClass = 'eff-danger';
+
+                let perfAcmClass = 'eff-good';
+                if (card.performanceAcumulada >= 80) perfAcmClass = 'eff-good';
+                else if (card.performanceAcumulada >= 60) perfAcmClass = 'eff-warning';
+                else perfAcmClass = 'eff-danger';
+
+                const liveBadge = card.isLive ? `<span class="live-tag">Tempo Real</span>` : '';
+
+                cardsHtml += `
+                    <div class="card status-${card.statusClass}" onclick="showMachineHistory('${card.name}')" style="cursor: pointer; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;">
+                        <div class="card-top" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                            <div class="card-title">
+                                <h4 style="font-size: 18px; font-weight: 700; color: var(--ink); margin: 0;">${card.name}</h4>
+                                <span style="font-size: 13px; margin-top: 2px; color: var(--ink-soft); text-overflow: ellipsis; white-space: nowrap; overflow: hidden; display: block; max-width: 170px;" title="${card.cliente}">${card.cliente}</span>
+                            </div>
+                            <div class="status-badge" style="font-size: 12px; padding: 4px 10px;">
+                                <span class="dot"></span>
+                                ${card.status}
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="card-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                                <div class="metric">
+                                    <span class="metric-label" style="font-size: 10px;">QTD PRODUZIDA</span>
+                                    <span class="metric-value" style="font-size: 18px;">${card.qtdProduzida}</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-label" style="font-size: 10px;">PERFORMANCE/H</span>
+                                    <span class="metric-value ${effClass}" style="font-size: 18px;">${card.efficiency}%</span>
+                                </div>
+                                <div class="metric" style="margin-top: 4px;">
+                                    <span class="metric-label" style="font-size: 10px;">QTD ACUMULADA</span>
+                                    <span class="metric-value" style="font-size: 18px;">${card.qtdAcumulada}</span>
+                                </div>
+                                <div class="metric" style="margin-top: 4px;">
+                                    <span class="metric-label" style="font-size: 10px;">PERF. ACUMULADA</span>
+                                    <span class="metric-value ${perfAcmClass}" style="font-size: 18px;">${card.performanceAcumulada}%</span>
+                                </div>
+                            </div>
+                        </div>
+                        ${liveBadge}
+                    </div>
+                `;
+            });
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 12px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 4px;">Grupo Ativo</span>
+                    <h2 id="slideshow-group-title" style="font-size: 32px; font-weight: 700; color: var(--ink); margin: 0; font-family: 'Space Grotesk', sans-serif;">${group.name}</h2>
+                </div>
+                <div class="tv-group-grid" style="display: grid; grid-template-columns: repeat(${cols}, 1fr); grid-template-rows: repeat(${rows}, 1fr); gap: 16px; height: 100%;">
+                    ${cardsHtml}
+                </div>
+            `;
+        }
+
+        function startSlideshowIntervals() {
+            stopSlideshowIntervals();
+            
+            const totalMs = slideshowDuration * 1000;
+            const progressStepMs = 100;
+
+            slideshowProgressTimer = setInterval(() => {
+                slideProgressElapsed += progressStepMs;
+                const percent = Math.min((slideProgressElapsed / totalMs) * 100, 100);
+                const progressBar = document.getElementById('slideshow-progress-bar');
+                if (progressBar) progressBar.style.width = percent + '%';
+                
+                if (slideProgressElapsed >= totalMs) {
+                    nextSlide();
+                }
+            }, progressStepMs);
+        }
+
+        function stopSlideshowIntervals() {
+            clearInterval(slideshowProgressTimer);
+        }
+
+        function resetSlideProgress() {
+            slideProgressElapsed = 0;
+            const progressBar = document.getElementById('slideshow-progress-bar');
+            if (progressBar) progressBar.style.width = '0%';
+        }
+
+        function updatePlayPauseButtonUI() {
+            const btn = document.getElementById('slideshow-play-pause-btn');
+            if (!btn) return;
+            if (slideshowPaused) {
+                btn.innerHTML = '▶';
+                btn.title = 'Iniciar auto-rotação';
+            } else {
+                btn.innerHTML = '⏸';
+                btn.title = 'Pausar auto-rotação';
+            }
+        }
+
+        function toggleSlideshowPlay() {
+            slideshowPaused = !slideshowPaused;
+            localStorage.setItem('pcp_slideshow_paused', slideshowPaused);
+            updatePlayPauseButtonUI();
+
+            if (slideshowPaused) {
+                stopSlideshowIntervals();
+            } else {
+                startSlideshowIntervals();
+            }
+        }
+
+        function nextSlide() {
+            resetSlideProgress();
+            const filtered = getFilteredGroups();
+            if (filtered.length > 0) {
+                slideshowIndex = (slideshowIndex + 1) % filtered.length;
+                localStorage.setItem('pcp_slideshow_index', slideshowIndex);
+                renderActiveSlide();
+            }
+            if (!slideshowPaused) {
+                startSlideshowIntervals();
+            }
+        }
+
+        function prevSlide() {
+            resetSlideProgress();
+            const filtered = getFilteredGroups();
+            if (filtered.length > 0) {
+                slideshowIndex = (slideshowIndex - 1 + filtered.length) % filtered.length;
+                localStorage.setItem('pcp_slideshow_index', slideshowIndex);
+                renderActiveSlide();
+            }
+            if (!slideshowPaused) {
+                startSlideshowIntervals();
+            }
+        }
+
+        function changeSlideshowFilter(val) {
+            slideshowFilter = val;
+            localStorage.setItem('pcp_slideshow_filter', val);
+            slideshowIndex = 0;
+            localStorage.setItem('pcp_slideshow_index', 0);
+            resetSlideProgress();
+            renderActiveSlide();
+            if (!slideshowPaused) {
+                startSlideshowIntervals();
+            }
+        }
+
+        function changeSlideshowDuration(val) {
+            slideshowDuration = parseInt(val);
+            localStorage.setItem('pcp_slideshow_duration', val);
+            resetSlideProgress();
+            if (!slideshowPaused) {
+                startSlideshowIntervals();
+            }
+        }
+
+        // Fullscreen Toggle
+        function toggleFullscreen() {
+            const area = document.getElementById('slideshow-fullscreen-area');
+            if (!area) return;
+            if (!document.fullscreenElement) {
+                area.requestFullscreen().catch(err => {
+                    alert(`Erro ao tentar entrar em tela cheia: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen().catch(err => console.log(err));
+            }
+        }
+
+        // Monitor fullscreen state change
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.getElementById('slideshow-fullscreen-btn');
+            const area = document.getElementById('slideshow-fullscreen-area');
+            if (!area) return;
+            
+            if (document.fullscreenElement === area) {
+                if (btn) {
+                    btn.innerHTML = ' Sair';
+                    btn.title = 'Sair da Tela Cheia';
+                }
+                area.classList.add('is-fullscreen');
+            } else {
+                if (btn) {
+                    btn.innerHTML = '⛶';
+                    btn.title = 'Tela Cheia';
+                }
+                area.classList.remove('is-fullscreen');
+            }
+        });
 
         // Initialize Page
         document.addEventListener('DOMContentLoaded', () => {
             startTimer();
+            
+            // Initialize slideshow data and options
+            initSlideshow();
 
             // Restore active tab
             const savedTab = localStorage.getItem('pcp_active_tab') || 'all';
