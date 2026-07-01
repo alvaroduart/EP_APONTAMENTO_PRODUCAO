@@ -9,5 +9,6 @@ urlpatterns = [
     path('api/ocorrencias/finalize/', views.finalize_ocorrencia, name='finalize_ocorrencia'),
     path('api/active-state/', views.active_state, name='active_state'),
     path('api/apontamentos/edit/', views.editar_apontamento, name='editar_apontamento'),
+    path('api/pcp-metrics/', views.pcp_metrics, name='pcp_metrics'),
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
 ]

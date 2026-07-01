@@ -444,3 +444,79 @@ def admin_dashboard(request):
         return render(request, 'producao/admin_dashboard.html', {'error': 'needs_authentication', 'message': str(e)})
     except Exception as e:
         return render(request, 'producao/admin_dashboard.html', {'error': 'error', 'message': str(e)})
+
+def pcp_metrics(request):
+    """API endpoint to retrieve PCP metrics for a specific machine."""
+    maquina = request.GET.get('maquina')
+    if not maquina:
+        return JsonResponse({'error': 'Missing maquina parameter'}, status=400)
+        
+    try:
+        repo = GoogleSheetsProducaoRepository()
+        apontamentos = repo.list_apontamentos_raw()
+        
+        # Filter for the specific machine
+        pts = [ap for ap in apontamentos if ap.get('maquina') == maquina]
+        
+        # Apply the 6:00 AM reset logic to determine start_of_day
+        from datetime import datetime, timezone, timedelta
+        tz_brazil = timezone(timedelta(hours=-3))
+        now_brazil = datetime.now(tz_brazil)
+        if now_brazil.hour >= 6:
+            start_of_day = now_brazil.replace(hour=6, minute=0, second=0, microsecond=0)
+        else:
+            start_of_day = (now_brazil - timedelta(days=1)).replace(hour=6, minute=0, second=0, microsecond=0)
+            
+        pts_today = []
+        for ap in pts:
+            try:
+                d_str = ap.get('data', '').strip()
+                h_str = ap.get('hora', '').strip()
+                if d_str and h_str:
+                    dt_pointing = datetime.strptime(f"{d_str} {h_str}", "%d/%m/%Y %H:%M:%S")
+                    dt_pointing = dt_pointing.replace(tzinfo=tz_brazil)
+                    if dt_pointing >= start_of_day:
+                        pts_today.append(ap)
+            except Exception:
+                pass
+                
+        # Calculate metrics using pts_today
+        qtd_produzida = '0'
+        qtd_acumulada = '0'
+        eff = 0
+        perf_acumulada = 0
+        
+        if pts_today:
+            # 1. Qtd produzida (hora_hora)
+            for ap in reversed(pts_today):
+                val = ap.get('hora_hora', '').strip()
+                if val:
+                    qtd_produzida = val
+                    break
+            # 2. Qtd acumulada (quantidade)
+            for ap in reversed(pts_today):
+                val = ap.get('quantidade', '').strip()
+                if val:
+                    qtd_acumulada = val
+                    break
+            # 3. Performance/h (performance_h)
+            for ap in reversed(pts_today):
+                val = ap.get('performance_h', '').strip()
+                if val:
+                    eff = clean_oee(val)
+                    break
+            # 4. Performance ACM (performance_acm)
+            for ap in reversed(pts_today):
+                val = ap.get('performance_acm', '').strip()
+                if val:
+                    perf_acumulada = clean_oee(val)
+                    break
+
+        return JsonResponse({
+            'qtd_produzida': qtd_produzida,
+            'qtd_acumulada': qtd_acumulada,
+            'efficiency': eff,
+            'performance_acumulada': perf_acumulada
+        })
+    except Exception as e:
+        return JsonResponse({'error': 'error', 'message': str(e)}, status=500)
