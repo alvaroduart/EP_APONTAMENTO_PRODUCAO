@@ -816,16 +816,8 @@
                         </div>
                         <div id="pcpMetricsBox" style="border-left: 1px solid var(--border); padding-left: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px;">
                             <div>
-                                <span style="font-size: 9px; font-weight: 700; color: var(--gray); text-transform: uppercase;">Qtd Prod.</span>
-                                <b id="termQtdProd" style="display: block; font-size: 13px; font-weight: 700; color: var(--ink); margin-top: 1px;">0</b>
-                            </div>
-                            <div>
                                 <span style="font-size: 9px; font-weight: 700; color: var(--gray); text-transform: uppercase;">Perf./H</span>
                                 <b id="termPerfH" style="display: block; font-size: 13px; font-weight: 700; color: var(--amber); margin-top: 1px;">0%</b>
-                            </div>
-                            <div>
-                                <span style="font-size: 9px; font-weight: 700; color: var(--gray); text-transform: uppercase;">Qtd Acm.</span>
-                                <b id="termQtdAcm" style="display: block; font-size: 13px; font-weight: 700; color: var(--ink); margin-top: 1px;">0</b>
                             </div>
                             <div>
                                 <span style="font-size: 9px; font-weight: 700; color: var(--gray); text-transform: uppercase;">Perf. Acm.</span>
@@ -1106,8 +1098,6 @@
                     const response = await fetch(`/api/pcp-metrics/?maquina=${encodeURIComponent(active.recurso)}`);
                     const data = await response.json();
                     if (data && !data.error) {
-                        $('termQtdProd').textContent = data.qtd_produzida;
-                        $('termQtdAcm').textContent = data.qtd_acumulada;
                         
                         const eff = data.efficiency;
                         const perfHEl = $('termPerfH');
