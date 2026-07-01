@@ -873,14 +873,28 @@
             font-size: 42px !important;
         }
 
+        #slideshow-fullscreen-area.is-fullscreen #slideshow-content-container {
+            display: flex !important;
+            flex-direction: column !important;
+            flex-grow: 1 !important;
+            height: 100% !important;
+            min-height: 0 !important;
+        }
+
         #slideshow-fullscreen-area.is-fullscreen .tv-group-grid {
+            display: grid !important;
             gap: 20px !important;
             flex-grow: 1 !important;
+            height: 100% !important;
         }
 
         #slideshow-fullscreen-area.is-fullscreen .card {
             padding: 24px !important;
-            min-height: 220px !important;
+            min-height: 0 !important;
+            height: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
         }
 
         #slideshow-fullscreen-area.is-fullscreen .card h4 {
