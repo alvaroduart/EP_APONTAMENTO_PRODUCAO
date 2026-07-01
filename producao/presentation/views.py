@@ -435,7 +435,9 @@ def admin_dashboard(request):
             })
 
         context = {
-            'sections': sections
+            'sections': sections,
+            'historico': raw_apontamentos[::-1],
+            'recursos': settings.RECURSOS
         }
         return render(request, 'producao/admin_dashboard.html', context)
     except FileNotFoundError as e:

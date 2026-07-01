@@ -632,6 +632,7 @@
             {% for section in sections %}
             <button class="tab-btn" data-tab="{{ section.name|slugify }}" onclick="switchTab('{{ section.name|slugify }}', this)">{{ section.name }}</button>
             {% endfor %}
+            <button class="tab-btn" data-tab="historico" onclick="switchTab('historico', this)">Histórico</button>
         </div>
 
         {% for section in sections %}
@@ -697,6 +698,93 @@
             </div>
         </div>
         {% endfor %}
+
+        <!-- Section Box for Histórico -->
+        <div class="section-box" data-section="historico" style="display: none;">
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
+                <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: var(--ink);">Histórico de Apontamentos</h3>
+                
+                <!-- Filters bar -->
+                <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <label for="filter-date" style="font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em;">Filtrar Data</label>
+                        <input type="date" id="filter-date" onchange="applyHistoryFilters()" style="border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-size: 13px; outline: none; background: var(--surface); color: var(--ink); font-family: inherit;">
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <label for="filter-machine" style="font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em;">Filtrar Máquina</label>
+                        <select id="filter-machine" onchange="applyHistoryFilters()" style="border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-size: 13px; outline: none; background: var(--surface); color: var(--ink); font-family: inherit; min-width: 140px;">
+                            <option value="">Todas</option>
+                            {% for rec in recursos %}
+                            <option value="{{ rec }}">{{ rec }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 6px; align-self: flex-end;">
+                        <button class="btn-nav" onclick="clearHistoryFilters()" style="background: var(--gray-bg); color: var(--ink); border: 1px solid var(--border); padding: 8px 16px; font-size: 13px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: var(--transition); height: 35px; display: flex; align-items: center; justify-content: center;">Limpar Filtros</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pointing History Table -->
+            <div style="overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow);">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13.5px;">
+                    <thead>
+                        <tr style="background: var(--gray-bg); border-bottom: 1px solid var(--border); font-weight: 600; color: var(--ink-soft); text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em;">
+                            <th style="padding: 14px 20px;">Data/Hora</th>
+                            <th style="padding: 14px 20px;">Ordem Produção</th>
+                            <th style="padding: 14px 20px;">Máquina</th>
+                            <th style="padding: 14px 20px;">Matrícula</th>
+                            <th style="padding: 14px 20px;">Cliente</th>
+                            <th style="padding: 14px 20px;">Produto</th>
+                            <th style="padding: 14px 20px; text-align: right;">Quantidade</th>
+                            <th style="padding: 14px 20px; text-align: right;">Aparas (kg)</th>
+                            <th style="padding: 14px 20px; text-align: center;">Status OP</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-table-body">
+                        {% for item in historico %}
+                        <tr class="history-row" data-date="{{ item.data }}" data-machine="{{ item.maquina }}" style="border-bottom: 1px solid var(--border); transition: background 0.2s;" onmouseover="this.style.background='var(--gray-bg)'" onmouseout="this.style.background='transparent'">
+                            <td style="padding: 12px 20px; white-space: nowrap; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft);">
+                                {{ item.data }} {{ item.hora }}
+                            </td>
+                            <td style="padding: 12px 20px; font-weight: 600; color: var(--blue-deep);">
+                                {{ item.op_id }}
+                            </td>
+                            <td style="padding: 12px 20px; font-weight: 600; color: var(--ink);">
+                                {{ item.maquina }}
+                            </td>
+                            <td style="padding: 12px 20px; font-family: 'JetBrains Mono', monospace; color: var(--ink-soft); font-size: 12px;">
+                                {{ item.matricula }}
+                            </td>
+                            <td style="padding: 12px 20px; color: var(--ink); font-size: 13px; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ item.cliente }}">
+                                {{ item.cliente }}
+                            </td>
+                            <td style="padding: 12px 20px; color: var(--ink-soft); font-size: 13px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ item.descricao_produto }}">
+                                {{ item.descricao_produto }}
+                            </td>
+                            <td style="padding: 12px 20px; text-align: right; font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--ink); font-size: 13px;">
+                                {{ item.quantidade }}
+                            </td>
+                            <td style="padding: 12px 20px; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--red); font-size: 13px; font-weight: 500;">
+                                {{ item.aparas|default:"0,00" }}
+                            </td>
+                            <td style="padding: 12px 20px; text-align: center;">
+                                {% if item.op_encerrada == 'Sim' %}
+                                <span style="background: var(--red-bg); color: var(--red-dark); padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em;">Encerrada</span>
+                                {% else %}
+                                <span style="background: var(--green-bg); color: var(--green-dark); padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em;">Aberta</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" style="padding: 32px; text-align: center; color: var(--ink-soft);">Nenhum apontamento histórico encontrado.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </main>
 
     <script>
@@ -747,8 +835,49 @@
                 }
             });
 
+            // Pause auto-refresh timer if viewing "historico" to prevent reload interruption
+            if (sectionName === 'historico') {
+                clearInterval(refreshInterval);
+                document.getElementById('countdown').innerText = 'PAUSADO';
+            } else {
+                startTimer();
+            }
+
             // Save choice in localStorage
             localStorage.setItem('pcp_active_tab', sectionName);
+        }
+
+        // History Client-side Filters
+        function applyHistoryFilters() {
+            const filterDateInput = document.getElementById('filter-date').value;
+            const filterMachine = document.getElementById('filter-machine').value;
+            
+            let targetDateStr = "";
+            if (filterDateInput) {
+                const parts = filterDateInput.split('-');
+                targetDateStr = `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+            
+            const rows = document.querySelectorAll('.history-row');
+            rows.forEach(row => {
+                const rowDate = row.getAttribute('data-date').trim();
+                const rowMachine = row.getAttribute('data-machine').trim();
+                
+                const matchesDate = !targetDateStr || rowDate === targetDateStr;
+                const matchesMachine = !filterMachine || rowMachine === filterMachine;
+                
+                if (matchesDate && matchesMachine) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
+        function clearHistoryFilters() {
+            document.getElementById('filter-date').value = '';
+            document.getElementById('filter-machine').value = '';
+            applyHistoryFilters();
         }
 
         // Initialize Page
