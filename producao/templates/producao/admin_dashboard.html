@@ -971,6 +971,7 @@
             font-size: 14px !important;
             padding: 4px 10px !important;
         }
+
     </style>
 </head>
 
@@ -1036,6 +1037,7 @@
             {% endfor %}
             <button class="tab-btn" data-tab="historico" style="display: none;" onclick="switchTab('historico', this)">Histórico</button>
             <button class="tab-btn" data-tab="slideshow" onclick="switchTab('slideshow', this)">Slideshow TV</button>
+            <button class="tab-btn" data-tab="analise-ocorrencias" onclick="switchTab('analise-ocorrencias', this)">Análise de Ocorrências</button>
         </div>
 
         {% for section in sections %}
@@ -1167,6 +1169,102 @@
             </div>
         </div>
 
+        <!-- Section Box for Análise de Ocorrências -->
+        <div class="section-box" data-section="analise-ocorrencias" style="display: none;">
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
+                <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: var(--ink);">Análise de Ocorrências</h3>
+                
+                <!-- Filters bar -->
+                <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <label for="ocorr-filter-recurso" style="font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em;">Recurso</label>
+                        <select id="ocorr-filter-recurso" onchange="filterOcorrencias()" style="border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-size: 13px; outline: none; background: var(--surface); color: var(--ink); font-family: inherit; min-width: 140px;">
+                            <option value="all">Todos os Recursos</option>
+                            {% for rec in recursos %}
+                            <option value="{{ rec }}">{{ rec }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <label for="ocorr-filter-start-date" style="font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em;">Data Início</label>
+                        <input type="date" id="ocorr-filter-start-date" onchange="filterOcorrencias()" style="border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-size: 13px; outline: none; background: var(--surface); color: var(--ink); font-family: inherit;">
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <label for="ocorr-filter-end-date" style="font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em;">Data Fim</label>
+                        <input type="date" id="ocorr-filter-end-date" onchange="filterOcorrencias()" style="border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-size: 13px; outline: none; background: var(--surface); color: var(--ink); font-family: inherit;">
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 6px; align-self: flex-end;">
+                        <button onclick="resetOcorrenciasFilters()" style="background: var(--surface); color: var(--ink); border: 1px solid var(--border); padding: 8px 16px; font-size: 13px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: var(--transition);" onmouseover="this.style.background='var(--gray-bg)'" onmouseout="this.style.background='var(--surface)'">
+                            Limpar Filtros
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPI Metric Cards Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                <div class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 8px;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em;">Tempo Total Parado</span>
+                    <h2 id="ocorr-kpi-total-time" style="font-size: 28px; font-weight: 700; color: var(--ink);">0 min</h2>
+                    <span id="ocorr-kpi-total-time-sub" style="font-size: 12px; color: var(--ink-soft);">0,0 horas</span>
+                </div>
+                <div class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 8px;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em;">Total de Ocorrências</span>
+                    <h2 id="ocorr-kpi-total-count" style="font-size: 28px; font-weight: 700; color: var(--ink);">0</h2>
+                    <span style="font-size: 12px; color: var(--ink-soft);">Eventos registrados</span>
+                </div>
+                <div class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 8px;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em;">Tempo Médio por Parada</span>
+                    <h2 id="ocorr-kpi-avg-time" style="font-size: 28px; font-weight: 700; color: var(--ink);">0 min</h2>
+                    <span style="font-size: 12px; color: var(--ink-soft);">Duração média do evento</span>
+                </div>
+                <div class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 8px;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em;">Causa Mais Crítica</span>
+                    <h2 id="ocorr-kpi-critical-cause" style="font-size: 20px; font-weight: 700; color: var(--red); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-top: 4px;" title="Nenhuma">Nenhuma</h2>
+                    <span id="ocorr-kpi-critical-cause-sub" style="font-size: 12px; color: var(--ink-soft);">Maior impacto no tempo</span>
+                </div>
+            </div>
+
+            <!-- Pareto Chart Container -->
+            <div style="display: grid; grid-template-columns: 1fr; gap: 24px; margin-bottom: 24px;">
+                <div class="card" style="padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                        <h4 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--ink);">Diagrama de Pareto de Ocorrências</h4>
+                        <div style="display: flex; gap: 8px;">
+                            <button id="btn-chart-metric-duration" onclick="setChartMetric('duration')" class="btn-nav" style="padding: 4px 12px; font-size: 11px; background: var(--blue-deep);">Por Tempo</button>
+                            <button id="btn-chart-metric-frequency" onclick="setChartMetric('frequency')" class="btn-nav" style="padding: 4px 12px; font-size: 11px; background: rgba(0,0,0,0.1); color: var(--ink); border: 1px solid var(--border);">Por Frequência</button>
+                        </div>
+                    </div>
+                    <div style="position: relative; height: 350px; width: 100%;">
+                        <canvas id="paretoChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pareto Detailed Table -->
+            <div style="margin-top: 24px;">
+                <!-- Table Card -->
+                <div class="card" style="padding: 24px; display: flex; flex-direction: column; gap: 16px; overflow-x: auto;">
+                    <h4 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--ink);">Tabela de Distribuição (Pareto)</h4>
+                    <table class="history-table" style="width: 100%; border-collapse: collapse; min-width: 500px;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border);">
+                                <th style="padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase;">Causa / Motivo</th>
+                                <th style="padding: 12px 16px; text-align: right; font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase;">Qtd. Paradas</th>
+                                <th style="padding: 12px 16px; text-align: right; font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase;">Tempo Total (min)</th>
+                                <th style="padding: 12px 16px; text-align: right; font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase;">Acumulado (min)</th>
+                                <th style="padding: 12px 16px; text-align: right; font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase;">% do Total</th>
+                                <th style="padding: 12px 16px; text-align: right; font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase;">% Acumulado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ocorr-pareto-table-body">
+                            <!-- Populated dynamically by javascript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- Section Box for Histórico -->
         <div class="section-box" data-section="historico" style="display: none;">
             <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
@@ -1243,6 +1341,10 @@
         </div>
     </main>
 
+    <script id="ocorrencias-data" type="application/json">
+        {{ ocorrencias_json|safe }}
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Auto-refresh countdown logic
         let timeLeft = 30;
@@ -1304,6 +1406,20 @@
                     if (oldBody && newBody) {
                         oldBody.innerHTML = newBody.innerHTML;
                         applyHistoryFilters();
+                    }
+                }
+
+                // 3. Update occurrences JSON script and analysis
+                const newOcorrScript = doc.getElementById('ocorrencias-data');
+                if (newOcorrScript) {
+                    try {
+                        const newOcorrData = JSON.parse(newOcorrScript.textContent);
+                        if (newOcorrData && Array.isArray(newOcorrData)) {
+                            ocorrenciasData = newOcorrData;
+                            renderOcorrenciasDashboard();
+                        }
+                    } catch (e) {
+                        console.error('Failed to parse updated occurrences data:', e);
                     }
                 }
                 
@@ -1383,6 +1499,10 @@
                 }
             } else {
                 stopSlideshowIntervals();
+            }
+
+            if (sectionName === 'analise-ocorrencias') {
+                renderOcorrenciasDashboard();
             }
 
             // Save choice in localStorage
@@ -1748,12 +1868,329 @@
             }
         });
 
+        // ---------- Occurrences Pareto & Insights Logic ----------
+        let ocorrenciasData = [];
+        let paretoChartInstance = null;
+        let chartMetric = 'duration';
+
+        function initOcorrenciasAnalysis() {
+            const scriptEl = document.getElementById('ocorrencias-data');
+            if (scriptEl) {
+                try {
+                    ocorrenciasData = JSON.parse(scriptEl.textContent);
+                } catch (e) {
+                    console.error('Error parsing occurrences JSON:', e);
+                }
+            }
+            renderOcorrenciasDashboard();
+        }
+
+        function resetOcorrenciasFilters() {
+            document.getElementById('ocorr-filter-recurso').value = 'all';
+            document.getElementById('ocorr-filter-start-date').value = '';
+            document.getElementById('ocorr-filter-end-date').value = '';
+            renderOcorrenciasDashboard();
+        }
+
+        function filterOcorrencias() {
+            renderOcorrenciasDashboard();
+        }
+
+        function setChartMetric(metric) {
+            chartMetric = metric;
+            const btnDuration = document.getElementById('btn-chart-metric-duration');
+            const btnFrequency = document.getElementById('btn-chart-metric-frequency');
+            if (metric === 'duration') {
+                btnDuration.style.background = 'var(--blue-deep)';
+                btnDuration.style.color = 'white';
+                btnFrequency.style.background = 'rgba(0,0,0,0.1)';
+                btnFrequency.style.color = 'var(--ink)';
+            } else {
+                btnFrequency.style.background = 'var(--blue-deep)';
+                btnFrequency.style.color = 'white';
+                btnDuration.style.background = 'rgba(0,0,0,0.1)';
+                btnDuration.style.color = 'var(--ink)';
+            }
+            renderOcorrenciasDashboard();
+        }
+
+        function parseDDate(dStr, tStr) {
+            if (!dStr) return null;
+            const parts = dStr.split('/');
+            if (parts.length !== 3) return null;
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1;
+            const year = parseInt(parts[2], 10);
+            if (tStr) {
+                const tParts = tStr.split(':');
+                if (tParts.length >= 2) {
+                    const hrs = parseInt(tParts[0], 10);
+                    const mins = parseInt(tParts[1], 10);
+                    const secs = tParts.length === 3 ? parseInt(tParts[2], 10) : 0;
+                    return new Date(year, month, day, hrs, mins, secs);
+                }
+            }
+            return new Date(year, month, day);
+        }
+
+        function renderOcorrenciasDashboard() {
+            const selectedRecurso = document.getElementById('ocorr-filter-recurso').value;
+            const startDateVal = document.getElementById('ocorr-filter-start-date').value;
+            const endDateVal = document.getElementById('ocorr-filter-end-date').value;
+            
+            const startLimit = startDateVal ? new Date(startDateVal + 'T00:00:00') : null;
+            const endLimit = endDateVal ? new Date(endDateVal + 'T23:59:59') : null;
+
+            const filtered = ocorrenciasData.filter(item => {
+                if (selectedRecurso !== 'all' && item.maquina !== selectedRecurso) {
+                    return false;
+                }
+                const itemDate = parseDDate(item.data_inicio);
+                if (!itemDate) return false;
+                
+                if (startLimit && itemDate < startLimit) return false;
+                if (endLimit && itemDate > endLimit) return false;
+                
+                return true;
+            });
+
+            const grouped = {};
+            let totalDowntimeMinutes = 0;
+            let totalEvents = filtered.length;
+            let openEventsCount = 0;
+
+            filtered.forEach(item => {
+                const motive = item.ocorrencia || 'Outros';
+                if (!grouped[motive]) {
+                    grouped[motive] = { count: 0, duration: 0 };
+                }
+                
+                grouped[motive].count += 1;
+                
+                if (item.data_inicio && item.hora_inicio && item.data_fim && item.hora_fim) {
+                    const startDt = parseDDate(item.data_inicio, item.hora_inicio);
+                    const endDt = parseDDate(item.data_fim, item.hora_fim);
+                    if (startDt && endDt) {
+                        const dur = (endDt - startDt) / 60000.0;
+                        if (dur > 0) {
+                            grouped[motive].duration += dur;
+                            totalDowntimeMinutes += dur;
+                        }
+                    }
+                } else {
+                    openEventsCount += 1;
+                }
+            });
+
+            const sortedList = Object.keys(grouped).map(motive => {
+                return {
+                    motive: motive,
+                    count: grouped[motive].count,
+                    duration: grouped[motive].duration
+                };
+            });
+
+            if (chartMetric === 'duration') {
+                sortedList.sort((a, b) => b.duration - a.duration);
+            } else {
+                sortedList.sort((a, b) => b.count - a.count);
+            }
+
+            let runningSum = 0;
+            const totalSum = chartMetric === 'duration' ? totalDowntimeMinutes : totalEvents;
+            
+            const paretoData = sortedList.map(item => {
+                const val = chartMetric === 'duration' ? item.duration : item.count;
+                runningSum += val;
+                const pct = totalSum > 0 ? (val / totalSum) * 100 : 0;
+                const cumPct = totalSum > 0 ? (runningSum / totalSum) * 100 : 0;
+                return {
+                    ...item,
+                    value: val,
+                    cumulativeValue: runningSum,
+                    percentage: pct,
+                    cumulativePercentage: cumPct
+                };
+            });
+
+            const totalHours = (totalDowntimeMinutes / 60.0).toFixed(1);
+            document.getElementById('ocorr-kpi-total-time').innerText = Math.round(totalDowntimeMinutes) + ' min';
+            document.getElementById('ocorr-kpi-total-time-sub').innerText = totalHours.replace('.', ',') + ' horas';
+            document.getElementById('ocorr-kpi-total-count').innerText = totalEvents;
+            
+            const avgTime = totalEvents > 0 ? Math.round(totalDowntimeMinutes / totalEvents) : 0;
+            document.getElementById('ocorr-kpi-avg-time').innerText = avgTime + ' min';
+            
+            const highestDurItem = [...sortedList].sort((a, b) => b.duration - a.duration)[0];
+            const criticalCauseEl = document.getElementById('ocorr-kpi-critical-cause');
+            if (highestDurItem && highestDurItem.duration > 0) {
+                criticalCauseEl.innerText = highestDurItem.motive;
+                criticalCauseEl.title = highestDurItem.motive;
+                document.getElementById('ocorr-kpi-critical-cause-sub').innerText = `Total: ${Math.round(highestDurItem.duration)} min`;
+            } else {
+                criticalCauseEl.innerText = 'Nenhuma';
+                criticalCauseEl.title = 'Nenhuma';
+                document.getElementById('ocorr-kpi-critical-cause-sub').innerText = '0 min de parada';
+            }
+
+            const tbody = document.getElementById('ocorr-pareto-table-body');
+            tbody.innerHTML = '';
+            if (paretoData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="padding: 24px; text-align: center; color: var(--ink-soft);">Nenhuma ocorrência encontrada para os filtros selecionados.</td></tr>`;
+            } else {
+                let runningTableSum = 0;
+                paretoData.forEach(item => {
+                    runningTableSum += item.duration;
+                    const pctStr = item.percentage.toFixed(1).replace('.', ',') + '%';
+                    const cumPctStr = item.cumulativePercentage.toFixed(1).replace('.', ',') + '%';
+                    
+                    const row = document.createElement('tr');
+                    row.style.borderBottom = '1px solid var(--border)';
+                    row.innerHTML = `
+                        <td style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--ink);">${item.motive}</td>
+                        <td style="padding: 12px 16px; text-align: right; font-family: monospace; color: var(--ink-soft);">${item.count}</td>
+                        <td style="padding: 12px 16px; text-align: right; font-family: monospace; color: var(--ink); font-weight: 500;">${Math.round(item.duration)} min</td>
+                        <td style="padding: 12px 16px; text-align: right; font-family: monospace; color: var(--ink-soft);">${Math.round(runningTableSum)} min</td>
+                        <td style="padding: 12px 16px; text-align: right; font-family: monospace; color: var(--ink-soft);">${pctStr}</td>
+                        <td style="padding: 12px 16px; text-align: right; font-family: monospace; color: var(--blue-badge-dark); font-weight: 600;">${cumPctStr}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            renderParetoChart(paretoData);
+        }
+
+        function renderParetoChart(paretoData) {
+            const chartCanvas = document.getElementById('paretoChart');
+            if (!chartCanvas) return;
+            const ctx = chartCanvas.getContext('2d');
+            
+            if (paretoChartInstance) {
+                paretoChartInstance.destroy();
+            }
+
+            if (paretoData.length === 0) {
+                return;
+            }
+
+            const labels = paretoData.map(item => item.motive);
+            const values = paretoData.map(item => chartMetric === 'duration' ? Math.round(item.duration) : item.count);
+            const cumulativePcts = paretoData.map(item => Math.round(item.cumulativePercentage));
+
+            const yAxisLabel = chartMetric === 'duration' ? 'Tempo de Parada (minutos)' : 'Frequência (Ocorrências)';
+
+            paretoChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: yAxisLabel,
+                            data: values,
+                            backgroundColor: '#ef4444',
+                            borderColor: '#ef4444',
+                            borderWidth: 1,
+                            yAxisID: 'y',
+                            order: 2
+                        },
+                        {
+                            label: '% Acumulada',
+                            data: cumulativePcts,
+                            type: 'line',
+                            borderColor: '#003c92',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#003c92',
+                            pointRadius: 4,
+                            fill: false,
+                            tension: 0.1,
+                            yAxisID: 'y1',
+                            order: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: yAxisLabel,
+                                color: '#5c6678',
+                                font: { weight: 'bold' }
+                            },
+                            grid: {
+                                color: '#e2e8f0'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            min: 0,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Porcentagem Acumulada (%)',
+                                color: '#5c6678',
+                                font: { weight: 'bold' }
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#5c6678',
+                                font: { weight: '600' }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#10172a',
+                                font: { family: 'inherit', weight: '600' }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.datasetIndex === 0) {
+                                        label += context.raw + (chartMetric === 'duration' ? ' min' : ' vezes');
+                                    } else {
+                                        label += context.raw + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         // Initialize Page
         document.addEventListener('DOMContentLoaded', () => {
             startTimer();
             
             // Initialize slideshow data and options
             initSlideshow();
+
+            // Initialize occurrences analysis
+            initOcorrenciasAnalysis();
 
             // Restore active tab
             const savedTab = localStorage.getItem('pcp_active_tab') || 'all';

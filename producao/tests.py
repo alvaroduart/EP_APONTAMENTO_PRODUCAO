@@ -377,4 +377,43 @@ class ProductionTerminalTests(TestCase):
             self.assertEqual(data['efficiency'], 88)
             self.assertEqual(data['performance_acumulada'], 92)
 
+    def test_admin_dashboard_with_ocorrencias(self):
+        """Test that the admin dashboard view retrieves and formats occurrences successfully."""
+        import json
+        with patch('producao.presentation.views.GoogleSheetsProducaoRepository') as mock_repo_class:
+            mock_repo = mock_repo_class.return_value
+            mock_repo.list_apontamentos_raw.return_value = []
+            
+            mock_ws_ops = MagicMock()
+            mock_ws_ops.get_all_values.return_value = [
+                ['NUMERO OP', 'CODIGO PRODUTO', 'DESCRIÇÃO PRODUTO', 'NOME CLIENTE', 'GRAMA SACO', 'QUANTIDADE OP'],
+                ['42574', 'PROD01', 'Saco PEBD', 'Client A', '5', '1000']
+            ]
+            
+            mock_ws_ocorr = MagicMock()
+            mock_ws_ocorr.get_all_values.return_value = [
+                ['Ordem Produção', 'Cliente', 'Descrição Produto', 'Ocorrência', 'Data Inicio', 'Hora Inicio', 'Data Fim', 'Hora Fim', 'Maquina'],
+                ['42574', 'Client A', 'Saco PEBD', 'Ajuste Operacional', '29/06/2026', '11:18:00', '29/06/2026', '11:19:00', 'CS600'],
+                ['', '', '', '', '', '', '', '', '']
+            ]
+            
+            def mock_get_worksheet(gid):
+                if gid == 1488139834:
+                    return mock_ws_ops
+                elif gid == 1265473594:
+                    return mock_ws_ocorr
+                return MagicMock()
+                
+            mock_repo._get_worksheet_by_id = mock_get_worksheet
+            
+            response = self.client.get(reverse('admin_dashboard'))
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('ocorrencias_json', response.context)
+            ocorrencias_data = json.loads(response.context['ocorrencias_json'])
+            self.assertEqual(len(ocorrencias_data), 1)
+            self.assertEqual(ocorrencias_data[0]['op_id'], '42574')
+            self.assertEqual(ocorrencias_data[0]['ocorrencia'], 'Ajuste Operacional')
+            self.assertEqual(ocorrencias_data[0]['maquina'], 'CS600')
+
+
 

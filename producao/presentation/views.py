@@ -296,18 +296,40 @@ def admin_dashboard(request):
             if len(row) >= 5:
                 op_grams[row[0].strip()] = row[4].strip()
                 
-        # 3. Fetch occurrences for open occurrence check
+        # 3. Fetch occurrences for open check and raw list
         ocorrencias_sheet = repo._get_worksheet_by_id(1265473594)
         ocorrencias_rows = ocorrencias_sheet.get_all_values()
         open_machine_occurrences = {}
+        ocorrencias_list = []
         for row in ocorrencias_rows[1:]:
             if len(row) >= 9:
                 op_id = row[0].strip()
-                data_fim = row[6].strip()
+                cliente = row[1].strip()
+                descricao_produto = row[2].strip()
                 motive = row[3].strip()
+                data_inicio = row[4].strip()
+                hora_inicio = row[5].strip()
+                data_fim = row[6].strip()
+                hora_fim = row[7].strip()
                 maquina = row[8].strip()
+                
+                # Check for open occurrences
                 if not data_fim and maquina:
                     open_machine_occurrences[maquina] = motive
+                
+                # Retrieve only valid entries with OP and Motive
+                if op_id and motive:
+                    ocorrencias_list.append({
+                        'op_id': op_id,
+                        'cliente': cliente,
+                        'descricao_produto': descricao_produto,
+                        'ocorrencia': motive,
+                        'data_inicio': data_inicio,
+                        'hora_inicio': hora_inicio,
+                        'data_fim': data_fim,
+                        'hora_fim': hora_fim,
+                        'maquina': maquina
+                    })
 
         # Define categories configuration
         categories_config = {
@@ -436,7 +458,8 @@ def admin_dashboard(request):
         context = {
             'sections': sections,
             'historico': raw_apontamentos[::-1],
-            'recursos': settings.RECURSOS
+            'recursos': settings.RECURSOS,
+            'ocorrencias_json': json.dumps(ocorrencias_list)
         }
         return render(request, 'producao/admin_dashboard.html', context)
     except FileNotFoundError as e:
