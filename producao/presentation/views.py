@@ -16,6 +16,58 @@ from producao.application.use_cases import (
 from producao.presentation.serializers import validate_fields
 from producao.domain.exceptions import BusinessError
 
+# Helper function to clean floats
+def clean_float(val_str):
+    if not val_str:
+        return 0.0
+    try:
+        val_clean = val_str.replace(' ', '').strip()
+        if ',' in val_clean and '.' in val_clean:
+            val_clean = val_clean.replace('.', '').replace(',', '.')
+        elif ',' in val_clean:
+            val_clean = val_clean.replace(',', '.')
+        parts = val_clean.split('.')
+        if len(parts) == 2 and len(parts[1]) == 3:
+            val_clean = val_clean.replace('.', '')
+        return float(val_clean)
+    except Exception:
+        return 0.0
+
+# Helper function to clean weight in grams (retains decimal points for small weights)
+def clean_grams(val_str):
+    if not val_str:
+        return 0.0
+    try:
+        val_clean = val_str.replace(' ', '').strip()
+        val_clean = val_clean.replace(',', '.')
+        return float(val_clean)
+    except Exception:
+        return 0.0
+
+
+# Helper function to clean OEE percentage values from Column M
+def clean_oee(val_str):
+    if not val_str:
+        return 0
+    try:
+        val_clean = val_str.replace(' ', '').strip()
+        is_percent = '%' in val_clean
+        val_clean = val_clean.replace('%', '')
+        if ',' in val_clean and '.' in val_clean:
+            val_clean = val_clean.replace('.', '').replace(',', '.')
+        elif ',' in val_clean:
+            val_clean = val_clean.replace(',', '.')
+        parts = val_clean.split('.')
+        if len(parts) == 2 and len(parts[1]) == 3:
+            val_clean = val_clean.replace('.', '')
+        
+        val_num = float(val_clean)
+        if val_num <= 1.0 and val_num > 0 and not is_percent:
+            val_num = val_num * 100
+        return int(round(val_num))
+    except Exception:
+        return 0
+
 def index(request):
     """Renders the main production terminal interface."""
     context = {
@@ -257,59 +309,6 @@ def admin_dashboard(request):
                 if not data_fim and maquina:
                     open_machine_occurrences[maquina] = motive
 
-        # Helper function to clean floats
-        def clean_float(val_str):
-            if not val_str:
-                return 0.0
-            try:
-                val_clean = val_str.replace(' ', '').strip()
-                if ',' in val_clean and '.' in val_clean:
-                    val_clean = val_clean.replace('.', '').replace(',', '.')
-                elif ',' in val_clean:
-                    val_clean = val_clean.replace(',', '.')
-                parts = val_clean.split('.')
-                if len(parts) == 2 and len(parts[1]) == 3:
-                    val_clean = val_clean.replace('.', '')
-                return float(val_clean)
-            except Exception:
-                return 0.0
-
-        # Helper function to clean weight in grams (retains decimal points for small weights)
-        def clean_grams(val_str):
-            if not val_str:
-                return 0.0
-            try:
-                val_clean = val_str.replace(' ', '').strip()
-                val_clean = val_clean.replace(',', '.')
-                return float(val_clean)
-            except Exception:
-                return 0.0
-
-
-        # Helper function to clean OEE percentage values from Column M
-        def clean_oee(val_str):
-            if not val_str:
-                return 0
-            try:
-                val_clean = val_str.replace(' ', '').strip()
-                is_percent = '%' in val_clean
-                val_clean = val_clean.replace('%', '')
-                if ',' in val_clean and '.' in val_clean:
-                    val_clean = val_clean.replace('.', '').replace(',', '.')
-                elif ',' in val_clean:
-                    val_clean = val_clean.replace(',', '.')
-                parts = val_clean.split('.')
-                if len(parts) == 2 and len(parts[1]) == 3:
-                    val_clean = val_clean.replace('.', '')
-                
-                val_num = float(val_clean)
-                if val_num <= 1.0 and val_num > 0 and not is_percent:
-                    val_num = val_num * 100
-                return int(round(val_num))
-            except Exception:
-                return 0
-
-
         # Define categories configuration
         categories_config = {
             'Solda Lateral': ['HS1002', 'HS1001', 'HS1201', 'HS1003', 'MS1004', 'MS1202', 'F75002', 'HSC 70', 'HSC 11', 'SCW700', 'CS600'],
@@ -458,8 +457,6 @@ def pcp_metrics(request):
         # Filter for the specific machine
         pts = [ap for ap in apontamentos if ap.get('maquina') == maquina]
         
-        # Apply the 6:00 AM reset logic to determine start_of_day
-        from datetime import datetime, timezone, timedelta
         tz_brazil = timezone(timedelta(hours=-3))
         now_brazil = datetime.now(tz_brazil)
         if now_brazil.hour >= 6:

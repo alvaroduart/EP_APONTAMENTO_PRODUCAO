@@ -336,3 +336,45 @@ class ProductionTerminalTests(TestCase):
                 'message': 'Ocorrência aberta correspondente não encontrada'
             })
 
+    @patch('producao.presentation.views.datetime')
+    def test_pcp_metrics_api_success(self, mock_datetime_class):
+        """Test fetching PCP metrics for a machine with valid pointing records."""
+        from datetime import datetime, timezone, timedelta
+        
+        tz_brazil = timezone(timedelta(hours=-3))
+        fixed_now = datetime(2026, 6, 30, 12, 0, 0, tzinfo=tz_brazil)
+        mock_datetime_class.now.return_value = fixed_now
+        mock_datetime_class.strptime.side_effect = lambda *args, **kwargs: datetime.strptime(*args, **kwargs)
+        
+        recent_time = fixed_now - timedelta(minutes=15)
+        recent_date_str = recent_time.strftime("%d/%m/%Y")
+        recent_hour_str = recent_time.strftime("%H:%M:%S")
+        
+        with patch('producao.presentation.views.GoogleSheetsProducaoRepository') as mock_repo_class:
+            mock_repo = mock_repo_class.return_value
+            mock_repo.list_apontamentos_raw.return_value = [
+                {
+                    'op_id': '12345',
+                    'cliente': 'Test Client',
+                    'descricao_produto': 'Test Product',
+                    'data': recent_date_str,
+                    'hora': recent_hour_str,
+                    'matricula': '456',
+                    'maquina': 'MAQ.01',
+                    'op_encerrada': 'Não',
+                    'quantidade': '500',
+                    'hora_hora': '50',
+                    'performance_h': '88%',
+                    'performance_acm': '92%',
+                }
+            ]
+            
+            response = self.client.get(reverse('pcp_metrics'), {'maquina': 'MAQ.01'})
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            self.assertEqual(data['qtd_produzida'], '50')
+            self.assertEqual(data['qtd_acumulada'], '500')
+            self.assertEqual(data['efficiency'], 88)
+            self.assertEqual(data['performance_acumulada'], 92)
+
+
