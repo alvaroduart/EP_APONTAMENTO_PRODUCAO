@@ -117,6 +117,85 @@ class ProductionTerminalTests(TestCase):
             raw=False
         )
 
+    def test_save_apontamento_with_ocorrencia_apara_col_p(self):
+        """Test that save_apontamento with ocorrencia_apara updates A:J and Column P."""
+        from unittest.mock import MagicMock, call
+        from producao.infrastructure.repositories import GoogleSheetsProducaoRepository
+        from producao.domain.entities import Apontamento
+
+        repo = GoogleSheetsProducaoRepository()
+        
+        mock_worksheet = MagicMock()
+        repo._get_worksheet_by_id = MagicMock(return_value=mock_worksheet)
+        mock_worksheet.col_values.return_value = ['OP', '101', '102']
+        
+        apontamento = Apontamento(
+            op_id="12345",
+            cliente="Cliente Teste",
+            descricao_produto="Produto Teste",
+            data="28/06/2026",
+            hora="20:00:00",
+            matricula="999",
+            maquina="M1",
+            op_encerrada="Não",
+            quantidade=100,
+            aparas=12.5,
+            ocorrencia_apara="Refile"
+        )
+        
+        repo.save_apontamento(apontamento)
+        
+        mock_worksheet.col_values.assert_called_once_with(1)
+        
+        # Verify both updates: A4:J4 and P4:P4
+        expected_calls = [
+            call(
+                values=[[
+                    "12345", "Cliente Teste", "Produto Teste",
+                    "28/06/2026", "20:00:00", "999", "M1", "Não", 100, 12.5
+                ]],
+                range_name="A4:J4",
+                raw=False
+            ),
+            call(
+                values=[["Refile"]],
+                range_name="P4:P4",
+                raw=False
+            )
+        ]
+        mock_worksheet.update.assert_has_calls(expected_calls)
+
+    def test_apontamentos_api_with_ocorrencia_apara(self):
+        """Test posting appointment with ocorrencia_apara through views API."""
+        with patch('producao.presentation.views.GoogleSheetsProducaoRepository') as mock_repo_class:
+            mock_repo = mock_repo_class.return_value
+            
+            payload = {
+                'op_id': '17711',
+                'cliente': 'Test Client',
+                'descricao_produto': 'Test Prod',
+                'data': '26/06/2026',
+                'hora': '08:45:37',
+                'matricula': '123',
+                'maquina': 'MS1000.4',
+                'op_encerrada': False,
+                'quantidade': 1500,
+                'aparas': 8.5,
+                'ocorrencia_apara': 'Extrusão'
+            }
+            
+            response = self.client.post(
+                reverse('apontamentos'),
+                data=json.dumps(payload),
+                content_type='application/json'
+            )
+            self.assertEqual(response.status_code, 200)
+            mock_repo.save_apontamento.assert_called_once()
+            saved_apontamento = mock_repo.save_apontamento.call_args[0][0]
+            self.assertEqual(saved_apontamento.op_id, '17711')
+            self.assertEqual(saved_apontamento.aparas, 8.5)
+            self.assertEqual(saved_apontamento.ocorrencia_apara, 'Extrusão')
+
     def test_admin_dashboard_with_mock(self):
         """Test that the admin dashboard view renders successfully with mocked repository data."""
         from unittest.mock import patch, MagicMock
@@ -374,6 +453,7 @@ class ProductionTerminalTests(TestCase):
             data = response.json()
             self.assertEqual(data['qtd_produzida'], '50')
             self.assertEqual(data['qtd_acumulada'], '500')
+            self.assertEqual(data['qtd_apara'], '0')
             self.assertEqual(data['efficiency'], 88)
             self.assertEqual(data['performance_acumulada'], 92)
 

@@ -123,7 +123,8 @@ def apontamentos(request):
             maquina=str(data['maquina']),
             op_encerrada=bool(data['op_encerrada']),
             quantidade=int(data['quantidade']),
-            aparas=float(data.get('aparas', 0.0))
+            aparas=float(data.get('aparas', 0.0)),
+            ocorrencia_apara=str(data.get('ocorrencia_apara', '')).strip()
         )
         
         return JsonResponse({
@@ -415,6 +416,13 @@ def admin_dashboard(request):
                         if val:
                             qtd_acumulada = val
                             break
+
+                    qtd_apara = '—'
+                    for ap in reversed(pts):
+                        val = ap.get('aparas', '').strip()
+                        if val:
+                            qtd_apara = val
+                            break
                             
                     cliente = latest.get('cliente', '')
                     
@@ -434,6 +442,7 @@ def admin_dashboard(request):
                 else:
                     qtd_produzida = '—'
                     qtd_acumulada = '—'
+                    qtd_apara = '—'
                     cliente = '—'
                     eff = 0
                     perf_acumulada = 0
@@ -445,6 +454,7 @@ def admin_dashboard(request):
                     'status_class': status_class,
                     'qtd_produzida': qtd_produzida,
                     'qtd_acumulada': qtd_acumulada,
+                    'qtd_apara': qtd_apara,
                     'performance_acumulada': perf_acumulada,
                     'efficiency': eff,
                     'cliente': cliente,
@@ -503,6 +513,7 @@ def pcp_metrics(request):
         # Calculate metrics using pts_today
         qtd_produzida = '0'
         qtd_acumulada = '0'
+        qtd_apara = '0'
         eff = 0
         perf_acumulada = 0
         
@@ -519,13 +530,19 @@ def pcp_metrics(request):
                 if val:
                     qtd_acumulada = val
                     break
-            # 3. Performance/h (performance_h)
+            # 3. Qtd apara (aparas)
+            for ap in reversed(pts_today):
+                val = ap.get('aparas', '').strip()
+                if val:
+                    qtd_apara = val
+                    break
+            # 4. Performance/h (performance_h)
             for ap in reversed(pts_today):
                 val = ap.get('performance_h', '').strip()
                 if val:
                     eff = clean_oee(val)
                     break
-            # 4. Performance ACM (performance_acm)
+            # 5. Performance ACM (performance_acm)
             for ap in reversed(pts_today):
                 val = ap.get('performance_acm', '').strip()
                 if val:
@@ -535,6 +552,7 @@ def pcp_metrics(request):
         return JsonResponse({
             'qtd_produzida': qtd_produzida,
             'qtd_acumulada': qtd_acumulada,
+            'qtd_apara': qtd_apara,
             'efficiency': eff,
             'performance_acumulada': perf_acumulada
         })

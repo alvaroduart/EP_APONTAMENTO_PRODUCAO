@@ -1092,6 +1092,10 @@
                                     {{ card.performance_acumulada }}%
                                 </span>
                             </div>
+                            <div class="metric" style="margin-top: 10px;">
+                                <span class="metric-label">QTD APARA</span>
+                                <span class="metric-value" style="color: var(--red);">{{ card.qtd_apara }}</span>
+                            </div>
                         </div>
                     </div>
 
@@ -1322,6 +1326,9 @@
                             </td>
                             <td style="padding: 12px 20px; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--red); font-size: 13px; font-weight: 500;">
                                 {{ item.aparas|default:"—" }}
+                                {% if item.ocorrencia_apara %}
+                                <span style="display: block; font-size: 11px; font-weight: 600; color: var(--ink-soft); font-family: inherit;">({{ item.ocorrencia_apara }})</span>
+                                {% endif %}
                             </td>
                             <td style="padding: 12px 20px; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--ink); font-size: 13px;">
                                 {{ item.performance_h|default:"—" }}
@@ -1590,6 +1597,7 @@
                         statusClass: "{{ card.status_class|escapejs }}",
                         qtdProduzida: "{{ card.qtd_produzida|escapejs }}",
                         qtdAcumulada: "{{ card.qtd_acumulada|escapejs }}",
+                        qtdApara: "{{ card.qtd_apara|escapejs }}",
                         efficiency: {{ card.efficiency|default:0 }},
                         performanceAcumulada: {{ card.performance_acumulada|default:0 }},
                         cliente: "{{ card.cliente|escapejs }}",
@@ -1716,6 +1724,10 @@
                                 <div class="metric" style="margin-top: 4px;">
                                     <span class="metric-label" style="font-size: 10px;">PERF. ACUMULADA</span>
                                     <span class="metric-value ${perfAcmClass}" style="font-size: 18px;">${card.performanceAcumulada}%</span>
+                                </div>
+                                <div class="metric" style="margin-top: 4px;">
+                                    <span class="metric-label" style="font-size: 10px;">QTD APARA</span>
+                                    <span class="metric-value" style="font-size: 18px; color: var(--red);">${card.qtdApara}</span>
                                 </div>
                             </div>
                         </div>

@@ -35,7 +35,8 @@ class ApontarProducaoUseCase:
         maquina: str,
         op_encerrada: bool,
         quantidade: int,
-        aparas: float = 0.0
+        aparas: float = 0.0,
+        ocorrencia_apara: str = ""
     ) -> Apontamento:
         op_encerrada_str = "Sim" if op_encerrada else "Não"
         apontamento = Apontamento(
@@ -48,7 +49,8 @@ class ApontarProducaoUseCase:
             maquina=maquina,
             op_encerrada=op_encerrada_str,
             quantidade=quantidade,
-            aparas=aparas
+            aparas=aparas,
+            ocorrencia_apara=ocorrencia_apara
         )
         self.repo.save_apontamento(apontamento)
         return apontamento

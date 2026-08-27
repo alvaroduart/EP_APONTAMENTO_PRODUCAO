@@ -86,6 +86,7 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
                     'hora_hora': r[10].strip() if len(r) > 10 else "",
                     'performance_h': r[13].strip() if len(r) > 13 else "",
                     'performance_acm': r[14].strip() if len(r) > 14 else "",
+                    'ocorrencia_apara': r[15].strip() if len(r) > 15 else "",
                 })
         return apontamentos
 
@@ -98,7 +99,7 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
         next_row = len(col_a_values) + 1
         
         # Limitar a atualização estritamente até a coluna J (A:J)
-        # para evitar sobrescrever fórmulas pessoais nas colunas seguintes (K, L...)
+        # para evitar sobrescrever fórmulas pessoais nas colunas seguintes (K, L, M, N, O)
         values = [
             apontamento.op_id,
             apontamento.cliente,
@@ -117,6 +118,14 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
             range_name=f"A{next_row}:J{next_row}",
             raw=False
         )
+
+        # Gravar a Ocorrência da Apara na Coluna P (Coluna 16)
+        if apontamento.ocorrencia_apara:
+            sheet.update(
+                values=[[apontamento.ocorrencia_apara]],
+                range_name=f"P{next_row}:P{next_row}",
+                raw=False
+            )
 
     def save_ocorrencia(self, ocorrencia: Ocorrencia) -> None:
         # Aba 2: Ocorrencias (gid = 1265473594)

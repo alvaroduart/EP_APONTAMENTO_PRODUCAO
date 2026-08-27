@@ -967,6 +967,37 @@
         </div>
     </div>
 
+    <!-- APARA OCORRÊNCIA MODAL -->
+    <div class="modal-overlay" id="aparaModal">
+        <div class="modal-content" style="max-width: 380px;">
+            <h2 style="font-size: 16px; font-weight: 700; color: #003C91; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--amber);">
+                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                </svg>
+                Ocorrência de Apara
+            </h2>
+            <div style="background: var(--gray-bg); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 13px; color: var(--ink-soft); font-weight: 500;">Apara informada:</span>
+                <span id="aparaModalWeight" style="font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: var(--red);">0,00 kg</span>
+            </div>
+            <div class="field">
+                <label for="aparaOcorrSelect">Selecione o motivo da apara <span style="color: var(--red);">*</span></label>
+                <select id="aparaOcorrSelect" style="width: 100%; padding: 10px 12px; font-size: 14px; font-weight: 500; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--ink); outline: none; margin-top: 6px;">
+                    <option value="" disabled selected>Selecione a ocorrência...</option>
+                    <option value="Aba">Aba</option>
+                    <option value="Refile">Refile</option>
+                    <option value="Acabamento">Acabamento</option>
+                    <option value="Extrusão">Extrusão</option>
+                    <option value="Impressão">Impressão</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-stop" id="cancelAparaBtn" style="background: var(--gray-bg); color: var(--ink); flex: 1;">Cancelar</button>
+                <button class="btn btn-primary" id="confirmAparaBtn" style="flex: 1;" disabled>Confirmar</button>
+            </div>
+        </div>
+    </div>
+
 
 
     <div class="toast" id="toast">
@@ -1088,6 +1119,50 @@
                     
                     cancelConfirmBtn.addEventListener('click', onCancel);
                     submitConfirmBtn.addEventListener('click', onSubmit);
+                });
+            }
+
+            function requestAparaOcorrencia(aparasKg) {
+                return new Promise((resolve) => {
+                    const aparaModal = $('aparaModal');
+                    const aparaOcorrSelect = $('aparaOcorrSelect');
+                    const aparaModalWeight = $('aparaModalWeight');
+                    const cancelAparaBtn = $('cancelAparaBtn');
+                    const confirmAparaBtn = $('confirmAparaBtn');
+                    
+                    aparaModalWeight.textContent = `${aparasKg.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg`;
+                    aparaOcorrSelect.value = '';
+                    confirmAparaBtn.disabled = true;
+
+                    aparaModal.classList.add('show');
+
+                    const onSelectChange = () => {
+                        confirmAparaBtn.disabled = !aparaOcorrSelect.value;
+                    };
+
+                    const onCancel = () => {
+                        aparaModal.classList.remove('show');
+                        cleanup();
+                        resolve(null);
+                    };
+
+                    const onConfirm = () => {
+                        const val = aparaOcorrSelect.value;
+                        if (!val) return;
+                        aparaModal.classList.remove('show');
+                        cleanup();
+                        resolve(val);
+                    };
+
+                    function cleanup() {
+                        aparaOcorrSelect.removeEventListener('change', onSelectChange);
+                        cancelAparaBtn.removeEventListener('click', onCancel);
+                        confirmAparaBtn.removeEventListener('click', onConfirm);
+                    }
+
+                    aparaOcorrSelect.addEventListener('change', onSelectChange);
+                    cancelAparaBtn.addEventListener('click', onCancel);
+                    confirmAparaBtn.addEventListener('click', onConfirm);
                 });
             }
 
@@ -1401,10 +1476,21 @@
                         return;
                     }
                 }
-                const end = new Date();
-                const originalStart = lastApontamentoAt;
                 const aparasVal = aparasInput.value.trim();
                 const aparas = Number(aparasVal.replace(',', '.')) || 0;
+                let ocorrenciaApara = '';
+
+                if (aparas > 0) {
+                    const chosenOcorrencia = await requestAparaOcorrencia(aparas);
+                    if (!chosenOcorrencia) {
+                        // Usuário cancelou a seleção da ocorrência de apara
+                        return;
+                    }
+                    ocorrenciaApara = chosenOcorrencia;
+                }
+
+                const end = new Date();
+                const originalStart = lastApontamentoAt;
                 
                 finalizeBtn.disabled = true;
                 const prevLabel = finalizeBtn.innerHTML;
@@ -1422,7 +1508,8 @@
                         maquina: active.recurso,
                         op_encerrada: encerrarCheck.checked,
                         quantidade: Number(qtdInput.value),
-                        aparas: aparas
+                        aparas: aparas,
+                        ocorrencia_apara: ocorrenciaApara
                     };
                     
                     const response = await fetch('/api/apontamentos/', {

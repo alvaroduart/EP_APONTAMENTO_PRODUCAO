@@ -31,3 +31,4 @@ class Apontamento:
     op_encerrada: str  # "Sim" or "Não"
     quantidade: int
     aparas: float = 0.0
+    ocorrencia_apara: str = ""
