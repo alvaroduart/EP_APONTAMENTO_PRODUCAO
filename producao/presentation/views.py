@@ -122,7 +122,7 @@ def apontamentos(request):
             matricula=str(data['matricula']),
             maquina=str(data['maquina']),
             op_encerrada=bool(data['op_encerrada']),
-            quantidade=int(data['quantidade']),
+            quantidade=int(data.get('quantidade', 0) or 0),
             aparas=float(data.get('aparas', 0.0)),
             ocorrencia_apara=str(data.get('ocorrencia_apara', '')).strip()
         )

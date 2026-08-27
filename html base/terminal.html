@@ -1056,7 +1056,8 @@
             // ---------- Finalize production ----------
             qtdInput.addEventListener('input', validateFinalize);
             function validateFinalize() {
-                const qtdOk = qtdInput.value !== '' && Number(qtdInput.value) > 0;
+                const val = qtdInput.value.trim();
+                const qtdOk = val === '' || (!isNaN(Number(val)) && Number(val) >= 0);
                 const blockedByOcc = status === 'occurrence';
                 finalizeBtn.disabled = !qtdOk || blockedByOcc;
                 finalizeHint.style.display = blockedByOcc ? 'block' : 'none';
@@ -1064,13 +1065,15 @@
 
             finalizeBtn.addEventListener('click', () => {
                 const end = new Date();
+                const rawQtd = qtdInput.value.trim();
+                const qtdVal = rawQtd === '' ? 0 : (Number(rawQtd) || 0);
                 const entry = {
                     type: 'producao',
                     op: active.op, cliente: active.cliente, produto: active.produto,
                     matricula: active.matricula, recurso: active.recurso,
                     start: lastApontamentoAt, end,
                     duration: end - lastApontamentoAt,
-                    quantidade: Number(qtdInput.value),
+                    quantidade: qtdVal,
                     encerrouOP: encerrarCheck.checked
                 };
                 log.unshift(entry);

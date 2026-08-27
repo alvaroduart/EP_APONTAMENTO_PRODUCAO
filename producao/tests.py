@@ -196,6 +196,37 @@ class ProductionTerminalTests(TestCase):
             self.assertEqual(saved_apontamento.aparas, 8.5)
             self.assertEqual(saved_apontamento.ocorrencia_apara, 'Extrusão')
 
+    def test_apontamentos_api_with_zero_quantidade(self):
+        """Test that posting apontamento with quantidade 0 succeeds."""
+        from unittest.mock import patch
+        
+        with patch('producao.presentation.views.GoogleSheetsProducaoRepository') as mock_repo_class:
+            mock_repo = mock_repo_class.return_value
+            
+            payload = {
+                'op_id': '17711',
+                'cliente': 'Test Client',
+                'descricao_produto': 'Test Prod',
+                'data': '26/06/2026',
+                'hora': '08:45:37',
+                'matricula': '123',
+                'maquina': 'MS1000.4',
+                'op_encerrada': False,
+                'quantidade': 0,
+                'aparas': 0.0,
+                'ocorrencia_apara': ''
+            }
+            
+            response = self.client.post(
+                reverse('apontamentos'),
+                data=json.dumps(payload),
+                content_type='application/json'
+            )
+            self.assertEqual(response.status_code, 200)
+            mock_repo.save_apontamento.assert_called_once()
+            saved_apontamento = mock_repo.save_apontamento.call_args[0][0]
+            self.assertEqual(saved_apontamento.quantidade, 0)
+
     def test_admin_dashboard_with_mock(self):
         """Test that the admin dashboard view renders successfully with mocked repository data."""
         from unittest.mock import patch, MagicMock

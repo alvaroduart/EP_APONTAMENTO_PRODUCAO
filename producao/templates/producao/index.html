@@ -1459,7 +1459,8 @@
             // ---------- Finalize production ----------
             qtdInput.addEventListener('input', validateFinalize);
             function validateFinalize() {
-                const qtdOk = qtdInput.value !== '' && Number(qtdInput.value) >= 0;
+                const val = qtdInput.value.trim();
+                const qtdOk = val === '' || (!isNaN(Number(val)) && Number(val) >= 0);
                 const blockedByOcc = status === 'occurrence';
                 finalizeBtn.disabled = !qtdOk || blockedByOcc;
                 finalizeHint.style.display = blockedByOcc ? 'block' : 'none';
@@ -1492,6 +1493,8 @@
 
                 const end = new Date();
                 const originalStart = lastApontamentoAt;
+                const rawQtd = qtdInput.value.trim();
+                const qtdVal = rawQtd === '' ? 0 : (Number(rawQtd) || 0);
                 
                 finalizeBtn.disabled = true;
                 const prevLabel = finalizeBtn.innerHTML;
@@ -1508,7 +1511,7 @@
                         matricula: active.matricula,
                         maquina: active.recurso,
                         op_encerrada: encerrarCheck.checked,
-                        quantidade: Number(qtdInput.value),
+                        quantidade: qtdVal,
                         aparas: aparas,
                         ocorrencia_apara: ocorrenciaApara
                     };
@@ -1531,7 +1534,7 @@
                         matricula: active.matricula, recurso: active.recurso,
                         start: originalStart, end,
                         duration: end - originalStart,
-                        quantidade: Number(qtdInput.value),
+                        quantidade: qtdVal,
                         encerrouOP: encerrarCheck.checked
                     };
                     log.unshift(entry);
