@@ -22,4 +22,5 @@ urlpatterns = [
     path('impressao/api/active-state/', views.active_state, {'setor': 'impressao'}, name='active_state_impressao'),
     path('impressao/api/apontamentos/edit/', views.editar_apontamento, {'setor': 'impressao'}, name='editar_apontamento_impressao'),
     path('impressao/api/pcp-metrics/', views.pcp_metrics, {'setor': 'impressao'}, name='pcp_metrics_impressao'),
+    path('impressao/admin-dashboard/', views.admin_dashboard, {'setor': 'impressao'}, name='admin_dashboard_impressao'),
 ]

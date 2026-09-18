@@ -279,13 +279,13 @@ def editar_apontamento(request, setor='acabamento'):
     except Exception as e:
         return JsonResponse({'error': 'error', 'message': str(e)}, status=500)
 
-def admin_dashboard(request):
+def admin_dashboard(request, setor='acabamento'):
     """Renders the administrative dashboard with machine efficiencies."""
     try:
         tz_brazil = timezone(timedelta(hours=-3))
         now_brazil = datetime.now(tz_brazil)
-        
-        repo = GoogleSheetsProducaoRepository()
+
+        repo = _repo_for_setor(setor)
         
         # Determine the start of the current production day (6:00 AM)
         if now_brazil.hour >= 6:
@@ -309,7 +309,7 @@ def admin_dashboard(request):
                 pass
         
         # 2. Fetch OPs for grams lookup
-        base_ops_sheet = repo._get_worksheet_by_id(1488139834)
+        base_ops_sheet = repo._get_worksheet_by_id(GoogleSheetsProducaoRepository.BASE_OPS_GID)
         ops_rows = base_ops_sheet.get_all_values()
         op_grams = {}
         for row in ops_rows[1:]:
@@ -317,7 +317,7 @@ def admin_dashboard(request):
                 op_grams[row[0].strip()] = row[4].strip()
                 
         # 3. Fetch occurrences for open check and raw list
-        ocorrencias_sheet = repo._get_worksheet_by_id(1265473594)
+        ocorrencias_sheet = repo._get_worksheet_by_id(GoogleSheetsProducaoRepository.OCORRENCIAS_GID)
         ocorrencias_rows = ocorrencias_sheet.get_all_values()
         open_machine_occurrences = {}
         ocorrencias_list = []
@@ -352,11 +352,16 @@ def admin_dashboard(request):
                     })
 
         # Define categories configuration
-        categories_config = {
-            'Solda Lateral': ['HS1002', 'HS1001', 'HS1201', 'HS1003', 'MS1004', 'MS1202', 'F75002', 'HSC 70', 'HSC 11', 'SCW700', 'CS600'],
-            'Varejo': ['P1301', 'P1302', 'P1303', 'P1304', 'P1305', 'P1306', 'P1307', 'P1308', 'PRV1'],
-            'Solda Fundo': ['MAQ.01', 'MAQ.02', 'P1401', 'P1402', 'P1403', 'F75001']
-        }
+        if setor == 'impressao':
+            categories_config = {
+                'Máquina': list(settings.RECURSOS_IMPRESSAO),
+            }
+        else:
+            categories_config = {
+                'Solda Lateral': ['HS1002', 'HS1001', 'HS1201', 'HS1003', 'MS1004', 'MS1202', 'F75002', 'HSC 70', 'HSC 11', 'SCW700', 'CS600'],
+                'Varejo': ['P1301', 'P1302', 'P1303', 'P1304', 'P1305', 'P1306', 'P1307', 'P1308', 'PRV1'],
+                'Solda Fundo': ['MAQ.01', 'MAQ.02', 'P1401', 'P1402', 'P1403', 'F75001']
+            }
 
         sections = []
         for cat_name, mids in categories_config.items():
@@ -487,14 +492,15 @@ def admin_dashboard(request):
         context = {
             'sections': sections,
             'historico': raw_apontamentos[::-1],
-            'recursos': settings.RECURSOS,
-            'ocorrencias_json': json.dumps(ocorrencias_list)
+            'recursos': _recursos_for_setor(setor),
+            'ocorrencias_json': json.dumps(ocorrencias_list),
+            'setor': setor,
         }
         return render(request, 'producao/admin_dashboard.html', context)
     except FileNotFoundError as e:
-        return render(request, 'producao/admin_dashboard.html', {'error': 'needs_authentication', 'message': str(e)})
+        return render(request, 'producao/admin_dashboard.html', {'error': 'needs_authentication', 'message': str(e), 'setor': setor})
     except Exception as e:
-        return render(request, 'producao/admin_dashboard.html', {'error': 'error', 'message': str(e)})
+        return render(request, 'producao/admin_dashboard.html', {'error': 'error', 'message': str(e), 'setor': setor})
 
 def pcp_metrics(request, setor='acabamento'):
     """API endpoint to retrieve PCP metrics for a specific machine."""
