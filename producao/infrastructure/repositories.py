@@ -4,8 +4,18 @@ from producao.application.interfaces import IProducaoRepository
 from producao.infrastructure.google_sheets import get_spreadsheet
 
 class GoogleSheetsProducaoRepository(IProducaoRepository):
-    def __init__(self):
+    # Aba 3: Base OP's (compartilhada entre setores)
+    BASE_OPS_GID = 1488139834
+    # Aba 2: Ocorrencias (compartilhada entre setores)
+    OCORRENCIAS_GID = 1265473594
+    # Aba 1: Producao / Apontamentos - setor Acabamento (padrão)
+    APONTAMENTOS_GID_ACABAMENTO = 0
+    # Aba 5: Impressão - setor Impressão
+    APONTAMENTOS_GID_IMPRESSAO = 376136350
+
+    def __init__(self, apontamentos_gid: int = APONTAMENTOS_GID_ACABAMENTO):
         self._spreadsheet = None
+        self.apontamentos_gid = apontamentos_gid
 
     @property
     def spreadsheet(self):
@@ -21,8 +31,7 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
         return self.spreadsheet.get_worksheet(0)
 
     def list_ops(self) -> List[OP]:
-        # Aba 3: Base OPs (gid = 1488139834)
-        sheet = self._get_worksheet_by_id(1488139834)
+        sheet = self._get_worksheet_by_id(self.BASE_OPS_GID)
         rows = sheet.get_all_values()
         
         ops = []
@@ -63,8 +72,7 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
         return None
 
     def list_apontamentos_raw(self) -> List[dict]:
-        # Aba 1: Apontamentos (gid = 0)
-        sheet = self._get_worksheet_by_id(0)
+        sheet = self._get_worksheet_by_id(self.apontamentos_gid)
         rows = sheet.get_all_values()
         if not rows:
             return []
@@ -91,8 +99,7 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
         return apontamentos
 
     def save_apontamento(self, apontamento: Apontamento) -> None:
-        # Aba 1: Apontamentos (gid = 0)
-        sheet = self._get_worksheet_by_id(0)
+        sheet = self._get_worksheet_by_id(self.apontamentos_gid)
         
         # Obter os valores da coluna A para encontrar a próxima linha vazia
         col_a_values = sheet.col_values(1)
@@ -128,8 +135,7 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
             )
 
     def save_ocorrencia(self, ocorrencia: Ocorrencia) -> None:
-        # Aba 2: Ocorrencias (gid = 1265473594)
-        sheet = self._get_worksheet_by_id(1265473594)
+        sheet = self._get_worksheet_by_id(self.OCORRENCIAS_GID)
         col_a_values = sheet.col_values(1)
         next_row = len(col_a_values) + 1
         
@@ -152,8 +158,7 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
         )
 
     def update_apontamento(self, filter_data: dict, new_quantidade: int) -> bool:
-        # Aba 1: Apontamentos (gid = 0)
-        sheet = self._get_worksheet_by_id(0)
+        sheet = self._get_worksheet_by_id(self.apontamentos_gid)
         rows = sheet.get_all_values()
         
         if not rows:
@@ -174,8 +179,7 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
         return False
 
     def finalize_ocorrencia(self, op_id: str, data_inicio: str, hora_inicio: str, data_fim: str, hora_fim: str) -> bool:
-        # Aba 2: Ocorrencias (gid = 1265473594)
-        sheet = self._get_worksheet_by_id(1265473594)
+        sheet = self._get_worksheet_by_id(self.OCORRENCIAS_GID)
         rows = sheet.get_all_values()
         
         if not rows:

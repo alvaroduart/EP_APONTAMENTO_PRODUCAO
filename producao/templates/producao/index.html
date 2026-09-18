@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Electro Plastic · Terminal de Produção</title>
+    <title>Electro Plastic · Terminal de Produção{% if setor == 'impressao' %} · Impressão{% endif %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -1014,6 +1014,8 @@
             // ---------- Dynamic Configs loaded from backend context ----------
             const RECURSOS = {{ recursos_json|safe }};
             const MOTIVOS = {{ motivos_json|safe }};
+            // Prefixo das rotas de API: cada setor (ex.: /impressao) grava numa aba própria da planilha
+            const API_BASE = window.location.pathname.replace(/\/+$/, '').startsWith('/impressao') ? '/impressao' : '';
             let DB_OPS = {};
 
             // ---------- State ----------
@@ -1171,7 +1173,7 @@
             async function updatePcpMetrics() {
                 if (!active || !active.recurso) return;
                 try {
-                    const response = await fetch(`/api/pcp-metrics/?maquina=${encodeURIComponent(active.recurso)}`);
+                    const response = await fetch(`${API_BASE}/api/pcp-metrics/?maquina=${encodeURIComponent(active.recurso)}`);
                     const data = await response.json();
                     if (data && !data.error) {
                         
@@ -1236,7 +1238,7 @@
             // ---------- Fetch state and setup OPs ----------
             async function initApp() {
                 try {
-                    const response = await fetch('/api/ops/');
+                    const response = await fetch(`${API_BASE}/api/ops/`);
                     const data = await response.json();
                     
                     if (response.status === 401 && data.error === 'needs_authentication') {
@@ -1282,7 +1284,7 @@
             async function saveActiveState() {
                 if (status === 'auth-error') return;
                 try {
-                    await fetch('/api/active-state/', {
+                    await fetch(`${API_BASE}/api/active-state/`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -1301,7 +1303,7 @@
 
             async function clearActiveState() {
                 try {
-                    await fetch('/api/active-state/', { method: 'DELETE' });
+                    await fetch(`${API_BASE}/api/active-state/`, { method: 'DELETE' });
                 } catch (e) {
                     console.error('Failed to clear session state on backend:', e);
                 }
@@ -1309,7 +1311,7 @@
 
             async function restoreActiveState() {
                 try {
-                    const response = await fetch('/api/active-state/');
+                    const response = await fetch(`${API_BASE}/api/active-state/`);
                     const data = await response.json();
                     
                     if (data.active_state) {
@@ -1516,7 +1518,7 @@
                         ocorrencia_apara: ocorrenciaApara
                     };
                     
-                    const response = await fetch('/api/apontamentos/', {
+                    const response = await fetch(`${API_BASE}/api/apontamentos/`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
@@ -1606,7 +1608,7 @@
                             maquina: active.recurso
                         };
                         
-                        const response = await fetch('/api/ocorrencias/', {
+                        const response = await fetch(`${API_BASE}/api/ocorrencias/`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(payload)
@@ -1650,7 +1652,7 @@
                             hora_fim: fmtTime(end)
                         };
                         
-                        const response = await fetch('/api/ocorrencias/finalize/', {
+                        const response = await fetch(`${API_BASE}/api/ocorrencias/finalize/`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(payload)
@@ -1833,7 +1835,7 @@
                         new_quantidade: newQtd
                     };
                     
-                    const response = await fetch('/api/apontamentos/edit/', {
+                    const response = await fetch(`${API_BASE}/api/apontamentos/edit/`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)

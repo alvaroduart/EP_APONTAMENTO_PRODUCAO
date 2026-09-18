@@ -16,6 +16,23 @@ from producao.application.use_cases import (
 from producao.presentation.serializers import validate_fields
 from producao.domain.exceptions import BusinessError
 
+# Setores atendidos pela mesma tela de apontamento (terminal), cada um com sua
+# aba de destino na planilha e sua lista de máquinas.
+SECTOR_APONTAMENTOS_GID = {
+    'acabamento': GoogleSheetsProducaoRepository.APONTAMENTOS_GID_ACABAMENTO,
+    'impressao': GoogleSheetsProducaoRepository.APONTAMENTOS_GID_IMPRESSAO,
+}
+
+def _recursos_for_setor(setor):
+    return settings.RECURSOS_IMPRESSAO if setor == 'impressao' else settings.RECURSOS
+
+def _repo_for_setor(setor):
+    gid = SECTOR_APONTAMENTOS_GID.get(setor, GoogleSheetsProducaoRepository.APONTAMENTOS_GID_ACABAMENTO)
+    return GoogleSheetsProducaoRepository(apontamentos_gid=gid)
+
+def _active_state_session_key(setor):
+    return 'active_state' if setor == 'acabamento' else f'active_state_{setor}'
+
 # Helper function to clean floats
 def clean_float(val_str):
     if not val_str:
@@ -68,11 +85,12 @@ def clean_oee(val_str):
     except Exception:
         return 0
 
-def index(request):
+def index(request, setor='acabamento'):
     """Renders the main production terminal interface."""
     context = {
-        'recursos_json': json.dumps(settings.RECURSOS),
+        'recursos_json': json.dumps(_recursos_for_setor(setor)),
         'motivos_json': json.dumps(settings.MOTIVOS),
+        'setor': setor,
     }
     return render(request, 'producao/index.html', context)
 
@@ -96,21 +114,21 @@ def list_ops(request):
         return JsonResponse({'error': 'error', 'message': str(e)}, status=500)
 
 @csrf_exempt
-def apontamentos(request):
+def apontamentos(request, setor='acabamento'):
     """API endpoint to post production appointments to Google Sheets."""
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
-        
+
     try:
         data = json.loads(request.body)
         err = validate_fields(data, [
-            'op_id', 'cliente', 'descricao_produto', 'data', 'hora', 
+            'op_id', 'cliente', 'descricao_produto', 'data', 'hora',
             'matricula', 'maquina', 'op_encerrada', 'quantidade'
         ])
         if err:
             return JsonResponse({'error': 'validation_error', 'message': err}, status=400)
-            
-        repo = GoogleSheetsProducaoRepository()
+
+        repo = _repo_for_setor(setor)
         use_case = ApontarProducaoUseCase(repo)
         
         apontamento = use_case.execute(
@@ -211,44 +229,45 @@ def finalize_ocorrencia(request):
         return JsonResponse({'error': 'error', 'message': str(e)}, status=500)
 
 @csrf_exempt
-def active_state(request):
+def active_state(request, setor='acabamento'):
     """API endpoint to manage active production session state (persistence)."""
+    session_key = _active_state_session_key(setor)
     if request.method == 'GET':
-        state = request.session.get('active_state', None)
+        state = request.session.get(session_key, None)
         return JsonResponse({'active_state': state})
-        
+
     elif request.method == 'POST':
         data = json.loads(request.body)
-        request.session['active_state'] = data.get('active_state')
+        request.session[session_key] = data.get('active_state')
         return JsonResponse({'status': 'saved'})
-        
+
     elif request.method == 'DELETE':
-        request.session.pop('active_state', None)
+        request.session.pop(session_key, None)
         return JsonResponse({'status': 'cleared'})
-        
+
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 @csrf_exempt
-def editar_apontamento(request):
+def editar_apontamento(request, setor='acabamento'):
     """API endpoint to edit an appointment's quantity in Google Sheets."""
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
-        
+
     try:
         data = json.loads(request.body)
         err = validate_fields(data, ['filter', 'new_quantidade'])
         if err:
             return JsonResponse({'error': 'validation_error', 'message': err}, status=400)
-            
+
         filter_data = data['filter']
         new_quantidade = int(data['new_quantidade'])
-        
+
         # Verify filter fields are present
         err_filter = validate_fields(filter_data, ['op_id', 'data', 'hora', 'matricula', 'maquina'])
         if err_filter:
             return JsonResponse({'error': 'validation_error', 'message': f"Filter error: {err_filter}"}, status=400)
-            
-        repo = GoogleSheetsProducaoRepository()
+
+        repo = _repo_for_setor(setor)
         use_case = EditarApontamentoUseCase(repo)
         success = use_case.execute(filter_data, new_quantidade)
         
@@ -477,14 +496,14 @@ def admin_dashboard(request):
     except Exception as e:
         return render(request, 'producao/admin_dashboard.html', {'error': 'error', 'message': str(e)})
 
-def pcp_metrics(request):
+def pcp_metrics(request, setor='acabamento'):
     """API endpoint to retrieve PCP metrics for a specific machine."""
     maquina = request.GET.get('maquina')
     if not maquina:
         return JsonResponse({'error': 'Missing maquina parameter'}, status=400)
-        
+
     try:
-        repo = GoogleSheetsProducaoRepository()
+        repo = _repo_for_setor(setor)
         apontamentos = repo.list_apontamentos_raw()
         
         # Filter for the specific machine

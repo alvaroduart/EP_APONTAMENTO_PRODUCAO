@@ -124,6 +124,13 @@ RECURSOS = [
     'HC 701'
 ]
 
+# Recursos (Machines) configuration - Setor Impressão
+RECURSOS_IMPRESSAO = [
+    'FEVA 01',
+    'FEVA 02',
+    'FW01',
+]
+
 # Motivos (Occurrence reasons) configuration
 MOTIVOS = [
     'Ajuste Operacional',
