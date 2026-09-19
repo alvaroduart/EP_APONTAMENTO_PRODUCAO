@@ -126,8 +126,8 @@ RECURSOS = [
 
 # Recursos (Machines) configuration - Setor Impressão
 RECURSOS_IMPRESSAO = [
-    'FEVA 01',
-    'FEVA 02',
+    'FEVA 1',
+    'FEVA 2',
     'FW01',
 ]
 
