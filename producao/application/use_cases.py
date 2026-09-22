@@ -36,9 +36,13 @@ class ApontarProducaoUseCase:
         op_encerrada: bool,
         quantidade: int,
         aparas: float = 0.0,
-        ocorrencia_apara: str = ""
+        ocorrencia_apara: str = "",
+        inicio: bool = False
     ) -> Apontamento:
-        op_encerrada_str = "Sim" if op_encerrada else "Não"
+        if inicio:
+            op_encerrada_str = "Início"
+        else:
+            op_encerrada_str = "Sim" if op_encerrada else "Não"
         apontamento = Apontamento(
             op_id=op_id,
             cliente=cliente,

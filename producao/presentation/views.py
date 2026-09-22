@@ -142,7 +142,8 @@ def apontamentos(request, setor='acabamento'):
             op_encerrada=bool(data['op_encerrada']),
             quantidade=int(data.get('quantidade', 0) or 0),
             aparas=float(data.get('aparas', 0.0)),
-            ocorrencia_apara=str(data.get('ocorrencia_apara', '')).strip()
+            ocorrencia_apara=str(data.get('ocorrencia_apara', '')).strip(),
+            inicio=bool(data.get('inicio', False))
         )
         
         return JsonResponse({
