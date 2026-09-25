@@ -26,6 +26,9 @@ SECTOR_APONTAMENTOS_GID = {
 def _recursos_for_setor(setor):
     return settings.RECURSOS_IMPRESSAO if setor == 'impressao' else settings.RECURSOS
 
+def _motivos_for_setor(setor):
+    return settings.MOTIVOS_IMPRESSAO if setor == 'impressao' else settings.MOTIVOS
+
 def _repo_for_setor(setor):
     gid = SECTOR_APONTAMENTOS_GID.get(setor, GoogleSheetsProducaoRepository.APONTAMENTOS_GID_ACABAMENTO)
     return GoogleSheetsProducaoRepository(apontamentos_gid=gid)
@@ -89,7 +92,7 @@ def index(request, setor='acabamento'):
     """Renders the main production terminal interface."""
     context = {
         'recursos_json': json.dumps(_recursos_for_setor(setor)),
-        'motivos_json': json.dumps(settings.MOTIVOS),
+        'motivos_json': json.dumps(_motivos_for_setor(setor)),
         'setor': setor,
     }
     return render(request, 'producao/index.html', context)
@@ -320,6 +323,9 @@ def admin_dashboard(request, setor='acabamento'):
         # 3. Fetch occurrences for open check and raw list
         ocorrencias_sheet = repo._get_worksheet_by_id(GoogleSheetsProducaoRepository.OCORRENCIAS_GID)
         ocorrencias_rows = ocorrencias_sheet.get_all_values()
+        # A aba de Ocorrencias é compartilhada entre setores; isolamos aqui para que
+        # o Pareto de cada painel (Acabamento/Impressão) só considere suas próprias máquinas.
+        sector_recursos = set(_recursos_for_setor(setor))
         open_machine_occurrences = {}
         ocorrencias_list = []
         for row in ocorrencias_rows[1:]:
@@ -338,8 +344,8 @@ def admin_dashboard(request, setor='acabamento'):
                 if not data_fim and maquina:
                     open_machine_occurrences[maquina] = motive
                 
-                # Retrieve only valid entries with OP and Motive
-                if op_id and motive:
+                # Retrieve only valid entries with OP and Motive, restritas às máquinas do setor
+                if op_id and motive and maquina in sector_recursos:
                     ocorrencias_list.append({
                         'op_id': op_id,
                         'cliente': cliente,
