@@ -579,9 +579,9 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 16px;
-            margin-bottom: 24px;
+            margin-bottom: 12px;
             border-bottom: 1px solid var(--border);
-            padding-bottom: 16px;
+            padding-bottom: 10px;
         }
 
         .slideshow-btn {
@@ -679,7 +679,7 @@
         }
 
         .tv-machine-name {
-            font-size: 72px;
+            font-size: 48px;
             font-weight: 700;
             color: var(--ink);
             line-height: 1.1;
@@ -689,20 +689,20 @@
         }
 
         .tv-client-name {
-            font-size: 22px;
+            font-size: 20px;
             color: var(--ink-soft);
-            margin-top: 16px;
+            margin-top: 8px;
             font-weight: 500;
             line-height: 1.4;
         }
 
         .tv-badge {
-            font-size: 18px;
-            padding: 10px 24px;
+            font-size: 14px;
+            padding: 6px 16px;
             border-radius: 30px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             font-weight: 700;
             box-shadow: 0 4px 10px rgba(0,0,0,0.03);
             text-transform: uppercase;
@@ -710,8 +710,8 @@
         }
 
         .tv-badge .dot {
-            width: 14px;
-            height: 14px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
         }
 
@@ -751,23 +751,28 @@
 
         .tv-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 32px;
-            margin-top: 48px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+            margin-top: 0;
             border-top: 1px solid var(--border);
-            padding-top: 36px;
+            padding-top: 10px;
             width: 100%;
         }
 
         .tv-metric {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 6px;
         }
 
         .tv-metric:not(:last-child) {
             border-right: 1px solid var(--border);
-            padding-right: 24px;
+            padding-right: 16px;
+        }
+
+        .tv-metric.is-gauge {
+            align-items: center;
+            text-align: center;
         }
 
         .tv-metric-label {
@@ -779,7 +784,7 @@
         }
 
         .tv-metric-value {
-            font-size: 46px;
+            font-size: 38px;
             font-weight: 700;
             line-height: 1.1;
             color: var(--ink);
@@ -790,26 +795,208 @@
         }
 
         .tv-live-tag {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             color: var(--blue);
             background: rgba(0, 60, 146, 0.08);
-            padding: 4px 12px;
+            padding: 3px 10px;
             border-radius: 6px;
             text-transform: uppercase;
             letter-spacing: 0.06em;
-            margin-left: auto;
-            margin-top: 8px;
+            margin-top: 6px;
             display: inline-block;
+        }
+
+        /* ---------- TV stage: one machine per slide ---------- */
+        .tv-stage {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: 100%;
+            min-height: 0;
+        }
+
+        .tv-card-header {
+            gap: 16px;
+        }
+
+        .tv-position-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+            background: var(--gray-bg);
+            padding: 5px 12px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--ink-soft);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            line-height: 1.3;
+            white-space: nowrap;
+        }
+
+        .tv-position-badge .tv-position-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ink);
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .tv-machine-name.is-clickable {
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .tv-machine-name.is-clickable:hover {
+            color: var(--blue-deep);
+        }
+
+        .tv-gauge-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tv-gauge-value {
+            position: absolute;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .tv-paradas {
+            border-top: 1px solid var(--border);
+            padding-top: 14px;
+            margin-top: auto;
+            overflow-y: auto;
+            min-height: 0;
+            flex-shrink: 0;
+        }
+
+        .tv-paradas-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .tv-paradas-count {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--red-dark);
+            background: var(--red-bg);
+            padding: 2px 9px;
+            border-radius: 8px;
+        }
+
+        .tv-paradas-empty {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--green-dark);
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .tv-paradas-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tv-parada-chip {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ink);
+            background: var(--gray-bg);
+            border: 1px solid var(--border);
+        }
+
+        .tv-parada-chip.is-open {
+            background: var(--red-bg);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: var(--red-dark);
+        }
+
+        .tv-parada-chip .tv-parada-time {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--ink-soft);
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .tv-parada-chip.is-open .tv-parada-time {
+            color: var(--red-dark);
+        }
+
+        .tv-fleet-strip {
+            flex-shrink: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        .tv-fleet-pill {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 14px;
+            border-radius: 999px;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--ink-soft);
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .tv-fleet-pill:hover {
+            border-color: var(--blue-deep);
+            color: var(--blue-deep);
+        }
+
+        .tv-fleet-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: var(--gray);
+        }
+
+        .tv-fleet-pill.status-operando .tv-fleet-dot { background: var(--green); }
+        .tv-fleet-pill.status-ociosa .tv-fleet-dot { background: var(--gray); }
+        .tv-fleet-pill.status-manutencao .tv-fleet-dot { background: var(--red); }
+
+        .tv-fleet-pill.is-active {
+            background: var(--blue-deep);
+            border-color: var(--blue-deep);
+            color: #fff;
+            transform: scale(1.07);
+            box-shadow: 0 4px 10px rgba(0, 58, 145, 0.25);
         }
 
         /* Responsive TV styles */
         @media (max-width: 992px) {
             .tv-grid {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: repeat(3, 1fr);
                 gap: 24px;
+                row-gap: 20px;
             }
-            .tv-metric:nth-child(2) {
+            .tv-metric:nth-child(3) {
                 border-right: none;
             }
             .tv-card {
@@ -822,7 +1009,7 @@
 
         @media (max-width: 576px) {
             .tv-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr 1fr;
                 gap: 20px;
             }
             .tv-metric {
@@ -864,6 +1051,7 @@
                 flex-direction: column !important;
                 overflow: hidden !important;
                 box-sizing: border-box !important;
+                padding: 18px 24px !important;
             }
 
             .section-box[data-section="slideshow"] #slideshow-fullscreen-area {
@@ -882,22 +1070,15 @@
                 min-height: 0 !important;
             }
 
-            .section-box[data-section="slideshow"] .tv-group-grid {
-                display: grid !important;
-                gap: 16px !important;
-                align-content: start !important;
+            .section-box[data-section="slideshow"] .tv-stage {
                 flex-grow: 1 !important;
-                height: 100% !important;
+                min-height: 0 !important;
             }
 
-            .section-box[data-section="slideshow"] .card {
-                padding: 14px !important;
-                min-height: 220px !important;
-                height: auto !important;
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: space-between !important;
-                box-sizing: border-box !important;
+            .section-box[data-section="slideshow"] .tv-card {
+                min-height: 0 !important;
+                flex: 1 1 auto !important;
+                padding: 28px 32px !important;
             }
         }
 
@@ -914,10 +1095,6 @@
             overflow: hidden !important; /* Enforces absolute fullscreen fit without scrollbars */
         }
 
-        #slideshow-fullscreen-area.is-fullscreen #slideshow-group-title {
-            font-size: 42px !important;
-        }
-
         #slideshow-fullscreen-area.is-fullscreen #slideshow-content-container {
             display: flex !important;
             flex-direction: column !important;
@@ -926,52 +1103,41 @@
             min-height: 0 !important;
         }
 
-        #slideshow-fullscreen-area.is-fullscreen .tv-group-grid {
-            display: grid !important;
-            gap: 20px !important;
-            align-content: start !important;
+        #slideshow-fullscreen-area.is-fullscreen .tv-stage {
             flex-grow: 1 !important;
-            height: 100% !important;
+            min-height: 0 !important;
         }
 
-        #slideshow-fullscreen-area.is-fullscreen .card {
-            padding: 24px !important;
-            min-height: 280px !important;
-            height: auto !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: space-between !important;
+        #slideshow-fullscreen-area.is-fullscreen .tv-card {
+            min-height: 0 !important;
+            flex: 1 1 auto !important;
+            padding: 56px !important;
         }
 
-        #slideshow-fullscreen-area.is-fullscreen .card h4 {
+        #slideshow-fullscreen-area.is-fullscreen .tv-machine-name {
+            font-size: 108px !important;
+        }
+
+        #slideshow-fullscreen-area.is-fullscreen .tv-client-name {
             font-size: 26px !important;
         }
 
-        #slideshow-fullscreen-area.is-fullscreen .card span {
-            font-size: 16px !important;
+        #slideshow-fullscreen-area.is-fullscreen .tv-metric-value {
+            font-size: 58px !important;
         }
 
-        #slideshow-fullscreen-area.is-fullscreen .card .status-badge {
-            font-size: 16px !important;
-            padding: 6px 14px !important;
+        #slideshow-fullscreen-area.is-fullscreen .tv-gauge-value {
+            font-size: 34px !important;
         }
 
-        #slideshow-fullscreen-area.is-fullscreen .card .status-badge .dot {
-            width: 10px !important;
-            height: 10px !important;
+        #slideshow-fullscreen-area.is-fullscreen .tv-parada-chip {
+            font-size: 17px !important;
+            padding: 10px 18px !important;
         }
 
-        #slideshow-fullscreen-area.is-fullscreen .card .metric-label {
-            font-size: 13px !important;
-        }
-
-        #slideshow-fullscreen-area.is-fullscreen .card .metric-value {
-            font-size: 24px !important;
-        }
-
-        #slideshow-fullscreen-area.is-fullscreen .card .live-tag {
-            font-size: 14px !important;
-            padding: 4px 10px !important;
+        #slideshow-fullscreen-area.is-fullscreen .tv-fleet-pill {
+            font-size: 15px !important;
+            padding: 9px 18px !important;
         }
 
     </style>
@@ -1171,7 +1337,7 @@
                 </button>
 
                 <!-- Progress Bar -->
-                <div style="width: 100%; height: 6px; background: var(--gray-bg); border-radius: 3px; overflow: hidden; margin-bottom: 24px; position: relative;">
+                <div style="width: 100%; height: 6px; background: var(--gray-bg); border-radius: 3px; overflow: hidden; margin-bottom: 12px; position: relative; flex-shrink: 0;">
                     <div id="slideshow-progress-bar" style="height: 100%; width: 0%; background: var(--blue-deep); transition: width 0.1s linear; border-radius: 3px;"></div>
                 </div>
 
@@ -1593,6 +1759,13 @@
             }
         }
 
+        // Setor atual, usado para isolar preferências salvas no localStorage (Acabamento e
+        // Impressão compartilham a mesma origem/navegador, então cada setor tem sua própria chave).
+        const CURRENT_SETOR = "{{ setor|default:'acabamento' }}";
+        function setorStorageKey(key) {
+            return `${key}_${CURRENT_SETOR}`;
+        }
+
         // Slideshow TV Data and State
         const slideshowGroups = [
             {% for section in sections %}
@@ -1612,6 +1785,8 @@
                         efficiency: {{ card.efficiency|default:0 }},
                         performanceAcumulada: {{ card.performance_acumulada|default:0 }},
                         cliente: "{{ card.cliente|escapejs }}",
+                        produto: "{{ card.produto|default:'—'|escapejs }}",
+                        opAtual: "{{ card.op_atual|default:'—'|escapejs }}",
                         isLive: {% if card.is_live %}true{% else %}false{% endif %}
                     },
                     {% endfor %}
@@ -1634,21 +1809,33 @@
             return slideshowGroups.filter(g => g.slug === slideshowFilter);
         }
 
+        // Achata os grupos filtrados em uma lista de máquinas: cada slide agora é UMA máquina,
+        // não mais um quadro-grade com várias. Mantém o nome/slug do grupo para exibir contexto.
+        function getFilteredMachines() {
+            const machines = [];
+            getFilteredGroups().forEach(g => {
+                g.cards.forEach(card => {
+                    machines.push(Object.assign({}, card, { groupName: g.name, groupSlug: g.slug }));
+                });
+            });
+            return machines;
+        }
+
         function initSlideshow() {
             // Load saved settings
-            slideshowFilter = localStorage.getItem('pcp_slideshow_filter') || 'all';
+            slideshowFilter = localStorage.getItem(setorStorageKey('pcp_slideshow_filter')) || 'all';
             const filterEl = document.getElementById('slideshow-filter-select');
             if (filterEl) filterEl.value = slideshowFilter;
 
-            slideshowDuration = parseInt(localStorage.getItem('pcp_slideshow_duration')) || 10;
+            slideshowDuration = parseInt(localStorage.getItem(setorStorageKey('pcp_slideshow_duration'))) || 10;
             const durationEl = document.getElementById('slideshow-duration-select');
             if (durationEl) durationEl.value = slideshowDuration;
 
-            slideshowPaused = localStorage.getItem('pcp_slideshow_paused') === 'true';
+            slideshowPaused = localStorage.getItem(setorStorageKey('pcp_slideshow_paused')) === 'true';
             updatePlayPauseButtonUI();
 
-            const savedIndex = parseInt(localStorage.getItem('pcp_slideshow_index')) || 0;
-            const filtered = getFilteredGroups();
+            const savedIndex = parseInt(localStorage.getItem(setorStorageKey('pcp_slideshow_index'))) || 0;
+            const filtered = getFilteredMachines();
             if (savedIndex >= 0 && savedIndex < filtered.length) {
                 slideshowIndex = savedIndex;
             } else {
@@ -1678,8 +1865,30 @@
             return `${d}/${m}/${y}`;
         }
 
-        // Monta a lista de paradas do dia de uma máquina para exibir dentro do card do slideshow
-        function buildMachineStopsHtml(machineCode, todayBR) {
+        // Cor do medidor/valor de performance, seguindo o mesmo limiar usado no resto do painel
+        function effColor(value) {
+            if (value >= 80) return 'var(--green)';
+            if (value >= 60) return 'var(--amber)';
+            return 'var(--red)';
+        }
+
+        // Anel de progresso (SVG) para as métricas de performance — leitura instantânea à distância
+        function renderGaugeSVG(percent, color, size, stroke) {
+            size = size || 60;
+            stroke = stroke || 8;
+            const clamped = Math.max(0, Math.min(100, percent || 0));
+            const radius = (size - stroke) / 2;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference * (1 - clamped / 100);
+            return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="transform: rotate(-90deg); display: block;">
+                <circle cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="none" stroke="var(--gray-bg)" stroke-width="${stroke}" />
+                <circle cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="none" stroke="${color}" stroke-width="${stroke}" stroke-linecap="round"
+                    stroke-dasharray="${circumference.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}" style="transition: stroke-dashoffset 0.8s ease;" />
+            </svg>`;
+        }
+
+        // Monta as paradas do dia da máquina em foco, como chips (aberta = vermelha e "em andamento")
+        function buildParadasChipsHtml(machineCode, todayBR) {
             const stops = (ocorrenciasData || [])
                 .filter(o => o.maquina === machineCode && o.data_inicio === todayBR)
                 .sort((a, b) => (b.hora_inicio || '').localeCompare(a.hora_inicio || ''));
@@ -1687,40 +1896,42 @@
             if (stops.length === 0) {
                 return {
                     count: 0,
-                    html: `<div style="font-size: 12px; color: var(--green-dark); font-weight: 600; display: flex; align-items: center; gap: 6px;">
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-                        Sem paradas hoje
+                    html: `<div class="tv-paradas-empty">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                        Sem paradas registradas hoje
                     </div>`
                 };
             }
 
-            const maxVisible = 4;
+            const maxVisible = 6;
             const visible = stops.slice(0, maxVisible);
-            let html = visible.map(o => {
-                const timeLabel = (o.data_fim && o.hora_fim) ? `${o.hora_inicio}–${o.hora_fim}` : `${o.hora_inicio} · em andamento`;
-                return `<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 12px; padding: 3px 0; border-bottom: 1px dashed var(--border);">
-                    <span style="color: var(--ink); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${o.ocorrencia}</span>
-                    <span style="color: var(--ink-soft); font-family: 'JetBrains Mono', monospace; white-space: nowrap; flex-shrink: 0;">${timeLabel}</span>
+            let html = `<div class="tv-paradas-chips">` + visible.map(o => {
+                const isOpen = !(o.data_fim && o.hora_fim);
+                const timeLabel = isOpen ? `${o.hora_inicio} · em andamento` : `${o.hora_inicio}–${o.hora_fim}`;
+                return `<div class="tv-parada-chip ${isOpen ? 'is-open' : ''}">
+                    <span>${o.ocorrencia}</span>
+                    <span class="tv-parada-time">${timeLabel}</span>
                 </div>`;
             }).join('');
-
             if (stops.length > visible.length) {
-                html += `<div style="font-size: 11px; color: var(--ink-soft); margin-top: 4px;">+${stops.length - visible.length} parada(s) a mais</div>`;
+                html += `<div class="tv-parada-chip" style="background: transparent; border-style: dashed; color: var(--ink-soft);">+${stops.length - visible.length} mais</div>`;
             }
+            html += `</div>`;
 
             return { count: stops.length, html };
         }
 
+        // Renderiza UMA máquina em destaque (slide atual) + tira de miniaturas com todo o parque filtrado
         function renderActiveSlide() {
-            const filtered = getFilteredGroups();
+            const filtered = getFilteredMachines();
             const container = document.getElementById('slideshow-content-container');
-            
+
             if (!container) return;
 
             if (filtered.length === 0) {
                 container.innerHTML = `
                     <div style="padding: 60px; text-align: center; color: var(--ink-soft); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);">
-                        <p style="font-size: 18px; font-weight: 500;">Nenhum grupo encontrado.</p>
+                        <p style="font-size: 18px; font-weight: 500;">Nenhuma máquina encontrada.</p>
                     </div>
                 `;
                 return;
@@ -1730,88 +1941,85 @@
                 slideshowIndex = 0;
             }
 
-            const group = filtered[slideshowIndex];
-            const cards = group.cards;
-            
-            // Enforce columns based on active group (Solda Lateral needs 4 columns to avoid clipping)
-            let cols = 3;
-            if (group.name.includes("Solda Lateral")) {
-                cols = 4;
-            }
-
+            const machine = filtered[slideshowIndex];
             const todayBR = getTodayBRDate();
 
-            let cardsHtml = '';
-            cards.forEach(card => {
-                let effClass = 'eff-good';
-                if (card.efficiency >= 80) effClass = 'eff-good';
-                else if (card.efficiency >= 60) effClass = 'eff-warning';
-                else effClass = 'eff-danger';
+            const effColorVal = effColor(machine.efficiency);
+            const acmColorVal = effColor(machine.performanceAcumulada);
+            const liveBadge = machine.isLive ? `<span class="tv-live-tag">● Ao vivo agora</span>` : '';
+            const paradas = buildParadasChipsHtml(machine.name, todayBR);
+            const temOp = machine.cliente && machine.cliente !== '—';
 
-                let perfAcmClass = 'eff-good';
-                if (card.performanceAcumulada >= 80) perfAcmClass = 'eff-good';
-                else if (card.performanceAcumulada >= 60) perfAcmClass = 'eff-warning';
-                else perfAcmClass = 'eff-danger';
-
-                const liveBadge = card.isLive ? `<span class="live-tag">Tempo Real</span>` : '';
-                const stopsHtml = buildMachineStopsHtml(card.name, todayBR);
-
-                cardsHtml += `
-                    <div class="card status-${card.statusClass}" onclick="showMachineHistory('${card.name}')" style="cursor: pointer; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;">
-                        <div class="card-top" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
-                            <div class="card-title">
-                                <h4 style="font-size: 18px; font-weight: 700; color: var(--ink); margin: 0;">${card.name}</h4>
-                                <span style="font-size: 13px; margin-top: 2px; color: var(--ink-soft); text-overflow: ellipsis; white-space: nowrap; overflow: hidden; display: block; max-width: 170px;" title="${card.cliente}">${card.cliente}</span>
-                            </div>
-                            <div class="status-badge" style="font-size: 12px; padding: 4px 10px;">
-                                <span class="dot"></span>
-                                ${card.status}
-                            </div>
+            const cardHtml = `
+                <div class="tv-card status-${machine.statusClass}" style="display: flex; flex-direction: column; gap: 14px; overflow-y: auto; overflow-x: hidden;">
+                    <div class="tv-card-header">
+                        <div class="tv-badge">
+                            <span class="dot"></span>
+                            ${machine.status}
                         </div>
+                        <div class="tv-position-badge">
+                            <span>${machine.groupName}</span>
+                            <span class="tv-position-count">${slideshowIndex + 1} de ${filtered.length}</span>
+                        </div>
+                    </div>
 
-                        <div>
-                            <div class="card-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
-                                <div class="metric">
-                                    <span class="metric-label" style="font-size: 10px;">QTD PRODUZIDA</span>
-                                    <span class="metric-value" style="font-size: 18px;">${card.qtdProduzida}</span>
-                                </div>
-                                <div class="metric">
-                                    <span class="metric-label" style="font-size: 10px;">PERFORMANCE/H</span>
-                                    <span class="metric-value ${effClass}" style="font-size: 18px;">${card.efficiency}%</span>
-                                </div>
-                                <div class="metric" style="margin-top: 4px;">
-                                    <span class="metric-label" style="font-size: 10px;">QTD ACUMULADA</span>
-                                    <span class="metric-value" style="font-size: 18px;">${card.qtdAcumulada}</span>
-                                </div>
-                                <div class="metric" style="margin-top: 4px;">
-                                    <span class="metric-label" style="font-size: 10px;">PERF. ACUMULADA</span>
-                                    <span class="metric-value ${perfAcmClass}" style="font-size: 18px;">${card.performanceAcumulada}%</span>
-                                </div>
-                                <div class="metric" style="margin-top: 4px;">
-                                    <span class="metric-label" style="font-size: 10px;">QTD APARA</span>
-                                    <span class="metric-value" style="font-size: 18px; color: var(--red);">${card.qtdApara}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                                <span style="font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em;">Paradas Hoje</span>
-                                ${stopsHtml.count > 0 ? `<span style="font-size: 10px; font-weight: 700; color: var(--red-dark); background: var(--red-bg); padding: 1px 7px; border-radius: 8px;">${stopsHtml.count}</span>` : ''}
-                            </div>
-                            ${stopsHtml.html}
-                        </div>
+                    <div>
+                        <h1 class="tv-machine-name is-clickable" onclick="showMachineHistory('${machine.name}')" title="Ver histórico desta máquina">${machine.name}</h1>
+                        ${temOp ? `
+                            <p class="tv-client-name">${machine.opAtual && machine.opAtual !== '—' ? `<strong style="color: var(--ink); font-weight: 700;">OP ${machine.opAtual}</strong> · ` : ''}${machine.cliente}${machine.produto && machine.produto !== '—' ? ' · ' + machine.produto : ''}</p>
+                        ` : `<p class="tv-client-name">Sem OP ativa no momento</p>`}
                         ${liveBadge}
                     </div>
-                `;
-            });
+
+                    <div class="tv-grid">
+                        <div class="tv-metric">
+                            <span class="tv-metric-label">Qtd Produzida</span>
+                            <span class="tv-metric-value mono">${machine.qtdProduzida}</span>
+                        </div>
+                        <div class="tv-metric is-gauge">
+                            <span class="tv-metric-label">Performance/h</span>
+                            <div class="tv-gauge-wrap">
+                                ${renderGaugeSVG(machine.efficiency, effColorVal)}
+                                <span class="tv-gauge-value" style="color: ${effColorVal};">${machine.efficiency}%</span>
+                            </div>
+                        </div>
+                        <div class="tv-metric">
+                            <span class="tv-metric-label">Qtd Acumulada</span>
+                            <span class="tv-metric-value mono">${machine.qtdAcumulada}</span>
+                        </div>
+                        <div class="tv-metric is-gauge">
+                            <span class="tv-metric-label">Perf. Acumulada</span>
+                            <div class="tv-gauge-wrap">
+                                ${renderGaugeSVG(machine.performanceAcumulada, acmColorVal)}
+                                <span class="tv-gauge-value" style="color: ${acmColorVal};">${machine.performanceAcumulada}%</span>
+                            </div>
+                        </div>
+                        <div class="tv-metric">
+                            <span class="tv-metric-label">Apara</span>
+                            <span class="tv-metric-value mono" style="color: var(--red);">${machine.qtdApara}</span>
+                        </div>
+                    </div>
+
+                    <div class="tv-paradas">
+                        <div class="tv-paradas-header">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.08em;">Paradas Hoje</span>
+                            ${paradas.count > 0 ? `<span class="tv-paradas-count">${paradas.count}</span>` : ''}
+                        </div>
+                        ${paradas.html}
+                    </div>
+                </div>
+            `;
+
+            const fleetHtml = filtered.map((m, idx) => `
+                <button class="tv-fleet-pill status-${m.statusClass} ${idx === slideshowIndex ? 'is-active' : ''}" onclick="jumpToMachine(${idx})" title="${m.groupName}">
+                    <span class="tv-fleet-dot"></span>${m.name}
+                </button>
+            `).join('');
 
             container.innerHTML = `
-                <div style="margin-bottom: 20px;">
-                    <span style="font-size: 12px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 4px;">Grupo Ativo</span>
-                    <h2 id="slideshow-group-title" style="font-size: 32px; font-weight: 700; color: var(--ink); margin: 0; font-family: 'Space Grotesk', sans-serif;">${group.name}</h2>
-                </div>
-                <div class="tv-group-grid" style="display: grid; grid-template-columns: repeat(${cols}, 1fr); grid-auto-rows: max-content; gap: 16px; width: 100%;">
-                    ${cardsHtml}
+                <div class="tv-stage">
+                    ${cardHtml}
+                    <div class="tv-fleet-strip">${fleetHtml}</div>
                 </div>
             `;
         }
@@ -1858,7 +2066,7 @@
 
         function toggleSlideshowPlay() {
             slideshowPaused = !slideshowPaused;
-            localStorage.setItem('pcp_slideshow_paused', slideshowPaused);
+            localStorage.setItem(setorStorageKey('pcp_slideshow_paused'), slideshowPaused);
             updatePlayPauseButtonUI();
 
             if (slideshowPaused) {
@@ -1870,10 +2078,10 @@
 
         function nextSlide() {
             resetSlideProgress();
-            const filtered = getFilteredGroups();
+            const filtered = getFilteredMachines();
             if (filtered.length > 0) {
                 slideshowIndex = (slideshowIndex + 1) % filtered.length;
-                localStorage.setItem('pcp_slideshow_index', slideshowIndex);
+                localStorage.setItem(setorStorageKey('pcp_slideshow_index'), slideshowIndex);
                 renderActiveSlide();
             }
             if (!slideshowPaused) {
@@ -1883,10 +2091,10 @@
 
         function prevSlide() {
             resetSlideProgress();
-            const filtered = getFilteredGroups();
+            const filtered = getFilteredMachines();
             if (filtered.length > 0) {
                 slideshowIndex = (slideshowIndex - 1 + filtered.length) % filtered.length;
-                localStorage.setItem('pcp_slideshow_index', slideshowIndex);
+                localStorage.setItem(setorStorageKey('pcp_slideshow_index'), slideshowIndex);
                 renderActiveSlide();
             }
             if (!slideshowPaused) {
@@ -1894,11 +2102,21 @@
             }
         }
 
+        function jumpToMachine(idx) {
+            resetSlideProgress();
+            slideshowIndex = idx;
+            localStorage.setItem(setorStorageKey('pcp_slideshow_index'), slideshowIndex);
+            renderActiveSlide();
+            if (!slideshowPaused) {
+                startSlideshowIntervals();
+            }
+        }
+
         function changeSlideshowFilter(val) {
             slideshowFilter = val;
-            localStorage.setItem('pcp_slideshow_filter', val);
+            localStorage.setItem(setorStorageKey('pcp_slideshow_filter'), val);
             slideshowIndex = 0;
-            localStorage.setItem('pcp_slideshow_index', 0);
+            localStorage.setItem(setorStorageKey('pcp_slideshow_index'), 0);
             resetSlideProgress();
             renderActiveSlide();
             if (!slideshowPaused) {
@@ -1908,7 +2126,7 @@
 
         function changeSlideshowDuration(val) {
             slideshowDuration = parseInt(val);
-            localStorage.setItem('pcp_slideshow_duration', val);
+            localStorage.setItem(setorStorageKey('pcp_slideshow_duration'), val);
             resetSlideProgress();
             if (!slideshowPaused) {
                 startSlideshowIntervals();
@@ -2285,11 +2503,12 @@
             // Initialize occurrences analysis
             initOcorrenciasAnalysis();
 
-            // Restore active tab
-            const savedTab = localStorage.getItem('pcp_active_tab') || 'all';
-            const activeBtn = document.querySelector(`.tab-btn[data-tab="${savedTab}"]`) || document.querySelector('.tab-btn[data-tab="all"]');
+            // Restore active tab (com fallback seguro: o setor ativo pode não ter a mesma aba
+            // salva pelo outro setor, ex.: categorias de Acabamento não existem na Impressão)
+            const requestedTab = localStorage.getItem('pcp_active_tab') || 'all';
+            const activeBtn = document.querySelector(`.tab-btn[data-tab="${requestedTab}"]`) || document.querySelector('.tab-btn[data-tab="all"]');
             if (activeBtn) {
-                switchTab(savedTab, activeBtn);
+                switchTab(activeBtn.getAttribute('data-tab'), activeBtn);
             }
         });
 

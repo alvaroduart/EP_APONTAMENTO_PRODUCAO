@@ -456,7 +456,9 @@ def admin_dashboard(request, setor='acabamento'):
                             break
                             
                     cliente = latest.get('cliente', '')
-                    
+                    produto = latest.get('descricao_produto', '')
+                    op_atual = latest.get('op_id', '')
+
                     eff = 0
                     for ap in reversed(pts):
                         oee_val = ap.get('performance_h', '').strip()
@@ -475,6 +477,8 @@ def admin_dashboard(request, setor='acabamento'):
                     qtd_acumulada = '—'
                     qtd_apara = '—'
                     cliente = '—'
+                    produto = '—'
+                    op_atual = '—'
                     eff = 0
                     perf_acumulada = 0
 
@@ -489,6 +493,8 @@ def admin_dashboard(request, setor='acabamento'):
                     'performance_acumulada': perf_acumulada,
                     'efficiency': eff,
                     'cliente': cliente,
+                    'produto': produto,
+                    'op_atual': op_atual,
                     'is_live': is_live
                 })
             sections.append({
