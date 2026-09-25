@@ -885,7 +885,7 @@
             .section-box[data-section="slideshow"] .tv-group-grid {
                 display: grid !important;
                 gap: 16px !important;
-                align-content: center !important;
+                align-content: start !important;
                 flex-grow: 1 !important;
                 height: 100% !important;
             }
@@ -929,7 +929,7 @@
         #slideshow-fullscreen-area.is-fullscreen .tv-group-grid {
             display: grid !important;
             gap: 20px !important;
-            align-content: center !important;
+            align-content: start !important;
             flex-grow: 1 !important;
             height: 100% !important;
         }
@@ -1433,6 +1433,8 @@
                         if (newOcorrData && Array.isArray(newOcorrData)) {
                             ocorrenciasData = newOcorrData;
                             renderOcorrenciasDashboard();
+                            // Re-renderiza o slide ativo para refletir novas paradas do dia nos cards
+                            renderActiveSlide();
                         }
                     } catch (e) {
                         console.error('Failed to parse updated occurrences data:', e);
@@ -1660,6 +1662,55 @@
             }
         }
 
+        function getTodayISODate() {
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function getTodayBRDate() {
+            const now = new Date();
+            const d = String(now.getDate()).padStart(2, '0');
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const y = now.getFullYear();
+            return `${d}/${m}/${y}`;
+        }
+
+        // Monta a lista de paradas do dia de uma máquina para exibir dentro do card do slideshow
+        function buildMachineStopsHtml(machineCode, todayBR) {
+            const stops = (ocorrenciasData || [])
+                .filter(o => o.maquina === machineCode && o.data_inicio === todayBR)
+                .sort((a, b) => (b.hora_inicio || '').localeCompare(a.hora_inicio || ''));
+
+            if (stops.length === 0) {
+                return {
+                    count: 0,
+                    html: `<div style="font-size: 12px; color: var(--green-dark); font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                        Sem paradas hoje
+                    </div>`
+                };
+            }
+
+            const maxVisible = 4;
+            const visible = stops.slice(0, maxVisible);
+            let html = visible.map(o => {
+                const timeLabel = (o.data_fim && o.hora_fim) ? `${o.hora_inicio}–${o.hora_fim}` : `${o.hora_inicio} · em andamento`;
+                return `<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 12px; padding: 3px 0; border-bottom: 1px dashed var(--border);">
+                    <span style="color: var(--ink); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${o.ocorrencia}</span>
+                    <span style="color: var(--ink-soft); font-family: 'JetBrains Mono', monospace; white-space: nowrap; flex-shrink: 0;">${timeLabel}</span>
+                </div>`;
+            }).join('');
+
+            if (stops.length > visible.length) {
+                html += `<div style="font-size: 11px; color: var(--ink-soft); margin-top: 4px;">+${stops.length - visible.length} parada(s) a mais</div>`;
+            }
+
+            return { count: stops.length, html };
+        }
+
         function renderActiveSlide() {
             const filtered = getFilteredGroups();
             const container = document.getElementById('slideshow-content-container');
@@ -1688,6 +1739,8 @@
                 cols = 4;
             }
 
+            const todayBR = getTodayBRDate();
+
             let cardsHtml = '';
             cards.forEach(card => {
                 let effClass = 'eff-good';
@@ -1701,6 +1754,7 @@
                 else perfAcmClass = 'eff-danger';
 
                 const liveBadge = card.isLive ? `<span class="live-tag">Tempo Real</span>` : '';
+                const stopsHtml = buildMachineStopsHtml(card.name, todayBR);
 
                 cardsHtml += `
                     <div class="card status-${card.statusClass}" onclick="showMachineHistory('${card.name}')" style="cursor: pointer; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;">
@@ -1738,6 +1792,13 @@
                                     <span class="metric-value" style="font-size: 18px; color: var(--red);">${card.qtdApara}</span>
                                 </div>
                             </div>
+                        </div>
+                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <span style="font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em;">Paradas Hoje</span>
+                                ${stopsHtml.count > 0 ? `<span style="font-size: 10px; font-weight: 700; color: var(--red-dark); background: var(--red-bg); padding: 1px 7px; border-radius: 8px;">${stopsHtml.count}</span>` : ''}
+                            </div>
+                            ${stopsHtml.html}
                         </div>
                         ${liveBadge}
                     </div>
@@ -1902,7 +1963,19 @@
                     console.error('Error parsing occurrences JSON:', e);
                 }
             }
+
+            // Ao abrir o painel, a Análise de Ocorrências já entra filtrada no dia de hoje;
+            // os campos de data continuam livres para consultar o histórico quando precisar.
+            const today = getTodayISODate();
+            const startInput = document.getElementById('ocorr-filter-start-date');
+            const endInput = document.getElementById('ocorr-filter-end-date');
+            if (startInput && !startInput.value) startInput.value = today;
+            if (endInput && !endInput.value) endInput.value = today;
+
             renderOcorrenciasDashboard();
+            // Garante que os cards do slideshow (já renderizados por initSlideshow) reflitam
+            // as paradas de hoje assim que ocorrenciasData estiver disponível.
+            renderActiveSlide();
         }
 
         function resetOcorrenciasFilters() {
