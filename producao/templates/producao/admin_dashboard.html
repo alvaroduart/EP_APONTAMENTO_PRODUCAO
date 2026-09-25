@@ -679,7 +679,7 @@
         }
 
         .tv-machine-name {
-            font-size: 48px;
+            font-size: clamp(40px, 6.5vw, 108px);
             font-weight: 700;
             color: var(--ink);
             line-height: 1.1;
@@ -689,7 +689,7 @@
         }
 
         .tv-client-name {
-            font-size: 20px;
+            font-size: clamp(15px, 1.5vw, 26px);
             color: var(--ink-soft);
             margin-top: 8px;
             font-weight: 500;
@@ -697,8 +697,8 @@
         }
 
         .tv-badge {
-            font-size: 14px;
-            padding: 6px 16px;
+            font-size: clamp(13px, 1.1vw, 20px);
+            padding: clamp(6px, 0.7vw, 12px) clamp(14px, 1.6vw, 28px);
             border-radius: 30px;
             display: flex;
             align-items: center;
@@ -710,8 +710,8 @@
         }
 
         .tv-badge .dot {
-            width: 10px;
-            height: 10px;
+            width: clamp(9px, 0.8vw, 15px);
+            height: clamp(9px, 0.8vw, 15px);
             border-radius: 50%;
         }
 
@@ -752,22 +752,22 @@
         .tv-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 14px;
+            gap: clamp(14px, 1.6vw, 32px);
             margin-top: 0;
             border-top: 1px solid var(--border);
-            padding-top: 10px;
+            padding-top: clamp(10px, 1.4vh, 24px);
             width: 100%;
         }
 
         .tv-metric {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: clamp(6px, 0.6vw, 12px);
         }
 
         .tv-metric:not(:last-child) {
             border-right: 1px solid var(--border);
-            padding-right: 16px;
+            padding-right: clamp(14px, 1.4vw, 26px);
         }
 
         .tv-metric.is-gauge {
@@ -776,7 +776,7 @@
         }
 
         .tv-metric-label {
-            font-size: 12px;
+            font-size: clamp(10px, 0.85vw, 14px);
             font-weight: 700;
             color: var(--gray);
             text-transform: uppercase;
@@ -784,7 +784,7 @@
         }
 
         .tv-metric-value {
-            font-size: 38px;
+            font-size: clamp(28px, 3.4vw, 60px);
             font-weight: 700;
             line-height: 1.1;
             color: var(--ink);
@@ -826,9 +826,9 @@
             align-items: flex-end;
             gap: 2px;
             background: var(--gray-bg);
-            padding: 5px 12px;
+            padding: clamp(5px, 0.6vw, 10px) clamp(12px, 1.2vw, 20px);
             border-radius: 10px;
-            font-size: 10px;
+            font-size: clamp(10px, 0.85vw, 13px);
             font-weight: 700;
             color: var(--ink-soft);
             text-transform: uppercase;
@@ -839,7 +839,7 @@
 
         .tv-position-badge .tv-position-count {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
+            font-size: clamp(13px, 1.1vw, 19px);
             font-weight: 700;
             color: var(--ink);
             text-transform: none;
@@ -861,17 +861,21 @@
             justify-content: center;
         }
 
+        .tv-gauge-svg {
+            width: clamp(64px, 7vw, 130px);
+            height: clamp(64px, 7vw, 130px);
+        }
+
         .tv-gauge-value {
             position: absolute;
             font-family: 'Space Grotesk', sans-serif;
             font-weight: 700;
-            font-size: 14px;
+            font-size: clamp(14px, 1.6vw, 26px);
         }
 
         .tv-paradas {
             border-top: 1px solid var(--border);
             padding-top: 14px;
-            margin-top: auto;
             overflow-y: auto;
             min-height: 0;
             flex-shrink: 0;
@@ -899,7 +903,7 @@
             gap: 8px;
             color: var(--green-dark);
             font-weight: 700;
-            font-size: 15px;
+            font-size: clamp(14px, 1.3vw, 20px);
         }
 
         .tv-paradas-chips {
@@ -912,9 +916,9 @@
             display: flex;
             align-items: center;
             gap: 9px;
-            padding: 8px 14px;
+            padding: clamp(7px, 0.8vw, 13px) clamp(13px, 1.3vw, 22px);
             border-radius: 10px;
-            font-size: 14px;
+            font-size: clamp(13px, 1.2vw, 19px);
             font-weight: 600;
             color: var(--ink);
             background: var(--gray-bg);
@@ -931,7 +935,7 @@
             font-family: 'JetBrains Mono', monospace;
             color: var(--ink-soft);
             font-weight: 600;
-            font-size: 12px;
+            font-size: clamp(11px, 1vw, 16px);
         }
 
         .tv-parada-chip.is-open .tv-parada-time {
@@ -952,11 +956,11 @@
             display: flex;
             align-items: center;
             gap: 7px;
-            padding: 7px 14px;
+            padding: clamp(6px, 0.6vw, 11px) clamp(12px, 1vw, 20px);
             border-radius: 999px;
             background: var(--surface);
             border: 1.5px solid var(--border);
-            font-size: 12.5px;
+            font-size: clamp(12px, 0.95vw, 16px);
             font-weight: 700;
             color: var(--ink-soft);
             cursor: pointer;
@@ -970,8 +974,8 @@
         }
 
         .tv-fleet-dot {
-            width: 8px;
-            height: 8px;
+            width: clamp(7px, 0.6vw, 10px);
+            height: clamp(7px, 0.6vw, 10px);
             border-radius: 50%;
             flex-shrink: 0;
             background: var(--gray);
@@ -1111,33 +1115,7 @@
         #slideshow-fullscreen-area.is-fullscreen .tv-card {
             min-height: 0 !important;
             flex: 1 1 auto !important;
-            padding: 56px !important;
-        }
-
-        #slideshow-fullscreen-area.is-fullscreen .tv-machine-name {
-            font-size: 108px !important;
-        }
-
-        #slideshow-fullscreen-area.is-fullscreen .tv-client-name {
-            font-size: 26px !important;
-        }
-
-        #slideshow-fullscreen-area.is-fullscreen .tv-metric-value {
-            font-size: 58px !important;
-        }
-
-        #slideshow-fullscreen-area.is-fullscreen .tv-gauge-value {
-            font-size: 34px !important;
-        }
-
-        #slideshow-fullscreen-area.is-fullscreen .tv-parada-chip {
-            font-size: 17px !important;
-            padding: 10px 18px !important;
-        }
-
-        #slideshow-fullscreen-area.is-fullscreen .tv-fleet-pill {
-            font-size: 15px !important;
-            padding: 9px 18px !important;
+            padding: clamp(28px, 4vw, 56px) !important;
         }
 
     </style>
@@ -1872,15 +1850,17 @@
             return 'var(--red)';
         }
 
-        // Anel de progresso (SVG) para as métricas de performance — leitura instantânea à distância
-        function renderGaugeSVG(percent, color, size, stroke) {
-            size = size || 60;
-            stroke = stroke || 8;
+        // Anel de progresso (SVG) para as métricas de performance — leitura instantânea à distância.
+        // viewBox fixo (100x100): o SVG escala fluidamente via CSS (.tv-gauge-svg), então o anel
+        // fica sempre proporcional e nítido, seja numa janela pequena ou numa TV grande.
+        function renderGaugeSVG(percent, color) {
+            const size = 100;
+            const stroke = 10;
             const clamped = Math.max(0, Math.min(100, percent || 0));
             const radius = (size - stroke) / 2;
             const circumference = 2 * Math.PI * radius;
             const offset = circumference * (1 - clamped / 100);
-            return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="transform: rotate(-90deg); display: block;">
+            return `<svg class="tv-gauge-svg" viewBox="0 0 ${size} ${size}" style="transform: rotate(-90deg); display: block;">
                 <circle cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="none" stroke="var(--gray-bg)" stroke-width="${stroke}" />
                 <circle cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="none" stroke="${color}" stroke-width="${stroke}" stroke-linecap="round"
                     stroke-dasharray="${circumference.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}" style="transition: stroke-dashoffset 0.8s ease;" />
@@ -1951,7 +1931,7 @@
             const temOp = machine.cliente && machine.cliente !== '—';
 
             const cardHtml = `
-                <div class="tv-card status-${machine.statusClass}" style="display: flex; flex-direction: column; gap: 14px; overflow-y: auto; overflow-x: hidden;">
+                <div class="tv-card status-${machine.statusClass}" style="display: flex; flex-direction: column; justify-content: safe center; gap: clamp(16px, 3vh, 44px); overflow-y: auto; overflow-x: hidden;">
                     <div class="tv-card-header">
                         <div class="tv-badge">
                             <span class="dot"></span>
