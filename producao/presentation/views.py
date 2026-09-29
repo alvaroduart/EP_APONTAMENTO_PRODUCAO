@@ -88,6 +88,51 @@ def clean_oee(val_str):
     except Exception:
         return 0
 
+
+# Helper to read numbers exactly as the spreadsheet displays them (pt-BR: '.' = thousands,
+# ',' = decimal). Unlike clean_float it never guesses, so '0,125' stays 0.125 and not 125.
+def parse_ptbr_number(val_str):
+    if not val_str:
+        return 0.0
+    try:
+        return float(val_str.replace(' ', '').replace('.', '').replace(',', '.'))
+    except ValueError:
+        return 0.0
+
+
+def build_desempenho_records(apontamentos):
+    """Slim, numeric per-appointment records used by the operator performance tab.
+
+    Each record covers the interval since the machine's previous appointment and is
+    credited to the matrícula that submitted it:
+      prod = kg produced in the interval (planilha 'Hora/Hora')
+      esp  = kg expected at the standard speed for that interval ('Novo Padrão')
+      min  = interval length in minutes ('Minutos')
+      kg   = scrap declared (aparas), also in kg
+    Performance is later computed as sum(prod) / sum(esp), which weights every interval
+    by its length (an average of the per-row percentages would let a 20-second interval
+    weigh as much as a 60-minute one).
+    """
+    records = []
+    for ap in apontamentos:
+        matricula = (ap.get('matricula') or '').strip()
+        if not matricula:
+            continue
+        try:
+            dt = datetime.strptime(f"{ap.get('data', '').strip()} {ap.get('hora', '').strip()}", "%d/%m/%Y %H:%M:%S")
+        except ValueError:
+            continue
+        records.append({
+            'd': dt.strftime('%Y-%m-%d'),
+            'h': dt.hour,
+            'mat': matricula,
+            'prod': round(parse_ptbr_number(ap.get('hora_hora', '')), 3),
+            'esp': round(parse_ptbr_number(ap.get('novo_padrao', '')), 3),
+            'min': round(parse_ptbr_number(ap.get('minutos', '')), 3),
+            'kg': round(parse_ptbr_number(ap.get('aparas', '')), 3),
+        })
+    return records
+
 def index(request, setor='acabamento'):
     """Renders the main production terminal interface."""
     context = {
@@ -502,11 +547,18 @@ def admin_dashboard(request, setor='acabamento'):
                 'cards': cat_cards
             })
 
+        # Aba de desempenho por matrícula: por enquanto só existe no setor Impressão.
+        # O '<' é escapado porque o JSON vai dentro de uma tag <script> (dados vêm da planilha).
+        desempenho_json = '[]'
+        if setor == 'impressao':
+            desempenho_json = json.dumps(build_desempenho_records(raw_apontamentos)).replace('<', '\\u003c')
+
         context = {
             'sections': sections,
             'historico': raw_apontamentos[::-1],
             'recursos': _recursos_for_setor(setor),
             'ocorrencias_json': json.dumps(ocorrencias_list),
+            'desempenho_json': desempenho_json,
             'setor': setor,
         }
         return render(request, 'producao/admin_dashboard.html', context)

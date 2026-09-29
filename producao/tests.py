@@ -528,3 +528,86 @@ class ProductionTerminalTests(TestCase):
 
 
 
+    def test_parse_ptbr_number(self):
+        """Numbers are read as the pt-BR spreadsheet displays them ('.' thousands, ',' decimal)."""
+        from producao.presentation.views import parse_ptbr_number
+        self.assertEqual(parse_ptbr_number('17.460'), 17460.0)
+        self.assertEqual(parse_ptbr_number('22.542,00'), 22542.0)
+        self.assertEqual(parse_ptbr_number('59,6'), 59.6)
+        # 3 decimal places must not be mistaken for a thousands separator
+        self.assertEqual(parse_ptbr_number('0,125'), 0.125)
+        self.assertEqual(parse_ptbr_number('6,268'), 6.268)
+        for empty in ('', '-', None, 'abc'):
+            self.assertEqual(parse_ptbr_number(empty), 0.0)
+
+    def test_build_desempenho_records(self):
+        """Raw appointments become slim numeric records credited to the matrícula."""
+        from producao.presentation.views import build_desempenho_records
+        raw = [
+            {'op_id': '45646', 'data': '28/09/2026', 'hora': '08:09:11', 'matricula': '600',
+             'hora_hora': '10.977', 'aparas': '0', 'minutos': '62,62', 'novo_padrao': '22.542,00'},
+            {'op_id': '45731', 'data': '28/09/2026', 'hora': '13:47:32', 'matricula': '1248',
+             'hora_hora': '4.256', 'aparas': '26', 'minutos': '43,25', 'novo_padrao': '8.650,00'},
+            # interval without a standard speed ('-'): kept, but esp = 0
+            {'op_id': '45716', 'data': '29/09/2026', 'hora': '07:00:15', 'matricula': '600',
+             'hora_hora': '4.220', 'aparas': '', 'minutos': '58,78', 'novo_padrao': '-'},
+            # discarded: no matrícula / invalid date
+            {'op_id': '1', 'data': '28/09/2026', 'hora': '08:00:00', 'matricula': '', 'hora_hora': '1'},
+            {'op_id': '1', 'data': '', 'hora': '', 'matricula': '999', 'hora_hora': '1'},
+        ]
+
+        records = build_desempenho_records(raw)
+
+        self.assertEqual(len(records), 3)
+        self.assertEqual(records[0], {'d': '2026-09-28', 'h': 8, 'mat': '600', 'prod': 10977.0,
+                                      'esp': 22542.0, 'min': 62.62, 'kg': 0.0})
+        self.assertEqual(records[1]['mat'], '1248')
+        self.assertEqual(records[1]['kg'], 26.0)
+        self.assertEqual(records[2]['esp'], 0.0)
+
+    def _mock_admin_repo(self, mock_repo_class, apontamentos):
+        # The class is patched, so its GID constants must be restored for the sheet lookup by id
+        mock_repo_class.BASE_OPS_GID = 1488139834
+        mock_repo_class.OCORRENCIAS_GID = 1265473594
+        mock_repo = mock_repo_class.return_value
+        mock_repo.list_apontamentos_raw.return_value = apontamentos
+        mock_ws_ops = MagicMock()
+        mock_ws_ops.get_all_values.return_value = [
+            ['NUMERO OP', 'CODIGO PRODUTO', 'DESCRIÇÃO PRODUTO', 'NOME CLIENTE', 'GRAMA SACO', 'QUANTIDADE OP'],
+            ['45646', 'PROD01', 'Saco', 'Client A', '7,64', '1600'],
+        ]
+        mock_ws_ocorr = MagicMock()
+        mock_ws_ocorr.get_all_values.return_value = [['h'] * 9]
+
+        def mock_get_worksheet(gid):
+            if gid == 1488139834:
+                return mock_ws_ops
+            elif gid == 1265473594:
+                return mock_ws_ocorr
+            return MagicMock()
+
+        mock_repo._get_worksheet_by_id = mock_get_worksheet
+
+    def test_admin_dashboard_impressao_exposes_desempenho(self):
+        """The Impressão dashboard ships the performance tab and its data; Acabamento does not."""
+        raw = [{
+            'op_id': '45646', 'cliente': 'Client A', 'descricao_produto': 'Saco',
+            'data': '28/09/2026', 'hora': '08:09:11', 'matricula': '600', 'maquina': 'FW01',
+            'op_encerrada': 'Não', 'quantidade': '17.460', 'aparas': '0', 'hora_hora': '10.977',
+            'minutos': '62,62', 'novo_padrao': '22.542,00',
+        }]
+        with patch('producao.presentation.views.GoogleSheetsProducaoRepository') as mock_repo_class:
+            self._mock_admin_repo(mock_repo_class, raw)
+
+            response = self.client.get(reverse('admin_dashboard_impressao'))
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, 'data-tab="desempenho"')
+            data = json.loads(response.context['desempenho_json'])
+            self.assertEqual(len(data), 1)
+            self.assertEqual(data[0]['mat'], '600')
+            self.assertEqual(data[0]['prod'], 10977.0)
+
+            response = self.client.get(reverse('admin_dashboard'))
+            self.assertEqual(response.status_code, 200)
+            self.assertNotContains(response, 'data-tab="desempenho"')
+            self.assertEqual(response.context['desempenho_json'], '[]')

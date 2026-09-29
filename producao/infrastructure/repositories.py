@@ -95,6 +95,8 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
                     'performance_h': r[13].strip() if len(r) > 13 else "",
                     'performance_acm': r[14].strip() if len(r) > 14 else "",
                     'ocorrencia_apara': r[15].strip() if len(r) > 15 else "",
+                    'minutos': r[16].strip() if len(r) > 16 else "",
+                    'novo_padrao': r[17].strip() if len(r) > 17 else "",
                 })
         return apontamentos
 

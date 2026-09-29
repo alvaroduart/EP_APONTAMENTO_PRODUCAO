@@ -1118,6 +1118,269 @@
             padding: clamp(28px, 4vw, 56px) !important;
         }
 
+        /* ---------- Desempenho por Matrícula ---------- */
+        .dsp-filters {
+            display: flex;
+            gap: 16px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .dsp-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .dsp-field > label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .dsp-input {
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            background: var(--surface);
+            color: var(--ink);
+            font-family: inherit;
+            height: 36px;
+        }
+
+        .dsp-input:focus {
+            border-color: var(--blue-deep);
+        }
+
+        .dsp-presets {
+            display: inline-flex;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            height: 36px;
+        }
+
+        .dsp-preset {
+            background: var(--surface);
+            border: none;
+            padding: 0 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink-soft);
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .dsp-preset + .dsp-preset {
+            border-left: 1px solid var(--border);
+        }
+
+        .dsp-preset:hover {
+            background: var(--gray-bg);
+        }
+
+        .dsp-preset.active {
+            background: var(--blue-badge-bg);
+            color: var(--blue-badge-dark);
+        }
+
+        .dsp-btn-ghost {
+            background: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--border);
+            padding: 0 16px;
+            height: 36px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .dsp-btn-ghost:hover {
+            background: var(--gray-bg);
+        }
+
+        .dsp-notice {
+            background: var(--amber-bg);
+            color: var(--amber-dark);
+            border: 1px solid #fde68a;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        .dsp-kpis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .dsp-tile {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .dsp-tile-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .dsp-tile-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--ink);
+            line-height: 1.1;
+        }
+
+        .dsp-tile-value small {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ink-soft);
+            margin-left: 4px;
+        }
+
+        .dsp-tile-sub {
+            font-size: 12px;
+            color: var(--ink-soft);
+        }
+
+        .dsp-meter {
+            height: 6px;
+            border-radius: 3px;
+            background: var(--gray-bg);
+            overflow: hidden;
+        }
+
+        .dsp-meter > span {
+            display: block;
+            height: 100%;
+            width: 0;
+            border-radius: 3px;
+        }
+
+        .dsp-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink-soft);
+            min-height: 16px;
+        }
+
+        .dsp-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+            min-width: 0;
+        }
+
+        .dsp-panel h4 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .dsp-panel p {
+            margin: 0;
+            font-size: 12.5px;
+            color: var(--ink-soft);
+        }
+
+        .dsp-chart {
+            position: relative;
+            width: 100%;
+        }
+
+        .dsp-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
+            gap: 24px;
+        }
+
+        .dsp-empty {
+            padding: 32px 16px;
+            text-align: center;
+            color: var(--ink-soft);
+            font-size: 14px;
+        }
+
+        .dsp-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 560px;
+        }
+
+        .dsp-table th {
+            padding: 12px 16px;
+            text-align: right;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--gray);
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .dsp-table th:first-child,
+        .dsp-table td:first-child {
+            text-align: left;
+        }
+
+        .dsp-table td {
+            padding: 12px 16px;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            color: var(--ink-soft);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .dsp-table td:first-child {
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .dsp-table tbody tr {
+            cursor: pointer;
+        }
+
+        .dsp-table tbody tr:hover {
+            background: var(--gray-bg);
+        }
+
+        .dsp-table tbody tr.is-selected {
+            background: var(--blue-badge-bg);
+        }
+
+        .dsp-table td.dsp-strong {
+            color: var(--ink);
+            font-weight: 600;
+        }
+
     </style>
 </head>
 
@@ -1191,6 +1454,9 @@
             <button class="tab-btn" data-tab="historico" style="display: none;" onclick="switchTab('historico', this)">Histórico</button>
             <button class="tab-btn" data-tab="slideshow" onclick="switchTab('slideshow', this)">Slideshow TV</button>
             <button class="tab-btn" data-tab="analise-ocorrencias" onclick="switchTab('analise-ocorrencias', this)">Análise de Ocorrências</button>
+            {% if setor == 'impressao' %}
+            <button class="tab-btn" data-tab="desempenho" onclick="switchTab('desempenho', this)">Desempenho</button>
+            {% endif %}
         </div>
 
         {% for section in sections %}
@@ -1422,6 +1688,122 @@
             </div>
         </div>
 
+        {% if setor == 'impressao' %}
+        <!-- Section Box for Desempenho por Matrícula (somente Impressão) -->
+        <div class="section-box" data-section="desempenho" style="display: none;">
+            <div class="section-header">
+                <h3>Desempenho por Matrícula</h3>
+            </div>
+
+            <!-- Filtros: uma única linha que escopa todos os números e gráficos abaixo -->
+            <div class="dsp-filters">
+                <div class="dsp-field">
+                    <label for="dsp-matricula">Matrícula</label>
+                    <input type="text" id="dsp-matricula" class="dsp-input" list="dsp-matriculas" inputmode="numeric" autocomplete="off" placeholder="Todas" oninput="renderDesempenho()" style="width: 150px;">
+                    <datalist id="dsp-matriculas"></datalist>
+                </div>
+                <div class="dsp-field">
+                    <label>Período</label>
+                    <div class="dsp-presets" id="dsp-presets" role="group" aria-label="Período">
+                        <button type="button" class="dsp-preset" data-preset="today" onclick="setDesempenhoPreset('today')">Hoje</button>
+                        <button type="button" class="dsp-preset" data-preset="7" onclick="setDesempenhoPreset('7')">7 dias</button>
+                        <button type="button" class="dsp-preset" data-preset="30" onclick="setDesempenhoPreset('30')">30 dias</button>
+                        <button type="button" class="dsp-preset" data-preset="all" onclick="setDesempenhoPreset('all')">Tudo</button>
+                    </div>
+                </div>
+                <div class="dsp-field">
+                    <label for="dsp-start">Data Início</label>
+                    <input type="date" id="dsp-start" class="dsp-input" onchange="onDesempenhoDateChange()">
+                </div>
+                <div class="dsp-field">
+                    <label for="dsp-end">Data Fim</label>
+                    <input type="date" id="dsp-end" class="dsp-input" onchange="onDesempenhoDateChange()">
+                </div>
+                <div class="dsp-field">
+                    <button type="button" class="dsp-btn-ghost" onclick="resetDesempenhoFilters()">Limpar Filtros</button>
+                </div>
+            </div>
+
+            <div id="dsp-notice" class="dsp-notice" hidden></div>
+
+            <!-- KPIs do recorte selecionado (matrícula, ou o setor inteiro quando nenhuma foi escolhida) -->
+            <div class="dsp-kpis">
+                <div class="dsp-tile">
+                    <span class="dsp-tile-label">Performance</span>
+                    <div class="dsp-tile-value" id="dsp-kpi-perf">—</div>
+                    <div class="dsp-meter" aria-hidden="true"><span id="dsp-kpi-perf-meter"></span></div>
+                    <span class="dsp-status" id="dsp-kpi-perf-status"></span>
+                    <span class="dsp-tile-sub" id="dsp-kpi-perf-sub">Padrão da máquina = 100%</span>
+                </div>
+                <div class="dsp-tile">
+                    <span class="dsp-tile-label">Refugo</span>
+                    <div class="dsp-tile-value" id="dsp-kpi-refugo">—</div>
+                    <span class="dsp-tile-sub" id="dsp-kpi-refugo-sub">Apara ÷ (produção + apara)</span>
+                </div>
+                <div class="dsp-tile">
+                    <span class="dsp-tile-label">Oscilação (CV)</span>
+                    <div class="dsp-tile-value" id="dsp-kpi-cv">—</div>
+                    <span class="dsp-tile-sub" id="dsp-kpi-cv-sub">Menor = mais estável</span>
+                </div>
+                <div class="dsp-tile">
+                    <span class="dsp-tile-label">Produção</span>
+                    <div class="dsp-tile-value" id="dsp-kpi-prod">—</div>
+                    <span class="dsp-tile-sub" id="dsp-kpi-prod-sub">0 apontamentos</span>
+                </div>
+            </div>
+
+            <!-- Tendência ao longo do tempo -->
+            <div class="dsp-panel">
+                <h4 id="dsp-line-title">Performance ao longo do tempo</h4>
+                <p>Cada ponto é Σ produzido ÷ Σ esperado no padrão da máquina (ponderado pelo tempo). 100% = padrão.</p>
+                <div class="dsp-chart" style="height: 300px;">
+                    <canvas id="dspLineChart" role="img" aria-label="Performance da matrícula ao longo do tempo, comparada ao setor"></canvas>
+                </div>
+                <div class="dsp-empty" id="dsp-line-empty" hidden>Sem dados com padrão de velocidade no período selecionado.</div>
+            </div>
+
+            <!-- Comparação entre matrículas -->
+            <div class="dsp-grid-2">
+                <div class="dsp-panel">
+                    <h4>Ranking de performance</h4>
+                    <p>Todas as matrículas do período. <span id="dsp-rank-hint"></span></p>
+                    <div class="dsp-chart" id="dsp-rank-wrap" style="height: 300px;">
+                        <canvas id="dspRankChart" role="img" aria-label="Ranking de performance por matrícula"></canvas>
+                    </div>
+                    <div class="dsp-empty" id="dsp-rank-empty" hidden>Sem dados no período selecionado.</div>
+                </div>
+                <div class="dsp-panel">
+                    <h4>Performance × Refugo</h4>
+                    <p>Cada ponto é uma matrícula: quanto mais à direita e mais embaixo, melhor.</p>
+                    <div class="dsp-chart" style="height: 300px;">
+                        <canvas id="dspScatterChart" role="img" aria-label="Dispersão de performance por refugo por matrícula"></canvas>
+                    </div>
+                    <div class="dsp-empty" id="dsp-scatter-empty" hidden>Sem dados no período selecionado.</div>
+                </div>
+            </div>
+
+            <!-- Visão em tabela (equivalente textual dos gráficos) -->
+            <div class="dsp-panel" style="margin-bottom: 0; overflow-x: auto;">
+                <h4>Resumo por matrícula</h4>
+                <p>Clique em uma linha para analisar a matrícula. * = amostra pequena (menos de 5 apontamentos com padrão).</p>
+                <table class="dsp-table">
+                    <thead>
+                        <tr>
+                            <th>Matrícula</th>
+                            <th>Apontamentos</th>
+                            <th>Produção (kg)</th>
+                            <th>Performance</th>
+                            <th>Refugo</th>
+                            <th>Apara (kg)</th>
+                            <th>Oscilação (CV)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dsp-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- Section Box for Histórico -->
         <div class="section-box" data-section="historico" style="display: none;">
             <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
@@ -1504,6 +1886,11 @@
     <script id="ocorrencias-data" type="application/json">
         {{ ocorrencias_json|safe }}
     </script>
+    {% if setor == 'impressao' %}
+    <script id="desempenho-data" type="application/json">
+        {{ desempenho_json|safe }}
+    </script>
+    {% endif %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Auto-refresh countdown logic
@@ -1549,7 +1936,8 @@
                 // 2. Update background tabs (Visão Global cards, etc.)
                 document.querySelectorAll('.section-box').forEach(box => {
                     const sectionName = box.getAttribute('data-section');
-                    if (sectionName && sectionName !== 'slideshow' && sectionName !== 'historico') {
+                    // 'desempenho' fica de fora: recriar o DOM apagaria os filtros e os gráficos abertos
+                    if (sectionName && sectionName !== 'slideshow' && sectionName !== 'historico' && sectionName !== 'desempenho') {
                         const newBox = doc.querySelector(`.section-box[data-section="${sectionName}"]`);
                         if (newBox) {
                             box.innerHTML = newBox.innerHTML;
@@ -1585,6 +1973,12 @@
                     }
                 }
                 
+                // 4. Update operator performance data, keeping the filters the user has set
+                if (document.getElementById('dsp-matricula')) {
+                    loadDesempenhoData(doc.getElementById('desempenho-data'));
+                    renderDesempenho();
+                }
+
                 console.log('Dashboard data updated successfully via AJAX.');
             } catch (err) {
                 console.error('Failed to refresh dashboard data:', err);
@@ -1631,7 +2025,7 @@
             document.querySelectorAll('.section-box').forEach(box => {
                 const boxSection = box.getAttribute('data-section');
                 if (sectionName === 'all') {
-                    if (boxSection !== 'historico' && boxSection !== 'slideshow') {
+                    if (boxSection !== 'historico' && boxSection !== 'slideshow' && boxSection !== 'desempenho') {
                         box.style.display = 'block';
                     } else {
                         box.style.display = 'none';
@@ -1665,6 +2059,10 @@
 
             if (sectionName === 'analise-ocorrencias') {
                 renderOcorrenciasDashboard();
+            }
+
+            if (sectionName === 'desempenho') {
+                renderDesempenho();
             }
 
             // Save choice in localStorage
@@ -2473,15 +2871,520 @@
             });
         }
 
+        // ---------- Desempenho por Matrícula (Impressão) ----------
+        // Cada registro cobre o intervalo desde o apontamento anterior da máquina e é creditado à
+        // matrícula que o fez: prod = kg produzidos no intervalo, esp = kg esperados no padrão da máquina,
+        // min = minutos do intervalo, kg = apara declarada (kg).
+        let desempenhoData = [];
+        let dspLineChart = null;
+        let dspRankChart = null;
+        let dspScatterChart = null;
+
+        const DSP_ACCENT = '#003c91';   // cor de marca do painel (--blue-deep): a matrícula em foco
+        const DSP_CONTEXT = '#7a889b';  // cinza de contexto: setor e demais matrículas
+        const DSP_REF = '#b6c0cf';      // linha de referência (padrão = 100%)
+        const DSP_INK = '#10172a';
+        const DSP_INK_SOFT = '#5c6678';
+        const DSP_GRID = '#e2e8f0';
+        const DSP_MIN_SAMPLE = 5;       // menos apontamentos com padrão que isso = "amostra pequena"
+        const DSP_MIN_BUCKET_MIN = 10;  // pontos com menos minutos (apontamentos duplicados) não entram na tendência/oscilação
+
+        const dspFmt = (v, d = 0) => v.toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d });
+        const dspPct = (v, d = 0) => (v === null || v === undefined) ? '—' : dspFmt(v, d) + '%';
+        // Refugo costuma ficar abaixo de 1%: com uma casa decimal viraria "0,0%"
+        const dspRefugo = v => (v === null || v === undefined) ? '—' : dspFmt(v, v < 1 ? 2 : 1) + '%';
+
+        function dspISO(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        // Intervalo [início, fim] de cada atalho de período ('' = sem limite)
+        function dspPresetRange(preset) {
+            const today = new Date();
+            if (preset === 'today') return [dspISO(today), dspISO(today)];
+            if (preset === '7' || preset === '30') {
+                const from = new Date();
+                from.setDate(from.getDate() - (Number(preset) - 1));
+                return [dspISO(from), dspISO(today)];
+            }
+            return ['', ''];
+        }
+
+        function initDesempenho() {
+            if (!document.getElementById('dsp-matricula')) return;  // aba existe só na Impressão
+            loadDesempenhoData(document.getElementById('desempenho-data'));
+            setDesempenhoPreset('7');
+        }
+
+        function loadDesempenhoData(scriptEl) {
+            // Vazio = a página veio no estado de erro (ex.: falha ao ler a planilha): mantém o que já havia
+            if (!scriptEl || !scriptEl.textContent.trim()) return;
+            try {
+                const parsed = JSON.parse(scriptEl.textContent);
+                if (Array.isArray(parsed)) desempenhoData = parsed;
+            } catch (e) {
+                console.error('Error parsing performance JSON:', e);
+                return;
+            }
+            const list = document.getElementById('dsp-matriculas');
+            if (!list) return;
+            const mats = [...new Set(desempenhoData.map(r => r.mat))].sort((a, b) => a.localeCompare(b, 'pt-BR', { numeric: true }));
+            list.replaceChildren(...mats.map(mat => {
+                const opt = document.createElement('option');
+                opt.value = mat;
+                return opt;
+            }));
+        }
+
+        function setDesempenhoPreset(preset) {
+            const [start, end] = dspPresetRange(preset);
+            document.getElementById('dsp-start').value = start;
+            document.getElementById('dsp-end').value = end;
+            renderDesempenho();
+        }
+
+        function onDesempenhoDateChange() {
+            renderDesempenho();
+        }
+
+        function resetDesempenhoFilters() {
+            document.getElementById('dsp-matricula').value = '';
+            setDesempenhoPreset('all');
+        }
+
+        function selectDesempenhoMatricula(mat) {
+            document.getElementById('dsp-matricula').value = mat;
+            renderDesempenho();
+        }
+
+        // Somas de um conjunto de registros. Performance = Σ produzido ÷ Σ esperado (só intervalos com
+        // padrão de velocidade); Refugo = Σ apara ÷ (Σ produção + Σ apara), tudo em kg.
+        function dspAggregate(list) {
+            const a = { n: list.length, nStd: 0, prod: 0, prodStd: 0, esp: 0, kg: 0 };
+            for (const r of list) {
+                a.prod += r.prod;
+                a.kg += r.kg;
+                if (r.esp > 0) {
+                    a.nStd++;
+                    a.prodStd += r.prod;
+                    a.esp += r.esp;
+                }
+            }
+            a.perf = a.esp > 0 ? a.prodStd / a.esp * 100 : null;
+            const total = a.prod + a.kg;
+            a.refugo = total > 0 ? a.kg / total * 100 : null;
+            return a;
+        }
+
+        // Agrupa os intervalos em dias (ou em horas do dia quando o recorte tem um único dia)
+        function dspBuckets(list, byHour) {
+            const map = new Map();
+            for (const r of list) {
+                if (!(r.esp > 0)) continue;
+                const key = byHour ? String(r.h).padStart(2, '0') : r.d;
+                const b = map.get(key) || { prod: 0, esp: 0, min: 0 };
+                b.prod += r.prod;
+                b.esp += r.esp;
+                b.min += r.min;
+                map.set(key, b);
+            }
+            return map;
+        }
+
+        function dspBucketPerf(b) {
+            return (b && b.esp > 0 && b.min >= DSP_MIN_BUCKET_MIN) ? b.prod / b.esp * 100 : null;
+        }
+
+        // Coeficiente de variação (desvio-padrão ÷ média) da performance entre os dias/horas
+        function dspCV(values) {
+            if (values.length < 3) return null;
+            const mean = values.reduce((s, v) => s + v, 0) / values.length;
+            if (mean <= 0) return null;
+            const variance = values.reduce((s, v) => s + (v - mean) ** 2, 0) / values.length;
+            return Math.sqrt(variance) / mean * 100;
+        }
+
+        function dspStats(list, byHour) {
+            const agg = dspAggregate(list);
+            const perfs = [...dspBuckets(list, byHour).values()].map(dspBucketPerf).filter(v => v !== null);
+            return { agg, cv: dspCV(perfs), nBuckets: perfs.length, small: agg.nStd < DSP_MIN_SAMPLE };
+        }
+
+        // Estado da performance: cor + forma do ícone + texto (nunca só a cor), com os limiares do painel
+        function dspStatus(perf) {
+            if (perf >= 80) return { color: effColor(perf), icon: '●', text: 'Bom (≥ 80%)' };
+            if (perf >= 60) return { color: effColor(perf), icon: '▲', text: 'Atenção (60–79%)' };
+            return { color: effColor(perf), icon: '■', text: 'Baixo (< 60%)' };
+        }
+
+        function dspDestroyCharts() {
+            [dspLineChart, dspRankChart, dspScatterChart].forEach(c => { if (c) c.destroy(); });
+            dspLineChart = dspRankChart = dspScatterChart = null;
+        }
+
+        // Mostra o gráfico ou a mensagem de "sem dados" no lugar dele
+        function dspToggleChart(canvasId, emptyId, hasData) {
+            document.getElementById(canvasId).parentElement.style.display = hasData ? '' : 'none';
+            document.getElementById(emptyId).hidden = hasData;
+        }
+
+        // Linha vertical que acompanha o ponteiro e trava no ponto mais próximo
+        const dspCrosshairPlugin = {
+            id: 'dspCrosshair',
+            beforeDatasetsDraw(chart) {
+                const active = chart.tooltip ? chart.tooltip.getActiveElements() : [];
+                if (!active.length) return;
+                const x = active[0].element.x;
+                const { top, bottom } = chart.chartArea;
+                const ctx = chart.ctx;
+                ctx.save();
+                ctx.strokeStyle = DSP_REF;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(x, top);
+                ctx.lineTo(x, bottom);
+                ctx.stroke();
+                ctx.restore();
+            }
+        };
+
+        // Valor na ponta de cada barra do ranking
+        const dspBarValuePlugin = {
+            id: 'dspBarValue',
+            afterDatasetsDraw(chart) {
+                const ctx = chart.ctx;
+                ctx.save();
+                ctx.font = '600 12px Inter, system-ui, sans-serif';
+                ctx.fillStyle = DSP_INK;
+                ctx.textBaseline = 'middle';
+                chart.getDatasetMeta(0).data.forEach((bar, i) => {
+                    ctx.fillText(dspFmt(chart.data.datasets[0].data[i], 1) + '%', bar.x + 8, bar.y);
+                });
+                ctx.restore();
+            }
+        };
+
+        // Identifica cada ponto da dispersão pela matrícula (todos se forem poucos; senão só o selecionado)
+        const dspPointLabelPlugin = {
+            id: 'dspPointLabel',
+            afterDatasetsDraw(chart) {
+                const ds = chart.data.datasets[0];
+                const meta = chart.getDatasetMeta(0);
+                const labelAll = ds.data.length <= 12;
+                const ctx = chart.ctx;
+                ctx.save();
+                ctx.textBaseline = 'bottom';
+                // O ponto em foco é rotulado primeiro; rótulos que colidiriam com outro já desenhado
+                // são omitidos (a matrícula continua no tooltip e na tabela).
+                const order = ds.data.map((p, i) => i).sort((a, b) => Number(ds.data[b].focus) - Number(ds.data[a].focus));
+                const placed = [];
+                order.forEach(i => {
+                    const p = ds.data[i];
+                    if (!labelAll && !p.focus) return;
+                    ctx.font = (p.focus ? '700 ' : '500 ') + '12px Inter, system-ui, sans-serif';
+                    const x = meta.data[i].x + 9;
+                    const y = meta.data[i].y - 7;
+                    const w = ctx.measureText(p.mat).width;
+                    const box = { l: x - 2, r: x + w + 2, t: y - 14, b: y + 2 };
+                    if (placed.some(o => box.l < o.r && box.r > o.l && box.t < o.b && box.b > o.t)) return;
+                    placed.push(box);
+                    ctx.fillStyle = p.focus ? DSP_INK : DSP_INK_SOFT;
+                    ctx.fillText(p.mat, x, y);
+                });
+                ctx.restore();
+            }
+        };
+
+        const dspAxisTicks = { color: DSP_INK_SOFT, font: { family: 'inherit', weight: '500' } };
+        const dspAxisTitle = text => ({ display: true, text, color: DSP_INK_SOFT, font: { family: 'inherit', weight: '600' } });
+
+        function renderDesempenho() {
+            const box = document.querySelector('.section-box[data-section="desempenho"]');
+            if (!box || box.style.display === 'none') return;  // aba fechada: renderiza ao abrir (canvas oculto não tem tamanho)
+
+            const start = document.getElementById('dsp-start').value;
+            const end = document.getElementById('dsp-end').value;
+            const matricula = document.getElementById('dsp-matricula').value.trim();
+
+            // Atalho de período ativo = o que bate exatamente com as datas escolhidas
+            document.querySelectorAll('#dsp-presets .dsp-preset').forEach(btn => {
+                const [s, e] = dspPresetRange(btn.dataset.preset);
+                btn.classList.toggle('active', s === start && e === end);
+            });
+
+            const rows = desempenhoData.filter(r => (!start || r.d >= start) && (!end || r.d <= end));
+            const byHour = new Set(rows.map(r => r.d)).size <= 1;
+            const unit = byHour ? 'horas' : 'dias';
+            const unitDone = byHour ? 'horas analisadas' : 'dias analisados';
+
+            const groups = new Map();
+            rows.forEach(r => {
+                if (!groups.has(r.mat)) groups.set(r.mat, []);
+                groups.get(r.mat).push(r);
+            });
+            const stats = [...groups.entries()].map(([mat, list]) => ({ mat, ...dspStats(list, byHour) }));
+            stats.sort((a, b) => (b.agg.perf ?? -1) - (a.agg.perf ?? -1));
+
+            const sectorStats = dspStats(rows, byHour);
+            const focusRows = matricula ? (groups.get(matricula) || []) : rows;
+            const focus = matricula ? (stats.find(s => s.mat === matricula) || dspStats([], byHour)) : sectorStats;
+
+            // Aviso (uma mensagem por vez, da mais à menos grave)
+            let notice = '';
+            if (start && end && start > end) {
+                notice = 'A data de início é posterior à data fim.';
+            } else if (!rows.length) {
+                notice = 'Nenhum apontamento no período selecionado.';
+            } else if (matricula && !groups.has(matricula)) {
+                notice = `Nenhum apontamento da matrícula ${matricula} no período selecionado.`;
+            } else if (focus.agg.nStd === 0) {
+                notice = 'Nenhum apontamento com padrão de velocidade neste recorte: a performance não pode ser calculada.';
+            } else if (focus.small) {
+                notice = `Amostra pequena: apenas ${focus.agg.nStd} apontamento(s) com padrão de velocidade neste recorte. Interprete com cautela.`;
+            }
+            const noticeEl = document.getElementById('dsp-notice');
+            noticeEl.textContent = notice;
+            noticeEl.hidden = !notice;
+
+            // KPIs
+            const perfEl = document.getElementById('dsp-kpi-perf');
+            const meterEl = document.getElementById('dsp-kpi-perf-meter');
+            const statusEl = document.getElementById('dsp-kpi-perf-status');
+            perfEl.textContent = dspPct(focus.agg.perf, 1);
+            if (focus.agg.perf === null) {
+                meterEl.style.width = '0';
+                statusEl.replaceChildren();
+            } else {
+                const st = dspStatus(focus.agg.perf);
+                meterEl.style.width = Math.min(100, focus.agg.perf) + '%';
+                meterEl.style.background = st.color;
+                const icon = document.createElement('span');
+                icon.textContent = st.icon;
+                icon.style.color = st.color;
+                statusEl.replaceChildren(icon, document.createTextNode(st.text));
+            }
+            document.getElementById('dsp-kpi-perf-sub').textContent = matricula
+                ? `Setor: ${dspPct(sectorStats.agg.perf, 1)} · padrão da máquina = 100%`
+                : 'Setor inteiro · padrão da máquina = 100%';
+
+            document.getElementById('dsp-kpi-refugo').textContent = dspRefugo(focus.agg.refugo);
+            document.getElementById('dsp-kpi-refugo-sub').textContent = focus.agg.n
+                ? `${dspFmt(focus.agg.kg, 1)} kg de apara · setor: ${dspRefugo(sectorStats.agg.refugo)}`
+                : 'Apara ÷ (produção + apara)';
+
+            document.getElementById('dsp-kpi-cv').textContent = dspPct(focus.cv, 0);
+            document.getElementById('dsp-kpi-cv-sub').textContent = focus.cv === null
+                ? `Precisa de ao menos 3 ${unit} com dados`
+                : `Menor = mais estável · ${focus.nBuckets} ${unitDone}`;
+
+            document.getElementById('dsp-kpi-prod').innerHTML = focus.agg.n ? `${dspFmt(focus.agg.prod)}<small>kg</small>` : '—';
+            document.getElementById('dsp-kpi-prod-sub').textContent = `${focus.agg.n} apontamentos · ${focus.agg.nStd} com padrão`;
+
+            renderDesempenhoTable(stats, matricula);
+            renderDesempenhoCharts({ stats, sectorRows: rows, focusRows, matricula, byHour });
+        }
+
+        function renderDesempenhoTable(stats, matricula) {
+            const tbody = document.getElementById('dsp-table-body');
+            tbody.replaceChildren();
+            if (!stats.length) {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = 7;
+                td.className = 'dsp-empty';
+                td.style.textAlign = 'center';
+                td.textContent = 'Nenhum apontamento encontrado para os filtros selecionados.';
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+                return;
+            }
+            stats.forEach(s => {
+                const tr = document.createElement('tr');
+                if (s.mat === matricula) tr.classList.add('is-selected');
+                tr.addEventListener('click', () => selectDesempenhoMatricula(s.mat));
+                const cells = [
+                    s.mat + (s.small ? '*' : ''),
+                    dspFmt(s.agg.n),
+                    dspFmt(s.agg.prod),
+                    dspPct(s.agg.perf, 1),
+                    dspRefugo(s.agg.refugo),
+                    dspFmt(s.agg.kg, 1),
+                    dspPct(s.cv, 0),
+                ];
+                cells.forEach((text, i) => {
+                    const td = document.createElement('td');
+                    td.textContent = text;
+                    if (i === 3) td.classList.add('dsp-strong');
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderDesempenhoCharts({ stats, sectorRows, focusRows, matricula, byHour }) {
+            dspDestroyCharts();
+            if (typeof Chart === 'undefined') return;  // CDN indisponível: KPIs e tabela continuam funcionando
+
+            // ---- Tendência: matrícula em foco × setor × padrão ----
+            const sectorBuckets = dspBuckets(sectorRows, byHour);
+            const focusBuckets = matricula ? dspBuckets(focusRows, byHour) : null;
+            const keys = [...sectorBuckets.keys()].sort();
+            const labelOf = key => byHour ? `${key}h` : `${key.slice(8, 10)}/${key.slice(5, 7)}`;
+            const titleOf = key => byHour ? `Das ${key}:00 às ${key}:59` : `${key.slice(8, 10)}/${key.slice(5, 7)}/${key.slice(0, 4)}`;
+            const sectorSeries = keys.map(k => dspBucketPerf(sectorBuckets.get(k)));
+            const hasLine = sectorSeries.some(v => v !== null);
+
+            document.getElementById('dsp-line-title').textContent = matricula
+                ? `Performance ao longo do tempo · matrícula ${matricula} × setor`
+                : 'Performance ao longo do tempo · setor';
+            dspToggleChart('dspLineChart', 'dsp-line-empty', hasLine);
+            if (hasLine) {
+                const lineStyle = color => ({
+                    borderColor: color, backgroundColor: color, borderWidth: 2,
+                    borderJoinStyle: 'round', borderCapStyle: 'round', tension: 0, spanGaps: true,
+                    pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: color,
+                    pointBorderColor: '#ffffff', pointBorderWidth: 2, pointHitRadius: 16,
+                });
+                const datasets = [];
+                if (matricula) {
+                    datasets.push({ label: `Matrícula ${matricula}`, data: keys.map(k => dspBucketPerf(focusBuckets.get(k))), ...lineStyle(DSP_ACCENT) });
+                }
+                datasets.push({ label: 'Setor (todas as matrículas)', data: sectorSeries, ...lineStyle(DSP_CONTEXT) });
+                datasets.push({
+                    label: 'Padrão (100%)', data: keys.map(() => 100), borderColor: DSP_REF, backgroundColor: DSP_REF,
+                    borderWidth: 1, pointRadius: 0, pointHoverRadius: 0, pointHitRadius: 0, order: 9,
+                });
+                const refIndex = datasets.length - 1;
+                dspLineChart = new Chart(document.getElementById('dspLineChart').getContext('2d'), {
+                    type: 'line',
+                    data: { labels: keys.map(labelOf), datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        scales: {
+                            y: { beginAtZero: true, suggestedMax: 120, ticks: { ...dspAxisTicks, callback: v => v + '%' }, grid: { color: DSP_GRID }, border: { display: false } },
+                            x: { ticks: dspAxisTicks, grid: { display: false }, title: dspAxisTitle(byHour ? 'Hora do dia' : 'Dia') },
+                        },
+                        plugins: {
+                            legend: { position: 'top', align: 'start', labels: { color: DSP_INK, usePointStyle: false, boxWidth: 24, boxHeight: 2, font: { family: 'inherit', weight: '600' } } },
+                            tooltip: {
+                                filter: item => item.datasetIndex !== refIndex,
+                                callbacks: {
+                                    title: items => titleOf(keys[items[0].dataIndex]),
+                                    label: item => `${item.dataset.label}: ${item.raw === null ? '—' : dspFmt(item.raw, 1) + '%'}`,
+                                },
+                            },
+                        },
+                    },
+                    plugins: [dspCrosshairPlugin],
+                });
+            }
+
+            // ---- Ranking: uma cor só; a matrícula em foco em destaque, as demais em cinza ----
+            const ranked = stats.filter(s => s.agg.perf !== null);
+            dspToggleChart('dspRankChart', 'dsp-rank-empty', ranked.length > 0);
+            document.getElementById('dsp-rank-hint').textContent = matricula ? `Em azul: matrícula ${matricula}.` : '* = amostra pequena.';
+            if (ranked.length) {
+                document.getElementById('dsp-rank-wrap').style.height = Math.max(220, ranked.length * 34 + 56) + 'px';
+                dspRankChart = new Chart(document.getElementById('dspRankChart').getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ranked.map(s => s.mat + (s.small ? '*' : '')),
+                        datasets: [{
+                            data: ranked.map(s => Math.round(s.agg.perf * 10) / 10),
+                            backgroundColor: ranked.map(s => (!matricula || s.mat === matricula) ? DSP_ACCENT : DSP_CONTEXT),
+                            borderRadius: 4, borderSkipped: 'start', maxBarThickness: 24,
+                        }],
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        layout: { padding: { right: 56 } },
+                        scales: {
+                            x: { beginAtZero: true, suggestedMax: 120, ticks: { ...dspAxisTicks, callback: v => v + '%' }, grid: { color: DSP_GRID }, border: { display: false } },
+                            y: { ticks: { ...dspAxisTicks, color: DSP_INK }, grid: { display: false }, title: dspAxisTitle('Matrícula') },
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    title: items => `Matrícula ${ranked[items[0].dataIndex].mat}`,
+                                    label: item => {
+                                        const s = ranked[item.dataIndex];
+                                        const lines = [`Performance: ${dspFmt(s.agg.perf, 1)}%`, `${s.agg.nStd} apontamentos com padrão`, `Produção: ${dspFmt(s.agg.prod)} kg`];
+                                        if (s.small) lines.push('Amostra pequena');
+                                        return lines;
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    plugins: [dspBarValuePlugin],
+                });
+            }
+
+            // ---- Dispersão: performance × refugo por matrícula ----
+            // A matrícula em foco vai por último para ser desenhada por cima dos pontos vizinhos
+            const points = stats
+                .filter(s => s.agg.perf !== null && s.agg.refugo !== null)
+                .sort((a, b) => Number(a.mat === matricula) - Number(b.mat === matricula));
+            dspToggleChart('dspScatterChart', 'dsp-scatter-empty', points.length > 0);
+            if (points.length) {
+                dspScatterChart = new Chart(document.getElementById('dspScatterChart').getContext('2d'), {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            data: points.map(s => ({ x: s.agg.perf, y: s.agg.refugo, mat: s.mat, n: s.agg.nStd, small: s.small, focus: !!matricula && s.mat === matricula })),
+                            pointRadius: 6, pointHoverRadius: 8, hitRadius: 16,
+                            pointBackgroundColor: points.map(s => (!matricula || s.mat === matricula) ? DSP_ACCENT : DSP_CONTEXT),
+                            pointBorderColor: '#ffffff', pointBorderWidth: 2,
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        layout: { padding: { top: 12, right: 24 } },
+                        scales: {
+                            x: { beginAtZero: true, suggestedMax: 120, ticks: { ...dspAxisTicks, callback: v => v + '%' }, grid: { color: DSP_GRID }, border: { display: false }, title: dspAxisTitle('Performance (%)') },
+                            y: { beginAtZero: true, ticks: { ...dspAxisTicks, callback: v => v + '%' }, grid: { color: DSP_GRID }, border: { display: false }, title: dspAxisTitle('Refugo (%)') },
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    title: items => `Matrícula ${items[0].raw.mat}`,
+                                    label: item => {
+                                        const p = item.raw;
+                                        const lines = [`Performance: ${dspFmt(p.x, 1)}%`, `Refugo: ${dspRefugo(p.y)}`, `${p.n} apontamentos com padrão`];
+                                        if (p.small) lines.push('Amostra pequena');
+                                        return lines;
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    plugins: [dspPointLabelPlugin],
+                });
+            }
+        }
+
         // Initialize Page
         document.addEventListener('DOMContentLoaded', () => {
             startTimer();
-            
+
             // Initialize slideshow data and options
             initSlideshow();
 
             // Initialize occurrences analysis
             initOcorrenciasAnalysis();
+
+            // Initialize operator performance tab (Impressão only)
+            initDesempenho();
 
             // Restore active tab (com fallback seguro: o setor ativo pode não ter a mesma aba
             // salva pelo outro setor, ex.: categorias de Acabamento não existem na Impressão)
