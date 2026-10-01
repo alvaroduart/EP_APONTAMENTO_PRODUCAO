@@ -105,10 +105,10 @@ def build_desempenho_records(apontamentos):
 
     Each record covers the interval since the machine's previous appointment and is
     credited to the matrícula that submitted it:
-      prod = kg produced in the interval (planilha 'Hora/Hora')
-      esp  = kg expected at the standard speed for that interval ('Novo Padrão')
+      prod = meters produced in the interval (planilha 'Hora/Hora')
+      esp  = meters expected at the standard speed for that interval ('Novo Padrão')
       min  = interval length in minutes ('Minutos')
-      kg   = scrap declared (aparas), also in kg
+      kg   = scrap declared (aparas), in kg
     Performance is later computed as sum(prod) / sum(esp), which weights every interval
     by its length (an average of the per-row percentages would let a 20-second interval
     weigh as much as a 60-minute one).

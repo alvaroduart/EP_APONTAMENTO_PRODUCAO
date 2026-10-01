@@ -1736,9 +1736,9 @@
                     <span class="dsp-tile-sub" id="dsp-kpi-perf-sub">Padrão da máquina = 100%</span>
                 </div>
                 <div class="dsp-tile">
-                    <span class="dsp-tile-label">Refugo</span>
-                    <div class="dsp-tile-value" id="dsp-kpi-refugo">—</div>
-                    <span class="dsp-tile-sub" id="dsp-kpi-refugo-sub">Apara ÷ (produção + apara)</span>
+                    <span class="dsp-tile-label">Apara / 1.000 m</span>
+                    <div class="dsp-tile-value" id="dsp-kpi-apara">—</div>
+                    <span class="dsp-tile-sub" id="dsp-kpi-apara-sub">kg de apara por 1.000 m produzidos</span>
                 </div>
                 <div class="dsp-tile">
                     <span class="dsp-tile-label">Oscilação (CV)</span>
@@ -1773,10 +1773,10 @@
                     <div class="dsp-empty" id="dsp-rank-empty" hidden>Sem dados no período selecionado.</div>
                 </div>
                 <div class="dsp-panel">
-                    <h4>Performance × Refugo</h4>
+                    <h4>Performance × Apara</h4>
                     <p>Cada ponto é uma matrícula: quanto mais à direita e mais embaixo, melhor.</p>
                     <div class="dsp-chart" style="height: 300px;">
-                        <canvas id="dspScatterChart" role="img" aria-label="Dispersão de performance por refugo por matrícula"></canvas>
+                        <canvas id="dspScatterChart" role="img" aria-label="Dispersão de performance por apara por 1.000 m, por matrícula"></canvas>
                     </div>
                     <div class="dsp-empty" id="dsp-scatter-empty" hidden>Sem dados no período selecionado.</div>
                 </div>
@@ -1791,10 +1791,10 @@
                         <tr>
                             <th>Matrícula</th>
                             <th>Apontamentos</th>
-                            <th>Produção (kg)</th>
+                            <th>Produção (m)</th>
                             <th>Performance</th>
-                            <th>Refugo</th>
-                            <th>Apara (kg)</th>
+                            <th>Apara / 1.000 m (kg)</th>
+                            <th>Apara total (kg)</th>
                             <th>Oscilação (CV)</th>
                         </tr>
                     </thead>
@@ -2873,8 +2873,8 @@
 
         // ---------- Desempenho por Matrícula (Impressão) ----------
         // Cada registro cobre o intervalo desde o apontamento anterior da máquina e é creditado à
-        // matrícula que o fez: prod = kg produzidos no intervalo, esp = kg esperados no padrão da máquina,
-        // min = minutos do intervalo, kg = apara declarada (kg).
+        // matrícula que o fez: prod = metros produzidos no intervalo, esp = metros esperados no padrão da
+        // máquina, min = minutos do intervalo, kg = apara declarada (kg).
         let desempenhoData = [];
         let dspLineChart = null;
         let dspRankChart = null;
@@ -2891,8 +2891,7 @@
 
         const dspFmt = (v, d = 0) => v.toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d });
         const dspPct = (v, d = 0) => (v === null || v === undefined) ? '—' : dspFmt(v, d) + '%';
-        // Refugo costuma ficar abaixo de 1%: com uma casa decimal viraria "0,0%"
-        const dspRefugo = v => (v === null || v === undefined) ? '—' : dspFmt(v, v < 1 ? 2 : 1) + '%';
+        const dspApara = v => (v === null || v === undefined) ? '—' : dspFmt(v, 2);
 
         function dspISO(date) {
             const y = date.getFullYear();
@@ -2961,7 +2960,8 @@
         }
 
         // Somas de um conjunto de registros. Performance = Σ produzido ÷ Σ esperado (só intervalos com
-        // padrão de velocidade); Refugo = Σ apara ÷ (Σ produção + Σ apara), tudo em kg.
+        // padrão de velocidade); Apara por 1.000 m = Σ apara (kg) ÷ Σ produção (m) × 1000. Não é um % porque a
+        // apara é medida em kg e a produção em metros.
         function dspAggregate(list) {
             const a = { n: list.length, nStd: 0, prod: 0, prodStd: 0, esp: 0, kg: 0 };
             for (const r of list) {
@@ -2974,8 +2974,7 @@
                 }
             }
             a.perf = a.esp > 0 ? a.prodStd / a.esp * 100 : null;
-            const total = a.prod + a.kg;
-            a.refugo = total > 0 ? a.kg / total * 100 : null;
+            a.aparaMil = a.prod > 0 ? a.kg / a.prod * 1000 : null;
             return a;
         }
 
@@ -3170,17 +3169,17 @@
                 ? `Setor: ${dspPct(sectorStats.agg.perf, 1)} · padrão da máquina = 100%`
                 : 'Setor inteiro · padrão da máquina = 100%';
 
-            document.getElementById('dsp-kpi-refugo').textContent = dspRefugo(focus.agg.refugo);
-            document.getElementById('dsp-kpi-refugo-sub').textContent = focus.agg.n
-                ? `${dspFmt(focus.agg.kg, 1)} kg de apara · setor: ${dspRefugo(sectorStats.agg.refugo)}`
-                : 'Apara ÷ (produção + apara)';
+            document.getElementById('dsp-kpi-apara').innerHTML = focus.agg.aparaMil === null ? '—' : `${dspFmt(focus.agg.aparaMil, 2)}<small>kg</small>`;
+            document.getElementById('dsp-kpi-apara-sub').textContent = focus.agg.n
+                ? `${dspFmt(focus.agg.kg, 1)} kg de apara no total · setor: ${dspApara(sectorStats.agg.aparaMil)} kg`
+                : 'kg de apara por 1.000 m produzidos';
 
             document.getElementById('dsp-kpi-cv').textContent = dspPct(focus.cv, 0);
             document.getElementById('dsp-kpi-cv-sub').textContent = focus.cv === null
                 ? `Precisa de ao menos 3 ${unit} com dados`
                 : `Menor = mais estável · ${focus.nBuckets} ${unitDone}`;
 
-            document.getElementById('dsp-kpi-prod').innerHTML = focus.agg.n ? `${dspFmt(focus.agg.prod)}<small>kg</small>` : '—';
+            document.getElementById('dsp-kpi-prod').innerHTML = focus.agg.n ? `${dspFmt(focus.agg.prod)}<small>m</small>` : '—';
             document.getElementById('dsp-kpi-prod-sub').textContent = `${focus.agg.n} apontamentos · ${focus.agg.nStd} com padrão`;
 
             renderDesempenhoTable(stats, matricula);
@@ -3210,7 +3209,7 @@
                     dspFmt(s.agg.n),
                     dspFmt(s.agg.prod),
                     dspPct(s.agg.perf, 1),
-                    dspRefugo(s.agg.refugo),
+                    dspApara(s.agg.aparaMil),
                     dspFmt(s.agg.kg, 1),
                     dspPct(s.cv, 0),
                 ];
@@ -3316,7 +3315,7 @@
                                     title: items => `Matrícula ${ranked[items[0].dataIndex].mat}`,
                                     label: item => {
                                         const s = ranked[item.dataIndex];
-                                        const lines = [`Performance: ${dspFmt(s.agg.perf, 1)}%`, `${s.agg.nStd} apontamentos com padrão`, `Produção: ${dspFmt(s.agg.prod)} kg`];
+                                        const lines = [`Performance: ${dspFmt(s.agg.perf, 1)}%`, `${s.agg.nStd} apontamentos com padrão`, `Produção: ${dspFmt(s.agg.prod)} m`];
                                         if (s.small) lines.push('Amostra pequena');
                                         return lines;
                                     },
@@ -3328,10 +3327,10 @@
                 });
             }
 
-            // ---- Dispersão: performance × refugo por matrícula ----
+            // ---- Dispersão: performance × apara por 1.000 m, por matrícula ----
             // A matrícula em foco vai por último para ser desenhada por cima dos pontos vizinhos
             const points = stats
-                .filter(s => s.agg.perf !== null && s.agg.refugo !== null)
+                .filter(s => s.agg.perf !== null && s.agg.aparaMil !== null)
                 .sort((a, b) => Number(a.mat === matricula) - Number(b.mat === matricula));
             dspToggleChart('dspScatterChart', 'dsp-scatter-empty', points.length > 0);
             if (points.length) {
@@ -3339,7 +3338,7 @@
                     type: 'scatter',
                     data: {
                         datasets: [{
-                            data: points.map(s => ({ x: s.agg.perf, y: s.agg.refugo, mat: s.mat, n: s.agg.nStd, small: s.small, focus: !!matricula && s.mat === matricula })),
+                            data: points.map(s => ({ x: s.agg.perf, y: s.agg.aparaMil, mat: s.mat, n: s.agg.nStd, small: s.small, focus: !!matricula && s.mat === matricula })),
                             pointRadius: 6, pointHoverRadius: 8, hitRadius: 16,
                             pointBackgroundColor: points.map(s => (!matricula || s.mat === matricula) ? DSP_ACCENT : DSP_CONTEXT),
                             pointBorderColor: '#ffffff', pointBorderWidth: 2,
@@ -3351,7 +3350,7 @@
                         layout: { padding: { top: 12, right: 24 } },
                         scales: {
                             x: { beginAtZero: true, suggestedMax: 120, ticks: { ...dspAxisTicks, callback: v => v + '%' }, grid: { color: DSP_GRID }, border: { display: false }, title: dspAxisTitle('Performance (%)') },
-                            y: { beginAtZero: true, ticks: { ...dspAxisTicks, callback: v => v + '%' }, grid: { color: DSP_GRID }, border: { display: false }, title: dspAxisTitle('Refugo (%)') },
+                            y: { beginAtZero: true, ticks: dspAxisTicks, grid: { color: DSP_GRID }, border: { display: false }, title: dspAxisTitle('Apara (kg por 1.000 m)') },
                         },
                         plugins: {
                             legend: { display: false },
@@ -3360,7 +3359,7 @@
                                     title: items => `Matrícula ${items[0].raw.mat}`,
                                     label: item => {
                                         const p = item.raw;
-                                        const lines = [`Performance: ${dspFmt(p.x, 1)}%`, `Refugo: ${dspRefugo(p.y)}`, `${p.n} apontamentos com padrão`];
+                                        const lines = [`Performance: ${dspFmt(p.x, 1)}%`, `Apara: ${dspApara(p.y)} kg por 1.000 m`, `${p.n} apontamentos com padrão`];
                                         if (p.small) lines.push('Amostra pequena');
                                         return lines;
                                     },
