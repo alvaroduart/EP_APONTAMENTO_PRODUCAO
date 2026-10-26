@@ -1118,6 +1118,16 @@
             padding: clamp(28px, 4vw, 56px) !important;
         }
 
+        /* Cards das máquinas com um Recurso escolhido no filtro da Análise de Ocorrências */
+        .card.card-dimmed {
+            opacity: 0.4;
+        }
+
+        .card.card-focus {
+            outline: 2px solid var(--blue-deep);
+            outline-offset: 2px;
+        }
+
         /* ---------- Desempenho por Matrícula ---------- */
         .dsp-filters {
             display: flex;
@@ -1469,7 +1479,7 @@
             <!-- Card Grid -->
             <div class="card-grid">
                 {% for card in section.cards %}
-                <div class="card status-{{ card.status_class }} {% if card.is_live %}live-card{% endif %}" onclick="showMachineHistory('{{ card.name|escapejs }}')" style="cursor: pointer;">
+                <div class="card status-{{ card.status_class }} {% if card.is_live %}live-card{% endif %}" data-machine="{{ card.code }}" onclick="showMachineHistory('{{ card.name|escapejs }}')" style="cursor: pointer;">
                     <div class="card-top">
                         <div class="card-title">
                             <h4>{{ card.name }}</h4>
@@ -1485,11 +1495,11 @@
                         <div class="card-body">
                             <div class="metric">
                                 <span class="metric-label">QTD PRODUZIDA</span>
-                                <span class="metric-value">{{ card.qtd_produzida }}</span>
+                                <span class="metric-value" data-metric="qtd_produzida">{{ card.qtd_produzida }}</span>
                             </div>
                             <div class="metric">
-                                <span class="metric-label">PERFORMANCE/H</span>
-                                <span class="metric-value 
+                                <span class="metric-label">PERFORMANCE</span>
+                                <span data-metric="efficiency" class="metric-value
                                     {% if card.efficiency >= 80 %}eff-good
                                     {% elif card.efficiency >= 60 %}eff-warning
                                     {% else %}eff-danger
@@ -1499,11 +1509,11 @@
                             </div>
                             <div class="metric" style="margin-top: 10px;">
                                 <span class="metric-label">QTD ACUMULADA</span>
-                                <span class="metric-value">{{ card.qtd_acumulada }}</span>
+                                <span class="metric-value" data-metric="qtd_acumulada">{{ card.qtd_acumulada }}</span>
                             </div>
                             <div class="metric" style="margin-top: 10px;">
                                 <span class="metric-label">PERF. ACUMULADA</span>
-                                <span class="metric-value 
+                                <span data-metric="performance_acumulada" class="metric-value
                                     {% if card.performance_acumulada >= 80 %}eff-good
                                     {% elif card.performance_acumulada >= 60 %}eff-warning
                                     {% else %}eff-danger
@@ -1513,7 +1523,7 @@
                             </div>
                             <div class="metric" style="margin-top: 10px;">
                                 <span class="metric-label">QTD APARA</span>
-                                <span class="metric-value" style="color: var(--red);">{{ card.qtd_apara }}</span>
+                                <span class="metric-value" data-metric="qtd_apara" style="color: var(--red);">{{ card.qtd_apara }}</span>
                             </div>
                         </div>
                     </div>
@@ -1594,35 +1604,44 @@
 
         <!-- Section Box for Análise de Ocorrências -->
         <div class="section-box" data-section="analise-ocorrencias" style="display: none;">
-            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
-                <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: var(--ink);">Análise de Ocorrências</h3>
-                
-                <!-- Filters bar -->
-                <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
-                    <div style="display: flex; flex-direction: column; gap: 6px;">
-                        <label for="ocorr-filter-recurso" style="font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em;">Recurso</label>
-                        <select id="ocorr-filter-recurso" onchange="filterOcorrencias()" style="border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-size: 13px; outline: none; background: var(--surface); color: var(--ink); font-family: inherit; min-width: 140px;">
-                            <option value="all">Todos os Recursos</option>
-                            {% for rec in recursos %}
-                            <option value="{{ rec }}">{{ rec }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 6px;">
-                        <label for="ocorr-filter-start-date" style="font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em;">Data Início</label>
-                        <input type="date" id="ocorr-filter-start-date" onchange="filterOcorrencias()" style="border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-size: 13px; outline: none; background: var(--surface); color: var(--ink); font-family: inherit;">
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 6px;">
-                        <label for="ocorr-filter-end-date" style="font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em;">Data Fim</label>
-                        <input type="date" id="ocorr-filter-end-date" onchange="filterOcorrencias()" style="border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-size: 13px; outline: none; background: var(--surface); color: var(--ink); font-family: inherit;">
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 6px; align-self: flex-end;">
-                        <button onclick="resetOcorrenciasFilters()" style="background: var(--surface); color: var(--ink); border: 1px solid var(--border); padding: 8px 16px; font-size: 13px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: var(--transition);" onmouseover="this.style.background='var(--gray-bg)'" onmouseout="this.style.background='var(--surface)'">
-                            Limpar Filtros
-                        </button>
+            <div class="section-header">
+                <h3>Análise de Ocorrências</h3>
+            </div>
+
+            <!-- Filtros (mesmo padrão da aba Desempenho): escopam a análise abaixo e os cards das máquinas -->
+            <div class="dsp-filters">
+                <div class="dsp-field">
+                    <label for="ocorr-filter-recurso">Recurso</label>
+                    <select id="ocorr-filter-recurso" class="dsp-input" onchange="filterOcorrencias()" style="min-width: 160px;">
+                        <option value="all">Todos os Recursos</option>
+                        {% for rec in recursos %}
+                        <option value="{{ rec }}">{{ rec }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="dsp-field">
+                    <label>Período</label>
+                    <div class="dsp-presets" id="ocorr-presets" role="group" aria-label="Período">
+                        <button type="button" class="dsp-preset" data-preset="today" onclick="setOcorrenciasPreset('today')">Hoje</button>
+                        <button type="button" class="dsp-preset" data-preset="7" onclick="setOcorrenciasPreset('7')">7 dias</button>
+                        <button type="button" class="dsp-preset" data-preset="30" onclick="setOcorrenciasPreset('30')">30 dias</button>
+                        <button type="button" class="dsp-preset" data-preset="all" onclick="setOcorrenciasPreset('all')">Tudo</button>
                     </div>
                 </div>
+                <div class="dsp-field">
+                    <label for="ocorr-filter-start-date">Data Início</label>
+                    <input type="date" id="ocorr-filter-start-date" class="dsp-input" onchange="filterOcorrencias()">
+                </div>
+                <div class="dsp-field">
+                    <label for="ocorr-filter-end-date">Data Fim</label>
+                    <input type="date" id="ocorr-filter-end-date" class="dsp-input" onchange="filterOcorrencias()">
+                </div>
+                <div class="dsp-field">
+                    <button type="button" class="dsp-btn-ghost" onclick="resetOcorrenciasFilters()">Limpar Filtros</button>
+                </div>
             </div>
+
+            <div id="ocorr-notice" class="dsp-notice" hidden></div>
 
             <!-- KPI Metric Cards Grid -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
@@ -1886,6 +1905,9 @@
     <script id="ocorrencias-data" type="application/json">
         {{ ocorrencias_json|safe }}
     </script>
+    <script id="cards-data" type="application/json">
+        {{ cards_json|safe }}
+    </script>
     {% if setor == 'impressao' %}
     <script id="desempenho-data" type="application/json">
         {{ desempenho_json|safe }}
@@ -1933,7 +1955,9 @@
                     }
                 }
                 
-                // 2. Update background tabs (Visão Global cards, etc.)
+                // 2. Update background tabs (Visão Global cards, etc.), mantendo os filtros de ocorrências
+                const ocorrFilters = getOcorrenciasFilters();
+                loadMachineCardsData(doc.getElementById('cards-data'));
                 document.querySelectorAll('.section-box').forEach(box => {
                     const sectionName = box.getAttribute('data-section');
                     // 'desempenho' fica de fora: recriar o DOM apagaria os filtros e os gráficos abertos
@@ -1944,6 +1968,7 @@
                         }
                     }
                 });
+                restoreOcorrenciasFilters(ocorrFilters);
                 
                 // Update history table if present
                 const historyBox = document.querySelector('.section-box[data-section="historico"]');
@@ -2560,6 +2585,8 @@
                 }
             }
 
+            loadMachineCardsData(document.getElementById('cards-data'));
+
             // Ao abrir o painel, a Análise de Ocorrências já entra filtrada no dia de hoje;
             // os campos de data continuam livres para consultar o histórico quando precisar.
             const today = getTodayISODate();
@@ -2576,13 +2603,105 @@
 
         function resetOcorrenciasFilters() {
             document.getElementById('ocorr-filter-recurso').value = 'all';
-            document.getElementById('ocorr-filter-start-date').value = '';
-            document.getElementById('ocorr-filter-end-date').value = '';
+            setOcorrenciasPreset('all');
+        }
+
+        function setOcorrenciasPreset(preset) {
+            const [start, end] = dspPresetRange(preset);
+            document.getElementById('ocorr-filter-start-date').value = start;
+            document.getElementById('ocorr-filter-end-date').value = end;
             renderOcorrenciasDashboard();
         }
 
         function filterOcorrencias() {
             renderOcorrenciasDashboard();
+        }
+
+        // O auto-refresh recria o HTML da seção; estes helpers guardam e devolvem os filtros escolhidos
+        function getOcorrenciasFilters() {
+            const recurso = document.getElementById('ocorr-filter-recurso');
+            if (!recurso) return null;
+            return {
+                recurso: recurso.value,
+                start: document.getElementById('ocorr-filter-start-date').value,
+                end: document.getElementById('ocorr-filter-end-date').value,
+            };
+        }
+
+        function restoreOcorrenciasFilters(filters) {
+            if (!filters) return;
+            document.getElementById('ocorr-filter-recurso').value = filters.recurso;
+            document.getElementById('ocorr-filter-start-date').value = filters.start;
+            document.getElementById('ocorr-filter-end-date').value = filters.end;
+        }
+
+        // ---------- Cards das máquinas seguindo o filtro da Análise de Ocorrências ----------
+        // Registros por apontamento (pd = dia de produção, que começa às 06:00): prod = produzido no
+        // intervalo (Hora/Hora), esp = esperado no padrão (Novo Padrão), kg = apara, qtd/pacm/ph = valores
+        // da planilha (Quantidade, Performance acumulada, Performance/h) usados como "último valor".
+        let machineCardsData = [];
+
+        function loadMachineCardsData(scriptEl) {
+            if (!scriptEl || !scriptEl.textContent.trim()) return;
+            try {
+                const parsed = JSON.parse(scriptEl.textContent);
+                if (Array.isArray(parsed)) machineCardsData = parsed;
+            } catch (e) {
+                console.error('Error parsing machine cards JSON:', e);
+            }
+        }
+
+        const fmtCardNumber = (v, decimals = 0) => v.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: decimals });
+        const effClass = v => v >= 80 ? 'eff-good' : (v >= 60 ? 'eff-warning' : 'eff-danger');
+
+        // Totais do período: produção e apara somadas; performance = Σ produzido ÷ Σ esperado (como na aba
+        // Desempenho), caindo para a última Performance/h da planilha quando não há padrão de velocidade.
+        function aggregateMachinePeriod(rows) {
+            if (!rows.length) return null;
+            let prod = 0, prodStd = 0, esp = 0, kg = 0;
+            rows.forEach(r => {
+                prod += r.prod;
+                kg += r.kg;
+                if (r.esp > 0) { prodStd += r.prod; esp += r.esp; }
+            });
+            const lastWith = key => { for (let i = rows.length - 1; i >= 0; i--) if (rows[i][key] !== '' && rows[i][key] !== null) return rows[i][key]; return null; };
+            const lastPh = lastWith('ph');
+            return {
+                prod,
+                kg,
+                perf: esp > 0 ? Math.round(prodStd / esp * 100) : (lastPh === null ? 0 : lastPh),
+                qtd: lastWith('qtd'),
+                pacm: lastWith('pacm') ?? 0,
+            };
+        }
+
+        function renderMachineCards(recurso, start, end) {
+            const cards = document.querySelectorAll('.card[data-machine]');
+            if (!cards.length) return;
+            const inPeriod = machineCardsData.filter(r => (!start || r.pd >= start) && (!end || r.pd <= end));
+            cards.forEach(card => {
+                const code = card.dataset.machine;
+                const agg = aggregateMachinePeriod(inPeriod.filter(r => r.m === code));
+                const set = (metric, text) => {
+                    const el = card.querySelector(`[data-metric="${metric}"]`);
+                    if (el) el.textContent = text;
+                };
+                const setPerf = (metric, value) => {
+                    const el = card.querySelector(`[data-metric="${metric}"]`);
+                    if (!el) return;
+                    el.textContent = value + '%';
+                    el.className = 'metric-value ' + effClass(value);
+                };
+                set('qtd_produzida', agg ? fmtCardNumber(agg.prod) : '—');
+                set('qtd_acumulada', agg && agg.qtd !== null ? agg.qtd : '—');
+                set('qtd_apara', agg ? fmtCardNumber(agg.kg, 2) : '—');
+                setPerf('efficiency', agg ? agg.perf : 0);
+                setPerf('performance_acumulada', agg ? agg.pacm : 0);
+
+                // Recurso escolhido em destaque; os demais esmaecidos
+                card.classList.toggle('card-focus', recurso !== 'all' && code === recurso);
+                card.classList.toggle('card-dimmed', recurso !== 'all' && code !== recurso);
+            });
         }
 
         function setChartMetric(metric) {
@@ -2627,6 +2746,18 @@
             const startDateVal = document.getElementById('ocorr-filter-start-date').value;
             const endDateVal = document.getElementById('ocorr-filter-end-date').value;
             
+            // Atalho de período ativo = o que bate exatamente com as datas escolhidas
+            document.querySelectorAll('#ocorr-presets .dsp-preset').forEach(btn => {
+                const [s, e] = dspPresetRange(btn.dataset.preset);
+                btn.classList.toggle('active', s === startDateVal && e === endDateVal);
+            });
+            const noticeEl = document.getElementById('ocorr-notice');
+            const notice = startDateVal && endDateVal && startDateVal > endDateVal ? 'A data de início é posterior à data fim.' : '';
+            noticeEl.textContent = notice;
+            noticeEl.hidden = !notice;
+
+            renderMachineCards(selectedRecurso, startDateVal, endDateVal);
+
             const startLimit = startDateVal ? new Date(startDateVal + 'T00:00:00') : null;
             const endLimit = endDateVal ? new Date(endDateVal + 'T23:59:59') : null;
 
@@ -3286,7 +3417,7 @@
             // ---- Ranking: uma cor só; a matrícula em foco em destaque, as demais em cinza ----
             const ranked = stats.filter(s => s.agg.perf !== null);
             dspToggleChart('dspRankChart', 'dsp-rank-empty', ranked.length > 0);
-            document.getElementById('dsp-rank-hint').textContent = matricula ? `Em azul: matrícula ${matricula}.` : '* = amostra pequena.';
+            document.getElementById('dsp-rank-hint').textContent = (matricula ? `Em azul: matrícula ${matricula}.` : '* = amostra pequena.') + ' Clique em uma barra para ver os dados da matrícula.';
             if (ranked.length) {
                 document.getElementById('dsp-rank-wrap').style.height = Math.max(220, ranked.length * 34 + 56) + 'px';
                 dspRankChart = new Chart(document.getElementById('dspRankChart').getContext('2d'), {
@@ -3304,6 +3435,16 @@
                         responsive: true,
                         maintainAspectRatio: false,
                         layout: { padding: { right: 56 } },
+                        // Clicar na linha de uma matrícula a seleciona, como na tabela de resumo. O setTimeout deixa o
+                        // Chart.js terminar de tratar o evento antes de o gráfico ser destruído e recriado.
+                        onClick: (evt, _elements, chart) => {
+                            const hit = chart.getElementsAtEventForMode(evt, 'y', { intersect: false }, false)[0];
+                            if (hit) setTimeout(() => selectDesempenhoMatricula(ranked[hit.index].mat), 0);
+                        },
+                        onHover: (evt, _elements, chart) => {
+                            const hit = chart.getElementsAtEventForMode(evt, 'y', { intersect: false }, false).length > 0;
+                            chart.canvas.style.cursor = hit ? 'pointer' : 'default';
+                        },
                         scales: {
                             x: { beginAtZero: true, suggestedMax: 120, ticks: { ...dspAxisTicks, callback: v => v + '%' }, grid: { color: DSP_GRID }, border: { display: false } },
                             y: { ticks: { ...dspAxisTicks, color: DSP_INK }, grid: { display: false }, title: dspAxisTitle('Matrícula') },

@@ -159,6 +159,14 @@ class GoogleSheetsProducaoRepository(IProducaoRepository):
             raw=False
         )
 
+        # Gravar a Matrícula do operador na Coluna M (Coluna 13), sem tocar nas colunas J:L
+        if ocorrencia.matricula:
+            sheet.update(
+                values=[[ocorrencia.matricula]],
+                range_name=f"M{next_row}:M{next_row}",
+                raw=False
+            )
+
     def update_apontamento(self, filter_data: dict, new_quantidade: int) -> bool:
         sheet = self._get_worksheet_by_id(self.apontamentos_gid)
         rows = sheet.get_all_values()

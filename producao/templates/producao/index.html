@@ -1555,6 +1555,7 @@
                         matricula: active.matricula,
                         maquina: active.recurso,
                         op_encerrada: encerrarCheck.checked,
+                        turno_encerrado: encerrarTurnoCheck.checked,
                         quantidade: qtdVal,
                         aparas: aparas,
                         ocorrencia_apara: ocorrenciaApara
@@ -1579,7 +1580,10 @@
                         start: originalStart, end,
                         duration: end - originalStart,
                         quantidade: qtdVal,
-                        encerrouOP: encerrarCheck.checked
+                        encerrouOP: encerrarCheck.checked,
+                        // data/hora como ficaram na planilha (podem ter ido para as 06:00)
+                        sheetData: resData.data || fmtDate(end),
+                        sheetHora: resData.hora || fmtTime(end)
                     };
                     log.unshift(entry);
                     renderLog();
@@ -1647,7 +1651,8 @@
                             ocorrencia: motivoSelect.value,
                             data_inicio: fmtDate(start),
                             hora_inicio: fmtTime(start),
-                            maquina: active.recurso
+                            maquina: active.recurso,
+                            matricula: active.matricula
                         };
                         
                         const response = await fetch(`${API_BASE}/api/ocorrencias/`, {
@@ -1869,8 +1874,8 @@
                     const payload = {
                         filter: {
                             op_id: entry.op,
-                            data: fmtDate(entry.end),
-                            hora: fmtTime(entry.end),
+                            data: entry.sheetData || fmtDate(entry.end),
+                            hora: entry.sheetHora || fmtTime(entry.end),
                             matricula: entry.matricula,
                             maquina: entry.recurso
                         },

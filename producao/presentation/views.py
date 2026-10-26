@@ -7,6 +7,7 @@ from django.conf import settings
 
 from producao.infrastructure.repositories import GoogleSheetsProducaoRepository
 from producao.application.use_cases import (
+    inicio_dia_producao,
     ListarOPsUseCase,
     ApontarProducaoUseCase,
     RegistrarOcorrenciaUseCase,
@@ -100,6 +101,19 @@ def parse_ptbr_number(val_str):
         return 0.0
 
 
+def format_ptbr_number(value, decimals=2):
+    """Formats a number the way the spreadsheet shows it (12.5 -> '12,5', 1234 -> '1.234')."""
+    text = f"{value:,.{decimals}f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+    if ',' in text:
+        text = text.rstrip('0').rstrip(',')
+    return text
+
+
+def sum_aparas(apontamentos):
+    """Total scrap (kg) declared in the given appointments, formatted pt-BR."""
+    return format_ptbr_number(sum(parse_ptbr_number(ap.get('aparas', '')) for ap in apontamentos))
+
+
 def build_desempenho_records(apontamentos):
     """Slim, numeric per-appointment records used by the operator performance tab.
 
@@ -130,6 +144,38 @@ def build_desempenho_records(apontamentos):
             'esp': round(parse_ptbr_number(ap.get('novo_padrao', '')), 3),
             'min': round(parse_ptbr_number(ap.get('minutos', '')), 3),
             'kg': round(parse_ptbr_number(ap.get('aparas', '')), 3),
+        })
+    return records
+
+def build_cards_records(apontamentos, maquinas):
+    """Slim per-appointment records that let the machine cards follow the dashboard's period filter.
+
+      m    = machine, pd = production day (starts at 06:00) as YYYY-MM-DD
+      prod = produced in the interval ('Hora/Hora'), esp = expected at standard speed ('Novo Padrão')
+      kg   = scrap (aparas)
+      qtd, pacm, ph = sheet values shown as "last value" (Quantidade, Performance acumulada, Performance/h);
+                      '' / None when the cell is empty
+    """
+    records = []
+    for ap in apontamentos:
+        maquina = (ap.get('maquina') or '').strip()
+        if maquina not in maquinas:
+            continue
+        try:
+            dt = datetime.strptime(f"{ap.get('data', '').strip()} {ap.get('hora', '').strip()}", "%d/%m/%Y %H:%M:%S")
+        except ValueError:
+            continue
+        ph = (ap.get('performance_h') or '').strip()
+        pacm = (ap.get('performance_acm') or '').strip()
+        records.append({
+            'm': maquina,
+            'pd': inicio_dia_producao(dt).strftime('%Y-%m-%d'),
+            'prod': round(parse_ptbr_number(ap.get('hora_hora', '')), 3),
+            'esp': round(parse_ptbr_number(ap.get('novo_padrao', '')), 3),
+            'kg': round(parse_ptbr_number(ap.get('aparas', '')), 3),
+            'qtd': (ap.get('quantidade') or '').strip(),
+            'pacm': clean_oee(pacm) if pacm else None,
+            'ph': clean_oee(ph) if ph else None,
         })
     return records
 
@@ -191,12 +237,17 @@ def apontamentos(request, setor='acabamento'):
             quantidade=int(data.get('quantidade', 0) or 0),
             aparas=float(data.get('aparas', 0.0)),
             ocorrencia_apara=str(data.get('ocorrencia_apara', '')).strip(),
-            inicio=bool(data.get('inicio', False))
+            inicio=bool(data.get('inicio', False)),
+            turno_encerrado=bool(data.get('turno_encerrado', False))
         )
         
+        # data/hora efetivamente gravadas (o 1º apontamento do dia vai para as 06:00), usadas pelo
+        # terminal para localizar a linha ao editar a quantidade
         return JsonResponse({
             'status': 'success',
-            'message': 'Apontamento registrado com sucesso no Google Sheets'
+            'message': 'Apontamento registrado com sucesso no Google Sheets',
+            'data': apontamento.data,
+            'hora': apontamento.hora
         })
     except BusinessError as e:
         return JsonResponse({'error': 'business_error', 'message': str(e)}, status=400)
@@ -230,7 +281,8 @@ def ocorrencias(request):
             hora_inicio=str(data['hora_inicio']),
             data_fim=data.get('data_fim'),
             hora_fim=data.get('hora_fim'),
-            maquina=str(data['maquina'])
+            maquina=str(data['maquina']),
+            matricula=str(data.get('matricula', '')).strip()
         )
         
         return JsonResponse({
@@ -450,7 +502,7 @@ def admin_dashboard(request, setor='acabamento'):
                     if pts:
                         latest = pts[-1]
                         op_encerrada = latest['op_encerrada']
-                        if op_encerrada == 'Sim':
+                        if op_encerrada in ('Sim', 'Turno encerrado'):
                             status = 'Ociosa'
                             status_class = 'ociosa'
                         else:
@@ -493,13 +545,9 @@ def admin_dashboard(request, setor='acabamento'):
                             qtd_acumulada = val
                             break
 
-                    qtd_apara = '—'
-                    for ap in reversed(pts):
-                        val = ap.get('aparas', '').strip()
-                        if val:
-                            qtd_apara = val
-                            break
-                            
+                    # Soma de toda a apara declarada na máquina no dia de produção (desde as 06:00)
+                    qtd_apara = sum_aparas(pts)
+
                     cliente = latest.get('cliente', '')
                     produto = latest.get('descricao_produto', '')
                     op_atual = latest.get('op_id', '')
@@ -553,11 +601,15 @@ def admin_dashboard(request, setor='acabamento'):
         if setor == 'impressao':
             desempenho_json = json.dumps(build_desempenho_records(raw_apontamentos)).replace('<', '\\u003c')
 
+        card_codes = {card['code'] for section in sections for card in section['cards']}
+        cards_json = json.dumps(build_cards_records(raw_apontamentos, card_codes)).replace('<', '\\u003c')
+
         context = {
             'sections': sections,
             'historico': raw_apontamentos[::-1],
             'recursos': _recursos_for_setor(setor),
             'ocorrencias_json': json.dumps(ocorrencias_list),
+            'cards_json': cards_json,
             'desempenho_json': desempenho_json,
             'setor': setor,
         }
@@ -620,12 +672,8 @@ def pcp_metrics(request, setor='acabamento'):
                 if val:
                     qtd_acumulada = val
                     break
-            # 3. Qtd apara (aparas)
-            for ap in reversed(pts_today):
-                val = ap.get('aparas', '').strip()
-                if val:
-                    qtd_apara = val
-                    break
+            # 3. Qtd apara: soma do dia (aparas)
+            qtd_apara = sum_aparas(pts_today)
             # 4. Performance/h (performance_h)
             for ap in reversed(pts_today):
                 val = ap.get('performance_h', '').strip()

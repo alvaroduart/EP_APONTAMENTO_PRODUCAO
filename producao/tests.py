@@ -285,7 +285,10 @@ class ProductionTerminalTests(TestCase):
                 return MagicMock()
                 
             mock_repo._get_worksheet_by_id = mock_get_worksheet
-            
+            # The class is patched, so its GID constants must be restored for the sheet lookup by id
+            mock_repo_class.BASE_OPS_GID = 1488139834
+            mock_repo_class.OCORRENCIAS_GID = 1265473594
+
             response = self.client.get(reverse('admin_dashboard'))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, "Módulo PCP")
@@ -516,7 +519,9 @@ class ProductionTerminalTests(TestCase):
                 return MagicMock()
                 
             mock_repo._get_worksheet_by_id = mock_get_worksheet
-            
+            mock_repo_class.BASE_OPS_GID = 1488139834
+            mock_repo_class.OCORRENCIAS_GID = 1265473594
+
             response = self.client.get(reverse('admin_dashboard'))
             self.assertEqual(response.status_code, 200)
             self.assertIn('ocorrencias_json', response.context)
@@ -611,3 +616,160 @@ class ProductionTerminalTests(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertNotContains(response, 'data-tab="desempenho"')
             self.assertEqual(response.context['desempenho_json'], '[]')
+
+    def test_build_cards_records(self):
+        """Card records keep only the sector's machines and use the production day (06:00)."""
+        from producao.presentation.views import build_cards_records
+        raw = [
+            {'maquina': 'FW01', 'data': '30/06/2026', 'hora': '08:00:00', 'hora_hora': '1.200', 'novo_padrao': '1.500,00',
+             'aparas': '2,5', 'quantidade': '6.800', 'performance_h': '61%', 'performance_acm': '55%'},
+            # madrugada: pertence ao dia de produção anterior
+            {'maquina': 'FW01', 'data': '01/07/2026', 'hora': '03:00:00', 'hora_hora': '', 'novo_padrao': '-',
+             'aparas': '', 'quantidade': '', 'performance_h': '', 'performance_acm': ''},
+            {'maquina': 'OUTRA', 'data': '30/06/2026', 'hora': '08:00:00'},
+            {'maquina': 'FW01', 'data': '', 'hora': ''},
+        ]
+        records = build_cards_records(raw, {'FW01'})
+        self.assertEqual(len(records), 2)
+        self.assertEqual(records[0], {'m': 'FW01', 'pd': '2026-06-30', 'prod': 1200.0, 'esp': 1500.0, 'kg': 2.5,
+                                      'qtd': '6.800', 'pacm': 55, 'ph': 61})
+        self.assertEqual(records[1]['pd'], '2026-06-30')
+        self.assertEqual((records[1]['qtd'], records[1]['pacm'], records[1]['ph']), ('', None, None))
+
+    def test_sum_aparas_and_format(self):
+        """QTD APARA is the sum of every scrap value, shown pt-BR."""
+        from producao.presentation.views import sum_aparas, format_ptbr_number
+        self.assertEqual(sum_aparas([{'aparas': '0'}, {'aparas': '12,5'}, {'aparas': ''}, {'aparas': '1.000'}]), '1.012,5')
+        self.assertEqual(sum_aparas([]), '0')
+        self.assertEqual(format_ptbr_number(3.0), '3')
+        self.assertEqual(format_ptbr_number(0.126), '0,13')
+
+    @patch('producao.presentation.views.datetime')
+    def test_pcp_metrics_qtd_apara_is_day_sum(self, mock_datetime_class):
+        """pcp_metrics sums today's scrap for the machine and ignores rows before 06:00."""
+        from datetime import datetime, timezone, timedelta
+        tz_brazil = timezone(timedelta(hours=-3))
+        mock_datetime_class.now.return_value = datetime(2026, 6, 30, 12, 0, 0, tzinfo=tz_brazil)
+        mock_datetime_class.strptime.side_effect = lambda *args, **kwargs: datetime.strptime(*args, **kwargs)
+
+        rows = [
+            {'maquina': 'MAQ.01', 'data': '30/06/2026', 'hora': '05:59:00', 'aparas': '100'},  # dia anterior
+            {'maquina': 'MAQ.01', 'data': '30/06/2026', 'hora': '06:00:00', 'aparas': '0'},
+            {'maquina': 'MAQ.01', 'data': '30/06/2026', 'hora': '08:00:00', 'aparas': '2,5'},
+            {'maquina': 'MAQ.01', 'data': '30/06/2026', 'hora': '09:00:00', 'aparas': '4'},
+            {'maquina': 'MAQ.02', 'data': '30/06/2026', 'hora': '09:00:00', 'aparas': '50'},
+        ]
+        with patch('producao.presentation.views.GoogleSheetsProducaoRepository') as mock_repo_class:
+            mock_repo_class.return_value.list_apontamentos_raw.return_value = rows
+            response = self.client.get(reverse('pcp_metrics'), {'maquina': 'MAQ.01'})
+            self.assertEqual(response.json()['qtd_apara'], '6,5')
+
+    def _run_apontar(self, existing_rows, data, hora, **kwargs):
+        from producao.application.use_cases import ApontarProducaoUseCase
+        repo = MagicMock()
+        repo.list_apontamentos_raw.return_value = existing_rows
+        params = dict(op_id='1', cliente='C', descricao_produto='P', data=data, hora=hora,
+                      matricula='600', maquina='FW01', op_encerrada=False, quantidade=0)
+        params.update(kwargs)
+        return ApontarProducaoUseCase(repo).execute(**params)
+
+    def test_first_apontamento_of_day_is_saved_at_six(self):
+        """The machine's first appointment of the production day is stored at 06:00."""
+        ap = self._run_apontar([], '30/06/2026', '07:42:10', inicio=True)
+        self.assertEqual((ap.data, ap.hora), ('30/06/2026', '06:00:00'))
+
+        # Before 06:00 the production day is still the previous one
+        ap = self._run_apontar([], '01/07/2026', '03:15:00')
+        self.assertEqual((ap.data, ap.hora), ('30/06/2026', '06:00:00'))
+
+        # Rows of another machine or of the previous day don't count
+        previous = [
+            {'maquina': 'FW01', 'data': '29/06/2026', 'hora': '23:00:00'},
+            {'maquina': 'FW02', 'data': '30/06/2026', 'hora': '06:30:00'},
+        ]
+        ap = self._run_apontar(previous, '30/06/2026', '07:42:10')
+        self.assertEqual(ap.hora, '06:00:00')
+
+    def test_later_apontamentos_keep_real_time(self):
+        """Once the machine has a row in the production day, the real time is kept."""
+        existing = [{'maquina': 'FW01', 'data': '30/06/2026', 'hora': '06:00:00'}]
+        ap = self._run_apontar(existing, '30/06/2026', '08:10:00')
+        self.assertEqual((ap.data, ap.hora), ('30/06/2026', '08:10:00'))
+
+    def test_column_h_values(self):
+        """Column H: Início / Sim / Turno encerrado / Não (closing the OP wins over closing the shift)."""
+        existing = [{'maquina': 'FW01', 'data': '30/06/2026', 'hora': '06:00:00'}]
+        cases = [
+            ({'inicio': True}, 'Início'),
+            ({'op_encerrada': True}, 'Sim'),
+            ({'turno_encerrado': True}, 'Turno encerrado'),
+            ({'op_encerrada': True, 'turno_encerrado': True}, 'Sim'),
+            ({}, 'Não'),
+        ]
+        for kwargs, expected in cases:
+            ap = self._run_apontar(existing, '30/06/2026', '08:10:00', **kwargs)
+            self.assertEqual(ap.op_encerrada, expected, kwargs)
+
+    def test_apontamentos_api_turno_encerrado(self):
+        """The terminal's 'Encerrar turno' flag reaches column H."""
+        with patch('producao.presentation.views.GoogleSheetsProducaoRepository') as mock_repo_class:
+            mock_repo = mock_repo_class.return_value
+            payload = {
+                'op_id': '17711', 'cliente': 'C', 'descricao_produto': 'P', 'data': '26/06/2026',
+                'hora': '18:00:00', 'matricula': '123', 'maquina': 'MS1000.4', 'op_encerrada': False,
+                'turno_encerrado': True, 'quantidade': 10,
+            }
+            response = self.client.post(reverse('apontamentos'), data=json.dumps(payload), content_type='application/json')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(mock_repo.save_apontamento.call_args[0][0].op_encerrada, 'Turno encerrado')
+            # No earlier row for the machine that day: saved (and reported back) at 06:00
+            self.assertEqual((response.json()['data'], response.json()['hora']), ('26/06/2026', '06:00:00'))
+
+    def test_machine_with_turno_encerrado_is_ociosa(self):
+        """A machine whose last row closed the shift shows as Ociosa right away."""
+        from datetime import datetime, timedelta, timezone
+        now = datetime.now(timezone(timedelta(hours=-3))) - timedelta(minutes=5)
+        raw = [{
+            'op_id': '45646', 'cliente': 'Client A', 'descricao_produto': 'Saco',
+            'data': now.strftime('%d/%m/%Y'), 'hora': now.strftime('%H:%M:%S'), 'matricula': '600',
+            'maquina': 'MAQ.01', 'op_encerrada': 'Turno encerrado', 'quantidade': '10', 'aparas': '3',
+        }]
+        if now.hour < 6:
+            self.skipTest('Row would fall in the previous production day')
+        with patch('producao.presentation.views.GoogleSheetsProducaoRepository') as mock_repo_class:
+            self._mock_admin_repo(mock_repo_class, raw)
+            response = self.client.get(reverse('admin_dashboard'))
+            card = next(c for s in response.context['sections'] for c in s['cards'] if c['code'] == 'MAQ.01')
+            self.assertEqual(card['status'], 'Ociosa')
+            self.assertEqual(card['qtd_apara'], '3')
+
+    def test_save_ocorrencia_writes_matricula_in_column_m(self):
+        """The operator's matrícula goes to column M, leaving J:L untouched."""
+        from unittest.mock import call
+        from producao.infrastructure.repositories import GoogleSheetsProducaoRepository
+        from producao.domain.entities import Ocorrencia
+
+        repo = GoogleSheetsProducaoRepository()
+        mock_worksheet = MagicMock()
+        repo._get_worksheet_by_id = MagicMock(return_value=mock_worksheet)
+        mock_worksheet.col_values.return_value = ['OP', '101']
+
+        repo.save_ocorrencia(Ocorrencia(
+            op_id='1', cliente='C', descricao_produto='P', ocorrencia='Banheiro',
+            data_inicio='30/06/2026', hora_inicio='08:00:00', maquina='FW01', matricula='600'
+        ))
+        mock_worksheet.update.assert_has_calls([
+            call(values=[['1', 'C', 'P', 'Banheiro', '30/06/2026', '08:00:00', '', '', 'FW01']], range_name='A3:I3', raw=False),
+            call(values=[['600']], range_name='M3:M3', raw=False),
+        ])
+
+    def test_ocorrencias_api_passes_matricula(self):
+        with patch('producao.presentation.views.GoogleSheetsProducaoRepository') as mock_repo_class:
+            mock_repo = mock_repo_class.return_value
+            payload = {
+                'op_id': '1', 'cliente': 'C', 'descricao_produto': 'P', 'ocorrencia': 'Banheiro',
+                'data_inicio': '30/06/2026', 'hora_inicio': '08:00:00', 'maquina': 'FW01', 'matricula': '600',
+            }
+            response = self.client.post(reverse('ocorrencias'), data=json.dumps(payload), content_type='application/json')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(mock_repo.save_ocorrencia.call_args[0][0].matricula, '600')

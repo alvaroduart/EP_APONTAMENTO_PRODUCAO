@@ -14,6 +14,11 @@ class IProducaoRepository(ABC):
         pass
 
     @abstractmethod
+    def list_apontamentos_raw(self) -> List[dict]:
+        """Fetch all appointment rows as dicts (values as displayed in the sheet)."""
+        pass
+
+    @abstractmethod
     def save_apontamento(self, apontamento: Apontamento) -> None:
         """Register a new production appointment."""
         pass

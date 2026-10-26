@@ -18,6 +18,7 @@ class Ocorrencia:
     data_fim: Optional[str] = None  # DD/MM/YYYY
     hora_fim: Optional[str] = None  # HH:MM:SS
     maquina: Optional[str] = None
+    matricula: Optional[str] = None
 
 @dataclass
 class Apontamento:
@@ -28,7 +29,7 @@ class Apontamento:
     hora: str  # HH:MM:SS
     matricula: str
     maquina: str
-    op_encerrada: str  # "Sim" or "Não"
+    op_encerrada: str  # "Início", "Não", "Sim" or "Turno encerrado"
     quantidade: int
     aparas: float = 0.0
     ocorrencia_apara: str = ""
